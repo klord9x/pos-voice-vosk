@@ -141,8 +141,7 @@ body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
 .keyboard{
   flex:none;
   background:var(--border);
-  padding:1px 0 0;
-  /* ĐÃ XÓA: padding-bottom:env(safe-area-inset-bottom); */
+  padding:1px 0 env(safe-area-inset-bottom);
   border-top:1px solid var(--border);
   display:flex;
   flex-direction:column;
