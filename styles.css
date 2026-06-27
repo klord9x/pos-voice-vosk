@@ -1,8 +1,8 @@
 :root{--bg:#1B1B1B;--surface:#242424;--border:#333333;--text:#ECECEC;--muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;--success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;touch-action:manipulation;}
 html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;user-select:none;font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;}
 .app{height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;}
-.header{height:48px;flex:none;display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:4px;padding:0 8px;background:var(--surface);border-bottom:1px solid var(--border);}
+.header{height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);flex:none;display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:4px;padding-left:8px;padding-right:8px;background:var(--surface);border-bottom:1px solid var(--border);}
 .nav-btn{appearance:none;border:0;background:none;color:var(--text);font:inherit;width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;}
 .nav-btn:active{background:rgba(255,255,255,.08);}
 .nav-btn.primary{color:var(--primary);}
@@ -95,7 +95,7 @@ body[data-parser="pay"] .keyboard > #payChips{display:grid;grid-template-columns
 .chip.has-count{background:rgba(10,132,255,.1);}
 .chip .count{font-size:11px;color:var(--primary);font-weight:700;min-width:14px;text-align:center;}
 body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
-.keyboard{flex:none;background:var(--border);padding:1px 0 0;border-top:1px solid var(--border);display:flex;flex-direction:column;}
+.keyboard{flex:none;background:var(--border);padding:1px 0 0;padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--border);display:flex;flex-direction:column;}
 .keyboard > .panel{gap:1px;}
 .keyboard .row{display:flex;gap:1px;background:var(--border);}
 .keyboard .key{flex:1;height:40px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);font:inherit;font-size:16px;font-weight:600;border:0;cursor:pointer;}
@@ -118,6 +118,6 @@ body[data-parser="qty"] .keyboard .row.action-row{height:56px;}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-text{font-size:13px;color:var(--muted);}
-@media(min-width:768px){.app{max-width:680px;}.header{padding:0 16px;}.cart-row,.suggest .item,.hold-row{padding:0 16px;}.command{padding:0 16px;}.keyboard .key{height:46px;font-size:18px;}body[data-parser="qty"] .keyboard .key{height:64px;font-size:22px;}body[data-parser="qty"] .keyboard .row.action-row{height:64px;}body[data-parser="pay"] .keyboard .key{font-size:22px;}}
+@media(min-width:768px){.app{max-width:680px;}.header{padding-left:16px;padding-right:16px;}.cart-row,.suggest .item,.hold-row{padding:0 16px;}.command{padding:0 16px;}.keyboard .key{height:46px;font-size:18px;}body[data-parser="qty"] .keyboard .key{height:64px;font-size:22px;}body[data-parser="qty"] .keyboard .row.action-row{height:64px;}body[data-parser="pay"] .keyboard .key{font-size:22px;}}
 @media(max-height:700px){.cart{height:120px;}.keyboard .key{height:36px;font-size:14px;}body[data-parser="qty"] .keyboard .key{height:48px;font-size:18px;}body[data-parser="qty"] .keyboard .row.action-row{height:48px;}.change{height:80px;}.change .change-value{font-size:30px;}body[data-parser="pay"] .keyboard .key{font-size:18px;}}
 @media(max-height:600px){.cart{height:100px;}.keyboard .key{height:32px;font-size:13px;}body[data-parser="qty"] .keyboard .key{height:42px;font-size:16px;}body[data-parser="qty"] .keyboard .row.action-row{height:42px;}.change .change-value{font-size:26px;}body[data-parser="pay"] .keyboard .key{font-size:16px;}}
