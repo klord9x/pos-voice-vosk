@@ -141,18 +141,22 @@ body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
 .keyboard{
   flex:none;
   background:var(--border);
-  padding:1px 0 0;           /* chỉ giữ padding-top 1px */
-  /* ĐÃ XÓA: padding-bottom:env(safe-area-inset-bottom); */
+  padding:1px 0 0;
+  /* KHÔNG padding-bottom */
   border-top:1px solid var(--border);
   display:flex;
   flex-direction:column;
+  position:relative; /* thêm để ::after absolute nằm trong */
 }
+
 .keyboard::after{
   content:"";
-  display:block;
+  position:absolute;
+  left:0; right:0; bottom:0;
   height:env(safe-area-inset-bottom);
   background:var(--surface);
-  flex-shrink:0;
+  pointer-events:none; /* để bấm xuyên qua nếu có nút ở dưới */
+  z-index:0;
 }
 .keyboard > .panel{gap:1px;}
 .keyboard .row{display:flex;gap:1px;background:var(--border);}
