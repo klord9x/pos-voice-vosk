@@ -31,14 +31,6 @@ document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, fal
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
-(function(){
-  var lastTouchEnd = 0;
-  document.addEventListener('touchend', function(e){
-    var now = Date.now();
-    if (now - lastTouchEnd <= 350) e.preventDefault();
-    lastTouchEnd = now;
-  }, false);
-})();
 
 /* ===== PWA: register service worker ===== */
 if('serviceWorker' in navigator){
