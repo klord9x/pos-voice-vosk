@@ -10,11 +10,13 @@
 /* ===== iOS height fix ===== */
 html{
   height:100%;
+  min-height:100dvh;
   min-height:100vh;
-  min-height:-webkit-fill-available; /* iOS 12-14 fallback */
+  min-height:-webkit-fill-available;
 }
 body{
   height:100%;
+  min-height:100dvh;
   min-height:100vh;
   min-height:-webkit-fill-available;
   background:var(--bg);color:var(--text);overflow:hidden;
@@ -30,7 +32,6 @@ body{
   display:flex;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
 }
 
 /* ===== Header: bỏ padding-top riêng vì app đã lo safe-area ===== */
