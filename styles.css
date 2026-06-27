@@ -24,22 +24,19 @@ body{
 /* ===== App container: fixed inset để tràn viền thật sự ===== */
 .app{
   position:fixed;
-  top:0;left:0;right:0;bottom:0;
+  top:0; left:0; right:0; bottom:0;
   max-width:520px;
   margin:0 auto;
   display:flex;
   flex-direction:column;
-  /* Safe area: chỉ ở đây, KHÔNG để ở body */
+  /* CHỈ để padding-top cho notch, KHÔNG để padding-bottom */
   padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
-  padding-left:env(safe-area-inset-left);
-  padding-right:env(safe-area-inset-right);
 }
 
 /* ===== Header: bỏ padding-top riêng vì app đã lo safe-area ===== */
 .header{
-  height:48px; /* cố định, không cộng env() nữa */
-  flex:none;
+  height:48px; /* cố định, không cộng env() */
+  padding-top:0; /* bỏ vì .app đã lo safe-area */
   display:grid;
   grid-template-columns:40px 1fr auto auto;
   align-items:center;
@@ -145,7 +142,7 @@ body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
   flex:none;
   background:var(--border);
   padding:1px 0 0;
-  /* KHÔNG để padding-bottom ở đây nữa — app đã lo ở trên */
+  /* ĐÃ XÓA: padding-bottom:env(safe-area-inset-bottom); */
   border-top:1px solid var(--border);
   display:flex;
   flex-direction:column;
