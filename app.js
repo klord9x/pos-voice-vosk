@@ -1,6 +1,33 @@
 /* ===== API config (Cloudflare Pages frontend -> Apps Script JSON API backend) ===== */
 var API_URL = 'https://script.google.com/macros/s/AKfycbwk_Zm5bTDLw0BRhN0qQ0unrCWOcBxhjF9xcyMK83INbcwx4l4bi9YJuY7qh2OJzbfE/exec'; // .../exec
 
+/* ===== Chrome iOS: auto-hide address bar then lock scroll ===== */
+(function(){
+  var isChromeIOS = /CriOS/.test(navigator.userAgent);
+  if(!isChromeIOS) return;
+
+  var app = document.getElementById('app');
+  if(!app) return;
+
+  // Tạo spacer tạm ở cuối app để đảm bảo body có scroll
+  var spacer = document.createElement('div');
+  spacer.style.cssText = 'height:80px;flex-shrink:0;pointer-events:none;opacity:0;';
+  app.appendChild(spacer);
+
+  // Scroll xuống để kích hoạt Chrome ẩn address bar + toolbar
+  window.scrollTo(0, 80);
+
+  // Sau khi bar đã ẩn, xóa spacer và khóa scroll
+  setTimeout(function(){
+    spacer.remove();
+    document.body.classList.add('scroll-locked');
+    // Scroll về top để không cắt header (overflow:hidden đã ngăn Chrome hiện lại bar)
+    window.scrollTo(0, 0);
+    // Đảm bảo app phủ kín viewport mới (bar ẩn → dvh tăng)
+    app.style.minHeight = '100dvh';
+  }, 800);
+})();
+
 function apiCall(action, payload){
   if(!payload){
     // Simple GET, no preflight
