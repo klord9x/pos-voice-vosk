@@ -23,7 +23,7 @@
   -webkit-touch-callout:none!important;-webkit-user-select:none!important;
   user-select:none!important;touch-action:manipulation;}
 
-/* ===== Body scrollable lúc đầu ===== */
+/* ===== Body scrollable ban đầu ===== */
 html,body{
   height:auto;
   min-height:100%;
@@ -35,13 +35,13 @@ html,body{
   font-variant-numeric:tabular-nums;
 }
 
-/* ===== Welcome Section ===== */
+/* ===== Welcome: page dài, normal flow ===== */
 .welcome{
   position:relative;
-  z-index:300;
+  z-index:1;
   background:var(--bg);
 }
-.welcome-inner{
+.welcome-top{
   min-height:100dvh;
   display:flex;
   flex-direction:column;
@@ -54,30 +54,45 @@ html,body{
 .welcome-title{font-size:28px;font-weight:700;color:var(--text);margin-bottom:10px;}
 .welcome-hint{font-size:15px;color:var(--muted);margin-bottom:24px;}
 .welcome-arrow{font-size:36px;color:var(--primary);animation:bounce 1.4s infinite;}
-.welcome-spacer{
-  height:100px;
-  width:100%;
-}
-.welcome-footer{
-  text-align:center;
-  padding:20px;
-  color:var(--muted);
-  font-size:13px;
-}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
 
-/* ===== Main App: fixed, ẩn ban đầu ===== */
+.welcome-bottom{
+  min-height:60vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding-top:60px;
+  padding-bottom:env(safe-area-inset-bottom);
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.welcome-bottom .hint{font-size:16px;color:var(--muted);margin-bottom:16px;}
+.welcome-bottom .note{font-size:13px;color:var(--disabled);padding:0 20px;}
+
+/* ===== Main App: overlay, ẩn ban đầu ===== */
 .app{
   position:fixed;
   top:0;left:0;right:0;bottom:0;
+  z-index:400;
   max-width:520px;
   margin:0 auto;
-  display:none; /* ẩn ban đầu */
+  display:none;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
+  background:var(--bg);
 }
-.app.visible{
-  display:flex;
+.app.visible{display:flex;}
+
+/* ===== Scroll-locked body ===== */
+body.scroll-locked{
+  overflow:hidden !important;
+  touch-action:none !important;
+  overscroll-behavior:none !important;
+}
+body.scroll-locked .welcome{
+  /* Giữ welcome nhưng không cho scroll tới nó */
+  pointer-events:none;
 }
 
 /* ===== Header ===== */
@@ -213,19 +228,21 @@ body[data-parser="qty"] .keyboard .row.action-row{height:56px;}
 </head>
 <body data-parser="search">
 
-<!-- ===== WELCOME SECTION ===== -->
+<!-- ===== WELCOME SECTION: page dài, không bao giờ xóa ===== -->
 <div class="welcome" id="welcomeScreen">
-  <div class="welcome-inner">
+  <div class="welcome-top">
     <div class="welcome-logo">🎤</div>
     <div class="welcome-title">POS Giọng Nói</div>
     <div class="welcome-hint">Vuốt xuống để bắt đầu</div>
     <div class="welcome-arrow">↓</div>
   </div>
-  <div class="welcome-spacer"></div>
-  <div class="welcome-footer">Vuốt tiếp xuống dưới để vào màn hình bán hàng</div>
+  <div class="welcome-bottom">
+    <div class="hint">Nội dung tiếp theo...</div>
+    <div class="note">Nếu Chrome iOS ẩn được address bar, bạn sẽ thấy màn hình tràn viền. Tiếp tục vuốt xuống để vào màn hình bán hàng.</div>
+  </div>
 </div>
 
-<!-- ===== MAIN APP ===== -->
+<!-- ===== MAIN APP: overlay, ẩn ban đầu ===== -->
 <div class="app" id="app">
   <div class="loading" id="loadingScreen">
     <div class="spinner"></div>
