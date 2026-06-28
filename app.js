@@ -32,13 +32,12 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
+/* ===== Welcome -> App: chỉ khi bar ẩn mới hiện app, không toggle ngược ===== */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
   if (!app || !welcome) return;
 
-  // PWA standalone: hiện app ngay, không cần toggle
   var isStandalone = window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches ||
     window.matchMedia('(display-mode: fullscreen)').matches;
@@ -49,36 +48,21 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     return;
   }
 
-  var appVisible = false;
+  var revealed = false;
   var vv = window.visualViewport;
   var baselineHeight = vv ? vv.height : window.innerHeight;
 
-  function showApp(){
-    if (appVisible) return;
-    appVisible = true;
+  function revealApp(){
+    if (revealed) return;
+    revealed = true;
     app.classList.add('revealed');
     document.body.classList.add('app-locked');
     window.scrollTo(0, 0);
   }
 
-  function hideApp(){
-    if (!appVisible) return;
-    appVisible = false;
-    app.classList.remove('revealed');
-    document.body.classList.remove('app-locked');
-  }
-
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baselineHeight > 25;
-
-    if (barHidden && !appVisible) {
-      showApp();
-      return;
-    }
-    if (!barHidden && appVisible) {
-      hideApp();
-    }
+    if (current - baselineHeight > 25) revealApp();
   }
 
   if (vv) {
@@ -87,7 +71,7 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     window.addEventListener('resize', onViewportResize);
   }
 
-  // Nudge nhẹ sau load để kích hoạt Chrome ẩn bar
+  // Nudge nhẹ sau load
   window.addEventListener('load', function(){
     setTimeout(function(){
       window.scrollTo(0, 1);
@@ -95,11 +79,11 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     }, 150);
   });
 
-  // Fallback: scroll đến đáy welcome cũng vào app
+  // Fallback: scroll đến đáy cũng vào app
   window.addEventListener('scroll', function(){
-    if (appVisible) return;
+    if (revealed) return;
     var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
-    if (atBottom) showApp();
+    if (atBottom) revealApp();
   }, { passive: true });
 })();
 
