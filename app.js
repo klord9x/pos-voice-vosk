@@ -44,11 +44,20 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
   var dismissed = false;
 
   /* --- helpers --- */
-  // Chỉ block touchmove ở ngoài #app (welcome + spacer)
-  // KHÔNG block touchstart → tap/click trong app vẫn hoạt động bình thường
+  // Block touchmove toàn document để khóa scroll iOS hoàn toàn,
+  // NHƯNG miễn trừ nếu element đang chạm có internal scroll (cart, suggest...)
+  // → button tap vẫn hoạt động vì touchstart không bị block
   function preventScroll(e) {
-    if (app && app.contains(e.target)) return; // trong app → cho qua
-    e.preventDefault();
+    var el = e.target;
+    while (el && el !== document.documentElement) {
+      var style = window.getComputedStyle(el);
+      var oy = style.overflowY;
+      if ((oy === 'scroll' || oy === 'auto') && el.scrollHeight > el.clientHeight) {
+        return; // element này có scroll nội bộ → cho phép
+      }
+      el = el.parentElement;
+    }
+    e.preventDefault(); // không có scrollable ancestor → chặn scroll document
   }
 
   function lock() {
@@ -57,7 +66,6 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.body.style.overscrollBehavior = 'none';
-    // Chỉ block touchmove (scroll), KHÔNG block touchstart
     document.addEventListener('touchmove', preventScroll, { passive: false });
   }
 
@@ -69,6 +77,7 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
     document.body.style.overscrollBehavior = '';
     document.removeEventListener('touchmove', preventScroll);
   }
+
 
 
   function showApp() {
