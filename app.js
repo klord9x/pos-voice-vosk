@@ -1,5 +1,5 @@
 /* ===== API config (Cloudflare Pages frontend -> Apps Script JSON API backend) ===== */
-var API_URL = 'https://script.google.com/macros/s/AKfycbwk_Zm5bTDLw0BRhN0qQ0unrCWOcBxhjF9xcyMK83INbcwx4l4bi9YJuY7qh2OJzbfE/exec'; // .../exec
+var API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // .../exec
 
 function apiCall(action, payload){
   if(!payload){
@@ -32,110 +32,75 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome + Main same page: scroll to main, lock when bar hidden ===== */
+/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
 (function(){
-  var welcome = document.getElementById('welcomeScreen');
   var app = document.getElementById('app');
-  if(!welcome || !app) return;
+  var welcome = document.getElementById('welcomeScreen');
+  if (!app || !welcome) return;
 
+  // PWA standalone: hiện app ngay, không cần toggle
+  var isStandalone = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches;
+
+  if (isStandalone) {
+    document.body.classList.add('app-locked');
+    app.classList.add('revealed');
+    return;
+  }
+
+  var appVisible = false;
   var vv = window.visualViewport;
-  var baseline = vv ? vv.height : window.innerHeight;
-  var locked = false;
-  var mainTop = 0;
+  var baselineHeight = vv ? vv.height : window.innerHeight;
 
-  function preventScroll(e){ e.preventDefault(); }
-
-  function lock(){
-    document.documentElement.classList.add('scroll-locked');
-    document.body.classList.add('scroll-locked');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('touchmove', preventScroll, { passive: false });
-    document.addEventListener('touchstart', preventScroll, { passive: false });
+  function showApp(){
+    if (appVisible) return;
+    appVisible = true;
+    app.classList.add('revealed');
+    document.body.classList.add('app-locked');
+    window.scrollTo(0, 0);
   }
 
-  function unlock(){
-    document.documentElement.classList.remove('scroll-locked');
-    document.body.classList.remove('scroll-locked');
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    document.removeEventListener('touchmove', preventScroll);
-    document.removeEventListener('touchstart', preventScroll);
-  }
-
-  function snapToMain(){
-    // Scroll đến đúng top của main section
-    window.scrollTo(0, mainTop);
-    setTimeout(function(){
-      lock();
-      app.classList.add('visible');
-    }, 100);
+  function hideApp(){
+    if (!appVisible) return;
+    appVisible = false;
+    app.classList.remove('revealed');
+    document.body.classList.remove('app-locked');
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baseline > 25;
-    var scrollY = window.scrollY;
+    var barHidden = current - baselineHeight > 25;
 
-    if(!locked && barHidden && scrollY > mainTop - 100){
-      locked = true;
-      snapToMain();
+    if (barHidden && !appVisible) {
+      showApp();
       return;
     }
-
-    if(locked && !barHidden){
-      // Bar hiện lại → unlock cho user tự cuộn xuống lại
-      locked = false;
-      app.classList.remove('visible');
-      unlock();
+    if (!barHidden && appVisible) {
+      hideApp();
     }
   }
 
-  function onScroll(){
-    if(locked) return;
-    var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baseline > 25;
-    var scrollY = window.scrollY;
-
-    if(barHidden && scrollY > mainTop - 50){
-      locked = true;
-      snapToMain();
-    }
-  }
-
-  // Tính vị trí main section sau khi DOM ready
-  function calcMainTop(){
-    var mainSection = document.querySelector('.main-section');
-    if(mainSection){
-      mainTop = mainSection.offsetTop;
-    } else {
-      // Fallback: main ở 100dvh
-      mainTop = window.innerHeight;
-    }
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      calcMainTop();
-      if(vv) vv.addEventListener('resize', onViewportResize);
-      else window.addEventListener('resize', onViewportResize);
-      window.addEventListener('scroll', onScroll, { passive: true });
-    });
+  if (vv) {
+    vv.addEventListener('resize', onViewportResize);
   } else {
-    calcMainTop();
-    if(vv) vv.addEventListener('resize', onViewportResize);
-    else window.addEventListener('resize', onViewportResize);
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onViewportResize);
   }
 
-  // Fallback
-  setTimeout(function(){
-    var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 25 && window.scrollY > mainTop - 100){
-      locked = true;
-      snapToMain();
-    }
-  }, 500);
+  // Nudge nhẹ sau load để kích hoạt Chrome ẩn bar
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      window.scrollTo(0, 1);
+      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
+    }, 150);
+  });
+
+  // Fallback: scroll đến đáy welcome cũng vào app
+  window.addEventListener('scroll', function(){
+    if (appVisible) return;
+    var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
+    if (atBottom) showApp();
+  }, { passive: true });
 })();
 
 /* ===== PWA: register service worker ===== */

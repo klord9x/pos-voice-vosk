@@ -14,124 +14,240 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="/styles.css">
-<base target="_blank">
 </head>
 <body data-parser="search">
 
-<!-- ===== WELCOME SECTION: top 0 ===== -->
 <div class="welcome" id="welcomeScreen">
-  <div class="welcome-top">
-    <div class="welcome-logo">🎤</div>
-    <div class="welcome-title">POS Giọng Nói</div>
-    <div class="welcome-hint">Vuốt xuống để bắt đầu</div>
-    <div class="welcome-arrow">↓</div>
+  <div class="welcome-screen">
+    <div class="welcome-icon">⌄</div>
+    <div class="welcome-text">Kéo xuống để bắt đầu</div>
   </div>
+  <div class="welcome-spacer"></div>
 </div>
 
-<!-- ===== MAIN APP: top 100dvh ===== -->
-<div class="main-section" id="mainSection">
-  <div class="app" id="app">
-    <div class="loading" id="loadingScreen">
-      <div class="spinner"></div>
-      <div class="loading-text">Đang tải danh mục…</div>
+<div class="loading" id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="loading-text">Đang tải danh mục…</div>
+</div>
+
+<div class="app" id="app">
+  <!-- HEADER -->
+  <header class="header" id="headerArea">
+    <button class="nav-btn" id="holdPrev" onclick="onHoldPrev(event)">◀</button>
+    <div class="header-center" id="orderLabel" onclick="onHeaderTap()">
+      <div class="header-count">0 món</div>
+      <div class="header-total">0</div>
     </div>
+    <button class="nav-btn" id="holdNext" onclick="onHoldNext(event)">▶</button>
+    <button class="nav-btn primary" id="newOrderBtn" onclick="onHoldAction(event)">＋</button>
+  </header>
 
-    <header class="header" id="headerArea">
-      <button class="nav-btn" id="holdPrev" onclick="onHoldPrev(event)">◀</button>
-      <div class="header-center" id="orderLabel" onclick="onHeaderTap()">
-        <div class="header-count">0 món</div>
-        <div class="header-total">0</div>
+  <!-- CART -->
+  <aside class="cart" id="cartRegion">
+    <div id="cartItems"></div>
+    <div id="holdList"></div>
+    <div class="cart-empty-msg" id="cartEmpty" style="display:none">0 món</div>
+  </aside>
+
+  <!-- UNDO BAR - removed, replaced by ghost row in cart -->
+
+  <!-- WORKSPACE -->
+  <main class="workspace" id="workspace">
+
+    <!-- COMMAND -->
+    <section class="command" id="commandArea" onclick="onCommandTap()">
+      <span class="prompt">&gt;</span>
+      <span class="input" id="filterText">
+        <span id="filterContent"></span>
+        <span class="caret" id="caret"></span>
+      </span>
+    </section>
+
+    <!-- CONTENT -->
+    <section class="content" id="contentArea">
+
+      <!-- SEARCH: Suggestion / Recent List -->
+      <div class="panel suggest" id="suggestArea" data-parser="search">
+        <div class="item" id="suggest0" onclick="onSuggestionTap(0)">
+          <span class="indicator"></span>
+          <span class="name" id="s0name">-</span>
+          <span class="price" id="s0price">-</span>
+        </div>
+        <div class="item" id="suggest1" onclick="onSuggestionTap(1)">
+          <span class="indicator"></span>
+          <span class="name" id="s1name">-</span>
+          <span class="price" id="s1price">-</span>
+        </div>
+        <div class="item" id="suggest2" onclick="onSuggestionTap(2)">
+          <span class="indicator"></span>
+          <span class="name" id="s2name">-</span>
+          <span class="price" id="s2price">-</span>
+        </div>
+        <div class="item" id="suggest3" onclick="onSuggestionTap(3)">
+          <span class="indicator"></span>
+          <span class="name" id="s3name">-</span>
+          <span class="price" id="s3price">-</span>
+        </div>
+        <div class="item" id="suggest4" onclick="onSuggestionTap(4)">
+          <span class="indicator"></span>
+          <span class="name" id="s4name">-</span>
+          <span class="price" id="s4price">-</span>
+        </div>
+        <div class="item" id="suggest5" onclick="onSuggestionTap(5)">
+          <span class="indicator"></span>
+          <span class="name" id="s5name">-</span>
+          <span class="price" id="s5price">-</span>
+        </div>
+        <div class="item" id="suggest6" onclick="onSuggestionTap(6)">
+          <span class="indicator"></span>
+          <span class="name" id="s6name">-</span>
+          <span class="price" id="s6price">-</span>
+        </div>
+        <div class="item" id="suggest7" onclick="onSuggestionTap(7)">
+          <span class="indicator"></span>
+          <span class="name" id="s7name">-</span>
+          <span class="price" id="s7price">-</span>
+        </div>
+
       </div>
-      <button class="nav-btn" id="holdNext" onclick="onHoldNext(event)">▶</button>
-      <button class="nav-btn primary" id="newOrderBtn" onclick="onHoldAction(event)">＋</button>
-    </header>
 
-    <aside class="cart" id="cartRegion">
-      <div id="cartItems"></div>
-      <div id="holdList"></div>
-      <div class="cart-empty-msg" id="cartEmpty" style="display:none">0 món</div>
-    </aside>
+      <!-- PAY: Change + Cash Counter -->
+      <div class="panel change" id="payChangeArea" data-parser="pay">
+        <div class="change-label">Tiền thối</div>
+        <div class="change-value" id="payChange">0</div>
+      </div>
+    </section>
 
-    <main class="workspace" id="workspace">
-      <section class="command" id="commandArea" onclick="onCommandTap()">
-        <span class="prompt">&gt;</span>
-        <span class="input" id="filterText">
-          <span id="filterContent"></span>
-          <span class="caret" id="caret"></span>
-        </span>
-      </section>
+    <!-- KEYBOARD -->
+    <section class="keyboard" id="keyboardRegion">
 
-      <section class="content" id="contentArea">
-        <div class="panel suggest" id="suggestArea" data-parser="search">
-          <div class="item" id="suggest0" onclick="onSuggestionTap(0)"><span class="indicator"></span><span class="name" id="s0name">-</span><span class="price" id="s0price">-</span></div>
-          <div class="item" id="suggest1" onclick="onSuggestionTap(1)"><span class="indicator"></span><span class="name" id="s1name">-</span><span class="price" id="s1price">-</span></div>
-          <div class="item" id="suggest2" onclick="onSuggestionTap(2)"><span class="indicator"></span><span class="name" id="s2name">-</span><span class="price" id="s2price">-</span></div>
-          <div class="item" id="suggest3" onclick="onSuggestionTap(3)"><span class="indicator"></span><span class="name" id="s3name">-</span><span class="price" id="s3price">-</span></div>
-          <div class="item" id="suggest4" onclick="onSuggestionTap(4)"><span class="indicator"></span><span class="name" id="s4name">-</span><span class="price" id="s4price">-</span></div>
-          <div class="item" id="suggest5" onclick="onSuggestionTap(5)"><span class="indicator"></span><span class="name" id="s5name">-</span><span class="price" id="s5price">-</span></div>
-          <div class="item" id="suggest6" onclick="onSuggestionTap(6)"><span class="indicator"></span><span class="name" id="s6name">-</span><span class="price" id="s6price">-</span></div>
-          <div class="item" id="suggest7" onclick="onSuggestionTap(7)"><span class="indicator"></span><span class="name" id="s7name">-</span><span class="price" id="s7price">-</span></div>
+      <!-- QTY: Quick Quantity Grid -->
+      <div class="panel quick-qty" id="quickQtyArea" data-parser="qty">
+        <div class="qgrid">
+          <button class="qq" onclick="onQuickQty(2)">2</button>
+          <button class="qq" onclick="onQuickQty(5)">5</button>
+          <button class="qq" onclick="onQuickQty(10)">10</button>
+          <button class="qq" onclick="onQuickQty(15)">15</button>
+          <button class="qq" onclick="onQuickQty(20)">20</button>
+          <button class="qq" onclick="onQuickQty(30)">30</button>
         </div>
-        <div class="panel change" id="payChangeArea" data-parser="pay">
-          <div class="change-label">Tiền thối</div>
-          <div class="change-value" id="payChange">0</div>
-        </div>
-      </section>
+      </div>
 
-      <section class="keyboard" id="keyboardRegion">
-        <div class="panel quick-qty" id="quickQtyArea" data-parser="qty">
-          <div class="qgrid">
-            <button class="qq" onclick="onQuickQty(2)">2</button>
-            <button class="qq" onclick="onQuickQty(5)">5</button>
-            <button class="qq" onclick="onQuickQty(10)">10</button>
-            <button class="qq" onclick="onQuickQty(15)">15</button>
-            <button class="qq" onclick="onQuickQty(20)">20</button>
-            <button class="qq" onclick="onQuickQty(30)">30</button>
-          </div>
+      <!-- SEARCH Keyboard -->
+      <div class="panel" id="kbSearch" data-parser="search">
+        <div class="row nums">
+          <button class="key" onclick="onSearchKey('1')">1</button>
+          <button class="key" onclick="onSearchKey('2')">2</button>
+          <button class="key" onclick="onSearchKey('3')">3</button>
+          <button class="key" onclick="onSearchKey('4')">4</button>
+          <button class="key" onclick="onSearchKey('5')">5</button>
+          <button class="key" onclick="onSearchKey('6')">6</button>
+          <button class="key" onclick="onSearchKey('7')">7</button>
+          <button class="key" onclick="onSearchKey('8')">8</button>
+          <button class="key" onclick="onSearchKey('9')">9</button>
+          <button class="key" onclick="onSearchKey('0')">0</button>
+          <button class="key" onclick="onSearchKey('.')">.</button>
         </div>
+        <div class="row qwerty">
+          <button class="key" onclick="onSearchKey('Q')">Q</button>
+          <button class="key" onclick="onSearchKey('W')">W</button>
+          <button class="key" onclick="onSearchKey('E')">E</button>
+          <button class="key" onclick="onSearchKey('R')">R</button>
+          <button class="key" onclick="onSearchKey('T')">T</button>
+          <button class="key" onclick="onSearchKey('Y')">Y</button>
+          <button class="key" onclick="onSearchKey('U')">U</button>
+          <button class="key" onclick="onSearchKey('I')">I</button>
+          <button class="key" onclick="onSearchKey('O')">O</button>
+          <button class="key" onclick="onSearchKey('P')">P</button>
+        </div>
+        <div class="row asdf">
+          <span class="spacer"></span>
+          <button class="key" onclick="onSearchKey('A')">A</button>
+          <button class="key" onclick="onSearchKey('S')">S</button>
+          <button class="key" onclick="onSearchKey('D')">D</button>
+          <button class="key" onclick="onSearchKey('F')">F</button>
+          <button class="key" onclick="onSearchKey('G')">G</button>
+          <button class="key" onclick="onSearchKey('H')">H</button>
+          <button class="key" onclick="onSearchKey('J')">J</button>
+          <button class="key" onclick="onSearchKey('K')">K</button>
+          <button class="key" onclick="onSearchKey('L')">L</button>
+          <span class="spacer"></span>
+        </div>
+        <div class="row zxcv">
+          <button class="key wide" onclick="onBackspace()">⌫</button>
+          <button class="key" onclick="onSearchKey('Z')">Z</button>
+          <button class="key" onclick="onSearchKey('X')">X</button>
+          <button class="key" onclick="onSearchKey('C')">C</button>
+          <button class="key" onclick="onSearchKey('V')">V</button>
+          <button class="key" onclick="onSearchKey('B')">B</button>
+          <button class="key" onclick="onSearchKey('N')">N</button>
+          <button class="key" onclick="onSearchKey('M')">M</button>
+          <button class="key wide primary" onclick="onEnterKey()">↵</button>
+        </div>
+      </div>
 
-        <div class="panel" id="kbSearch" data-parser="search">
-          <div class="row nums">
-            <button class="key" onclick="onSearchKey('1')">1</button><button class="key" onclick="onSearchKey('2')">2</button><button class="key" onclick="onSearchKey('3')">3</button><button class="key" onclick="onSearchKey('4')">4</button><button class="key" onclick="onSearchKey('5')">5</button><button class="key" onclick="onSearchKey('6')">6</button><button class="key" onclick="onSearchKey('7')">7</button><button class="key" onclick="onSearchKey('8')">8</button><button class="key" onclick="onSearchKey('9')">9</button><button class="key" onclick="onSearchKey('0')">0</button><button class="key" onclick="onSearchKey('.')">.</button>
-          </div>
-          <div class="row qwerty">
-            <button class="key" onclick="onSearchKey('Q')">Q</button><button class="key" onclick="onSearchKey('W')">W</button><button class="key" onclick="onSearchKey('E')">E</button><button class="key" onclick="onSearchKey('R')">R</button><button class="key" onclick="onSearchKey('T')">T</button><button class="key" onclick="onSearchKey('Y')">Y</button><button class="key" onclick="onSearchKey('U')">U</button><button class="key" onclick="onSearchKey('I')">I</button><button class="key" onclick="onSearchKey('O')">O</button><button class="key" onclick="onSearchKey('P')">P</button>
-          </div>
-          <div class="row asdf">
-            <span class="spacer"></span>
-            <button class="key" onclick="onSearchKey('A')">A</button><button class="key" onclick="onSearchKey('S')">S</button><button class="key" onclick="onSearchKey('D')">D</button><button class="key" onclick="onSearchKey('F')">F</button><button class="key" onclick="onSearchKey('G')">G</button><button class="key" onclick="onSearchKey('H')">H</button><button class="key" onclick="onSearchKey('J')">J</button><button class="key" onclick="onSearchKey('K')">K</button><button class="key" onclick="onSearchKey('L')">L</button>
-            <span class="spacer"></span>
-          </div>
-          <div class="row zxcv">
-            <button class="key wide" onclick="onBackspace()">⌫</button>
-            <button class="key" onclick="onSearchKey('Z')">Z</button><button class="key" onclick="onSearchKey('X')">X</button><button class="key" onclick="onSearchKey('C')">C</button><button class="key" onclick="onSearchKey('V')">V</button><button class="key" onclick="onSearchKey('B')">B</button><button class="key" onclick="onSearchKey('N')">N</button><button class="key" onclick="onSearchKey('M')">M</button>
-            <button class="key wide primary" onclick="onEnterKey()">↵</button>
-          </div>
+      <!-- QTY Keyboard -->
+      <div class="panel" id="kbQty" data-parser="qty">
+        <div class="row">
+          <button class="key" onclick="onNumpadKey('7')">7</button>
+          <button class="key" onclick="onNumpadKey('8')">8</button>
+          <button class="key" onclick="onNumpadKey('9')">9</button>
         </div>
+        <div class="row">
+          <button class="key" onclick="onNumpadKey('4')">4</button>
+          <button class="key" onclick="onNumpadKey('5')">5</button>
+          <button class="key" onclick="onNumpadKey('6')">6</button>
+        </div>
+        <div class="row">
+          <button class="key" onclick="onNumpadKey('1')">1</button>
+          <button class="key" onclick="onNumpadKey('2')">2</button>
+          <button class="key" onclick="onNumpadKey('3')">3</button>
+        </div>
+        <div class="row">
+          <button class="key" onclick="onNumpadKey('.')">.</button>
+          <button class="key" onclick="onNumpadKey('0')">0</button>
+          <button class="key" onclick="onNumpadKey('del')">⌫</button>
+        </div>
+        <div class="row action-row">
+          <button class="key clear" onclick="onQtyClear()">Hủy</button>
+          <button class="key wide primary" onclick="onEnterKey()">↵</button>
+        </div>
+      </div>
 
-        <div class="panel" id="kbQty" data-parser="qty">
-          <div class="row"><button class="key" onclick="onNumpadKey('7')">7</button><button class="key" onclick="onNumpadKey('8')">8</button><button class="key" onclick="onNumpadKey('9')">9</button></div>
-          <div class="row"><button class="key" onclick="onNumpadKey('4')">4</button><button class="key" onclick="onNumpadKey('5')">5</button><button class="key" onclick="onNumpadKey('6')">6</button></div>
-          <div class="row"><button class="key" onclick="onNumpadKey('1')">1</button><button class="key" onclick="onNumpadKey('2')">2</button><button class="key" onclick="onNumpadKey('3')">3</button></div>
-          <div class="row"><button class="key" onclick="onNumpadKey('.')">.</button><button class="key" onclick="onNumpadKey('0')">0</button><button class="key" onclick="onNumpadKey('del')">⌫</button></div>
-          <div class="row action-row"><button class="key clear" onclick="onQtyClear()">Hủy</button><button class="key wide primary" onclick="onEnterKey()">↵</button></div>
+      <div class="panel counter" id="payChips" data-parser="pay"></div>
+      <!-- PAY Keyboard -->
+      <div class="panel" id="kbPay" data-parser="pay">
+        <div class="row">
+          <button class="key" onclick="onPayKey('7')">7</button>
+          <button class="key" onclick="onPayKey('8')">8</button>
+          <button class="key" onclick="onPayKey('9')">9</button>
         </div>
+        <div class="row">
+          <button class="key" onclick="onPayKey('4')">4</button>
+          <button class="key" onclick="onPayKey('5')">5</button>
+          <button class="key" onclick="onPayKey('6')">6</button>
+        </div>
+        <div class="row">
+          <button class="key" onclick="onPayKey('1')">1</button>
+          <button class="key" onclick="onPayKey('2')">2</button>
+          <button class="key" onclick="onPayKey('3')">3</button>
+        </div>
+        <div class="row">
+          <button class="key" onclick="onPay500()">+500</button>
+          <button class="key" onclick="onPayKey('0')">0</button>
+          <button class="key" onclick="onPayBackspace()">⌫</button>
+        </div>
+        <div class="row action-row">
+          <button class="key" onclick="onExactCash()">Đủ tiền</button>
+          <button class="key primary" onclick="onEnterKey()">↵</button>
+        </div>
+      </div>
 
-        <div class="panel counter" id="payChips" data-parser="pay"></div>
-        <div class="panel" id="kbPay" data-parser="pay">
-          <div class="row"><button class="key" onclick="onPayKey('7')">7</button><button class="key" onclick="onPayKey('8')">8</button><button class="key" onclick="onPayKey('9')">9</button></div>
-          <div class="row"><button class="key" onclick="onPayKey('4')">4</button><button class="key" onclick="onPayKey('5')">5</button><button class="key" onclick="onPayKey('6')">6</button></div>
-          <div class="row"><button class="key" onclick="onPayKey('1')">1</button><button class="key" onclick="onPayKey('2')">2</button><button class="key" onclick="onPayKey('3')">3</button></div>
-          <div class="row"><button class="key" onclick="onPay500()">+500</button><button class="key" onclick="onPayKey('0')">0</button><button class="key" onclick="onPayBackspace()">⌫</button></div>
-          <div class="row action-row"><button class="key" onclick="onExactCash()">Đủ tiền</button><button class="key primary" onclick="onEnterKey()">↵</button></div>
-        </div>
-      </section>
-    </main>
-  </div>
+    </section>
+  </main>
 </div>
 
-<!-- Spacer để tạo scroll cho body -->
-<div class="page-spacer"></div>
+
 
 <script src="/app.js"></script>
 </body>
