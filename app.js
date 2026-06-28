@@ -32,8 +32,10 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome screen (scrollable, normal flow) -> chờ user kéo xuống hoặc Chrome tự ẩn bar -> reveal #app (fixed) =====
-   PWA standalone (đã add Home Screen) thì bỏ qua hẳn, dùng safe-area như cũ. */
+/* ===== Welcome mechanism: detect Chrome bar hiện/ẩn giống test-welcome.html =====
+   - Khi bar ẩn + scroll đủ xa → reveal app + lock scroll
+   - Khi bar hiện lại → unlock cho user tự cuộn tiếp
+   - PWA standalone bỏ qua luôn. */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
@@ -44,50 +46,72 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     window.matchMedia('(display-mode: fullscreen)').matches;
 
   if (isStandalone) {
-    document.body.classList.add('app-locked');
     app.classList.add('revealed');
+    document.body.classList.add('app-locked');
     return;
   }
 
+  var locked = false;
   var revealed = false;
   var vv = window.visualViewport;
-  var baselineHeight = vv ? vv.height : window.innerHeight;
+  var baseline = vv ? vv.height : window.innerHeight;
 
   function revealApp(){
     if (revealed) return;
     revealed = true;
     app.classList.add('revealed');
     document.body.classList.add('app-locked');
-    window.scrollTo(0, 0);
+    window.scrollTo(0, window.innerHeight);
+  }
+
+  function lockPage(){
+    document.documentElement.classList.add('locked');
+    document.body.classList.add('locked');
+  }
+
+  function unlockPage(){
+    document.documentElement.classList.remove('locked');
+    document.body.classList.remove('locked');
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    // Chrome ẩn bar xong -> visualViewport cao thêm hẳn so với lúc đầu
-    if (current - baselineHeight > 30) revealApp();
+    var barHidden = current - baseline > 30;
+
+    if (!locked && barHidden && window.scrollY > 50) {
+      locked = true;
+      revealApp();
+      setTimeout(lockPage, 100);
+      return;
+    }
+
+    if (locked && !barHidden) {
+      locked = false;
+      unlockPage();
+    }
   }
 
-  if (vv) {
-    vv.addEventListener('resize', onViewportResize);
-  } else {
-    window.addEventListener('resize', onViewportResize);
-  }
-
-  // Vẫn tự thử nudge nhẹ sau khi load, để không bắt buộc user phải tự kéo tay
-  window.addEventListener('load', function(){
-    setTimeout(function(){
-      window.scrollTo(0, 1);
-      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
-    }, 150);
-  });
-
-  // Fallback: nếu user tự kéo hết welcome-spacer (chạm đáy scroll) mà bar vẫn chưa ẩn được
-  // (vd Safari không có cơ chế này) thì vẫn cho vào app luôn, không bắt chờ vô thời hạn.
-  window.addEventListener('scroll', function(){
-    if (revealed) return;
+  function onScroll(){
+    if (locked) return;
+    var current = vv ? vv.height : window.innerHeight;
+    if (current - baseline > 30 && window.scrollY > window.innerHeight * 0.6) {
+      locked = true;
+      revealApp();
+      setTimeout(lockPage, 100);
+      return;
+    }
+    // Fallback: scroll đến đáy document
     var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
-    if (atBottom) revealApp();
-  }, { passive: true });
+    if (atBottom) {
+      locked = true;
+      revealApp();
+      setTimeout(lockPage, 100);
+    }
+  }
+
+  if (vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
+  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 
 /* ===== PWA: register service worker ===== */

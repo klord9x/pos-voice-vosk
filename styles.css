@@ -9,8 +9,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);user-select:none;fo
 @keyframes welcomeBounce{0%,100%{transform:translateY(0);opacity:.5;}50%{transform:translateY(10px);opacity:1;}}
 .welcome-text{font-size:14px;}
 .welcome-spacer{height:100px;}
-body.app-locked{overflow:hidden;}
+body.app-locked{overflow:hidden!important;touch-action:none;}
 body.app-locked .welcome{display:none;}
+html.locked,body.locked{overflow:hidden!important;touch-action:none!important;overscroll-behavior:none!important;}
 .header{height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);flex:none;display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:4px;padding-left:8px;padding-right:8px;background:var(--surface);border-bottom:1px solid var(--border);}
 .nav-btn{appearance:none;border:0;background:none;color:var(--text);font:inherit;width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;}
 .nav-btn:active{background:rgba(255,255,255,.08);}
@@ -104,7 +105,7 @@ body[data-parser="pay"] .keyboard > #payChips{display:grid;grid-template-columns
 .chip.has-count{background:rgba(10,132,255,.1);}
 .chip .count{font-size:11px;color:var(--primary);font-weight:700;min-width:14px;text-align:center;}
 body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
-.keyboard{flex:none;background:var(--border);padding:1px 0 0;padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--border);display:flex;flex-direction:column;}
+.keyboard{flex:none;background:var(--border);padding:1px 0 0;border-top:1px solid var(--border);display:flex;flex-direction:column;}
 .keyboard > .panel{gap:1px;}
 .keyboard .row{display:flex;gap:1px;background:var(--border);}
 .keyboard .key{flex:1;height:40px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);font:inherit;font-size:16px;font-weight:600;border:0;cursor:pointer;}
