@@ -32,6 +32,55 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
+/* ===== Ẩn toolbar trên/dưới Chrome iOS (chỉ áp dụng khi mở bằng tab browser thường, KHÔNG áp dụng khi đã chạy như PWA standalone — case đó đã xử lý bằng safe-area trong CSS) ===== */
+(function(){
+  var isStandalone = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches;
+  if (isStandalone) return;
+
+  var app = document.getElementById('app');
+
+  function forceScrollNudge(){
+    // .app vốn overflow:hidden nên không có gì để cuộn — tạm tạo dư khoảng để cuộn được 1px,
+    // đủ để Chrome hiểu là "người dùng đang cuộn" và tự thu gọn toolbar.
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.body.style.height = (window.innerHeight + 50) + 'px';
+    window.scrollTo(0, 1);
+  }
+
+  function lockExpandedHeight(){
+    var h = window.innerHeight;
+    document.documentElement.style.height = h + 'px';
+    document.body.style.height = h + 'px';
+    if (app) app.style.height = h + 'px';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+  }
+
+  function tryCollapseAndLock(){
+    forceScrollNudge();
+    setTimeout(function(){
+      window.scrollTo(0, 1); // nudge lần 2 — vài bản Chrome iOS cần 2 lần mới chịu ẩn bar
+      setTimeout(lockExpandedHeight, 300);
+    }, 100);
+  }
+
+  window.addEventListener('load', function(){
+    setTimeout(tryCollapseAndLock, 50);
+  });
+
+  // Xoay màn hình → viewport đổi kích thước → phải đo và khoá lại từ đầu
+  window.addEventListener('orientationchange', function(){
+    if (app) app.style.height = '';
+    document.documentElement.style.height = '';
+    document.body.style.height = '';
+    setTimeout(tryCollapseAndLock, 300);
+  });
+})();
+
 /* ===== PWA: register service worker ===== */
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
