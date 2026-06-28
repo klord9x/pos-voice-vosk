@@ -26,6 +26,8 @@ body{overflow:hidden;}
 .cart-row .name.strikethrough{text-decoration:line-through;}
 .cart-row .name{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cart-row .qty{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;margin-right:8px;}
+.cart-row .qty .qty-add{color:var(--primary);font-weight:700;}
+.cart-row .qty .qty-base{color:var(--muted);}
 .cart-row .price{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;}
 .hold-row{height:40px;display:grid;grid-template-columns:16px 1fr auto;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);cursor:pointer;}
 .hold-row:last-child{border-bottom:none;}

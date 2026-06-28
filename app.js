@@ -51,6 +51,7 @@ function fmtCompact(n){
   return n%1===0?String(n):n.toFixed(1).replace(/\.0$/,'');
 }
 function vibrate(){if(navigator.vibrate)navigator.vibrate(12);}
+function fmtQty(n,u){return(u==='kg'||u==='ký')?fmtCompact(n)+'kg':'×'+fmtCompact(n);}
 
 var PRODUCTS = [];
 var ITEMS = [];
@@ -419,7 +420,17 @@ function renderCart(){
     var item = ITEMS[i];
     var prod = item.top3[item.selectedIdx].product;
     var isActive = !item._deleted && i === EDIT_IDX;
-    var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
+    var qtyStr;
+    if(item._feedbackAdded){
+      var prevQty = item.qty - item._feedbackAdded;
+      if(prevQty > 0){
+        qtyStr = '<span class="qty-base">'+fmtQty(prevQty, item.unit)+'</span> <span class="qty-add">+'+fmtCompact(item._feedbackAdded)+'</span>';
+      } else {
+        qtyStr = '<span class="qty-add">+'+fmtCompact(item._feedbackAdded)+'</span>';
+      }
+    } else {
+      qtyStr = fmtQty(item.qty, item.unit);
+    }
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
     html += '<span class="name'+(item._deleted?' strikethrough':'')+'">'+prod.name+'</span>';
@@ -496,10 +507,17 @@ function addToCartDirect(product, qty, unit){
   SALES_HISTORY.unshift({code: product.code, name: product.name, timestamp: Date.now()});
   if(SALES_HISTORY.length > 50) SALES_HISTORY.length = 50;
   EDIT_IDX = hlIdx;
+  ITEMS[hlIdx]._feedbackAdded = qty;
   renderCart();
   updateTotal();
   var el = document.querySelector('#cartItems .cart-row.active');
   if(el) el.scrollIntoView({block:'nearest'});
+  var item = ITEMS[hlIdx];
+  setTimeout(function(){
+    item._feedbackAdded = null;
+    renderCart();
+    updateTotal();
+  }, 200);
 }
 
 function deleteCartItem(idx){
