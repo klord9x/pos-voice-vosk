@@ -16,28 +16,27 @@
 <link rel="stylesheet" href="/styles.css">
 <base target="_blank">
 </head>
-<body data-parser="search">
+<body>
 
-<!-- ===== WELCOME SCREEN: hiện khi bar hiện, ẩn khi bar ẩn ===== -->
+<!-- WELCOME: normal flow, body scrollable -->
 <div class="welcome" id="welcomeScreen">
-  <div class="welcome-top">
+  <div class="welcome-inner">
     <div class="welcome-logo">🎤</div>
     <div class="welcome-title">POS Giọng Nói</div>
-    <div class="welcome-hint">Vuốt xuống để mở ứng dụng</div>
+    <div class="welcome-hint">Vuốt xuống để bắt đầu</div>
     <div class="welcome-arrow">↓</div>
   </div>
-  <div class="welcome-bottom">
-    <div class="welcome-msg">Cuộn xuống để ẩn thanh địa chỉ<br>và mở màn hình bán hàng</div>
-  </div>
+  <div class="welcome-spacer"></div>
 </div>
 
-<!-- ===== MAIN APP: ẩn khi bar hiện, hiện khi bar ẩn ===== -->
-<div class="app" id="app">
+<!-- APP: fixed, ẩn ban đầu -->
+<div class="app" id="app" style="display:none">
   <div class="loading" id="loadingScreen">
     <div class="spinner"></div>
     <div class="loading-text">Đang tải danh mục…</div>
   </div>
 
+  <!-- HEADER -->
   <header class="header" id="headerArea">
     <button class="nav-btn" id="holdPrev" onclick="onHoldPrev(event)">◀</button>
     <div class="header-center" id="orderLabel" onclick="onHeaderTap()">
@@ -48,12 +47,14 @@
     <button class="nav-btn primary" id="newOrderBtn" onclick="onHoldAction(event)">＋</button>
   </header>
 
+  <!-- CART -->
   <aside class="cart" id="cartRegion">
     <div id="cartItems"></div>
     <div id="holdList"></div>
     <div class="cart-empty-msg" id="cartEmpty" style="display:none">0 món</div>
   </aside>
 
+  <!-- WORKSPACE -->
   <main class="workspace" id="workspace">
     <section class="command" id="commandArea" onclick="onCommandTap()">
       <span class="prompt">&gt;</span>
