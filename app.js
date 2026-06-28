@@ -32,7 +32,7 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome ↔ App: phát hiện bar ẩn/hiện qua nhiều cơ chế ===== */
+/* ===== 2 sections liền kề: snap to main khi bar ẩn, snap to welcome khi bar hiện ===== */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
@@ -48,81 +48,85 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     return;
   }
 
-  var appVisible = false;
   var vv = window.visualViewport;
   var baselineHeight = vv ? vv.height : window.innerHeight;
-  var screenHeight = window.screen.height;
-  var lastViewport = baselineHeight;
+  var mainTop = 0;
+  var locked = false;
 
-  function showApp(){
-    if (appVisible) return;
-    appVisible = true;
-    app.classList.add('revealed');
+  function lock(){
+    locked = true;
     document.body.classList.add('app-locked');
-    window.scrollTo(0, 0);
   }
 
-  function hideApp(){
-    if (!appVisible) return;
-    appVisible = false;
-    app.classList.remove('revealed');
+  function unlock(){
+    locked = false;
     document.body.classList.remove('app-locked');
   }
 
-  function checkBarState(){
+  function snapToMain(){
+    if (!locked) lock();
+    app.classList.add('revealed');
+    window.scrollTo({ top: mainTop, behavior: 'smooth' });
+  }
+
+  function snapToWelcome(){
+    app.classList.remove('revealed');
+    unlock();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function checkBar(){
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current > screenHeight * 0.92 || current - baselineHeight > 20;
+    var barHidden = current - baselineHeight > 20;
+    var atMain = window.scrollY >= mainTop - 50;
 
-    if (barHidden && !appVisible) {
-      showApp();
-    } else if (!barHidden && appVisible) {
-      hideApp();
+    if (barHidden && atMain && !locked) {
+      snapToMain();
+    } else if (!barHidden && locked) {
+      snapToWelcome();
     }
-    lastViewport = current;
   }
 
-  // Cơ chế 1: visualViewport resize
-  if (vv) {
-    vv.addEventListener('resize', checkBarState);
+  function calcPositions(){
+    mainTop = app.offsetTop;
   }
-  window.addEventListener('resize', checkBarState);
 
-  // Cơ chế 2: scroll event (Chrome iOS thường trigger khi bar ẩn/hiện)
+  // Init
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', calcPositions);
+  } else {
+    calcPositions();
+  }
+
+  // Listeners
+  if (vv) vv.addEventListener('resize', checkBar);
+  window.addEventListener('resize', checkBar);
   window.addEventListener('scroll', function(){
-    if (appVisible) return;
-    // Nếu scroll xuống đủ và viewport tăng
+    if (locked) return;
     var current = vv ? vv.height : window.innerHeight;
-    if (window.scrollY > 50 && current - baselineHeight > 15) {
-      showApp();
+    if (current - baselineHeight > 20 && window.scrollY > mainTop - 100) {
+      snapToMain();
     }
   }, { passive: true });
 
-  // Cơ chế 3: touch end (sau khi user thả tay, kiểm tra lại)
+  // Touch end check
   document.addEventListener('touchend', function(){
-    setTimeout(checkBarState, 200);
+    setTimeout(checkBar, 200);
   }, { passive: true });
 
-  // Cơ chế 4: nudge sau load
+  // Nudge
   window.addEventListener('load', function(){
     setTimeout(function(){
       window.scrollTo(0, 1);
-      setTimeout(checkBarState, 300);
     }, 150);
   });
 
-  // Cơ chế 5: fallback scroll đến đáy
-  window.addEventListener('scroll', function(){
-    if (appVisible) return;
-    var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
-    if (atBottom) showApp();
-  }, { passive: true });
-
-  // Cơ chế 6: kiểm tra định kỳ mỗi 500ms trong 5s đầu
-  var checkInterval = setInterval(function(){
-    checkBarState();
-    if (appVisible) clearInterval(checkInterval);
+  // Fallback interval
+  var interval = setInterval(function(){
+    checkBar();
+    if (locked) clearInterval(interval);
   }, 500);
-  setTimeout(function(){ clearInterval(checkInterval); }, 5000);
+  setTimeout(function(){ clearInterval(interval); }, 5000);
 })();
 
 /* ===== PWA: register service worker ===== */
