@@ -1,30 +1,26 @@
-:root{
-  --bg:#1B1B1B;--surface:#242424;--border:#333333;--text:#ECECEC;
-  --muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;
-  --success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;
+/* ===== iOS height fix ===== */
+html{
+  height:100%;
+  min-height:100vh;
+  min-height:-webkit-fill-available;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
-  -webkit-touch-callout:none!important;-webkit-user-select:none!important;
-  user-select:none!important;touch-action:manipulation;}
-
-/* ===== Body scrollable lúc đầu để Chrome iOS ẩn bar ===== */
-html,body{
-  height:auto;
-  min-height:100%;
-  overflow:auto;
-  background:var(--bg);
-  color:var(--text);
+body{
+  height:100%;
+  min-height:100vh;
+  min-height:-webkit-fill-available;
+  background:var(--bg);color:var(--text);overflow:auto;
   font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
 }
 
-/* ===== Welcome Screen: normal flow, body scrollable ===== */
+/* ===== Welcome Screen ===== */
 .welcome{
   position:relative;
   z-index:300;
   background:var(--bg);
-}
-.welcome-inner{
   min-height:100dvh;
+}
+.welcome-top{
+  min-height:80dvh;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -32,26 +28,45 @@ html,body{
   padding-top:env(safe-area-inset-top);
   padding-bottom:40px;
 }
-.welcome-logo{font-size:64px;margin-bottom:16px;}
-.welcome-title{font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px;}
-.welcome-hint{font-size:14px;color:var(--muted);margin-bottom:12px;}
-.welcome-arrow{font-size:28px;color:var(--primary);animation:bounce 1.5s infinite;}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
-.welcome-spacer{
-  height:120px; /* tạo đủ scroll cho body */
-  width:100%;
+.welcome-logo{font-size:80px;margin-bottom:20px;}
+.welcome-title{font-size:28px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.welcome-hint{font-size:15px;color:var(--muted);margin-bottom:24px;}
+.welcome-arrow{font-size:36px;color:var(--primary);animation:bounce 1.4s infinite;}
+.welcome-bottom{
+  min-height:40dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding-top:40px;
+  padding-bottom:env(safe-area-inset-bottom);
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.welcome-msg{font-size:16px;color:var(--muted);padding:0 20px;line-height:1.6;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
+
+/* ===== Scroll lock ===== */
+html.scroll-locked, body.scroll-locked{
+  overflow:hidden !important;
+  touch-action:none !important;
+  overscroll-behavior:none !important;
 }
 
-/* ===== App: fixed, ẩn ban đầu, hiện sau khi bar ẩn ===== */
+/* ===== Main App ===== */
 .app{
   position:fixed;
   top:0;left:0;right:0;bottom:0;
+  z-index:400;
   max-width:520px;
   margin:0 auto;
-  display:flex;
+  display:none;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
-  /* KHÔNG padding-bottom */
+  background:var(--bg);
+}
+.app.visible{
+  display:flex;
 }
 
 /* ===== Header ===== */
