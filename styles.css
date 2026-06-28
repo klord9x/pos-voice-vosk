@@ -1,52 +1,8 @@
-:root{
-  --bg:#1B1B1B;--surface:#242424;--border:#333333;--text:#ECECEC;
-  --muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;
-  --success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
-  -webkit-touch-callout:none!important;-webkit-user-select:none!important;
-  user-select:none!important;touch-action:manipulation;}
-
-/* ===== iOS height fix ===== */
-html{
-  height:100%;
-  min-height:100dvh;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
-}
-body{
-  height:100%;
-  min-height:100dvh;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
-  background:var(--bg);color:var(--text);overflow:hidden;
-  font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
-}
-
-/* ===== App container: fixed inset để tràn viền thật sự ===== */
-.app{
-  position:fixed;
-  top:0; left:0; right:0; bottom:0;
-  max-width:520px;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  padding-top:env(safe-area-inset-top);
-}
-
-/* ===== Header: bỏ padding-top riêng vì app đã lo safe-area ===== */
-.header{
-  height:48px; /* cố định, không cộng env() */
-  padding-top:0; /* bỏ vì .app đã lo safe-area */
-  display:grid;
-  grid-template-columns:40px 1fr auto auto;
-  align-items:center;
-  gap:4px;
-  padding-left:8px;
-  padding-right:8px;
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-}
+:root{--bg:#1B1B1B;--surface:#242424;--border:#333333;--text:#ECECEC;--muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;--success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;touch-action:manipulation;}
+html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden;user-select:none;font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;}
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;}
+.header{height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);flex:none;display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:4px;padding-left:8px;padding-right:8px;background:var(--surface);border-bottom:1px solid var(--border);}
 .nav-btn{appearance:none;border:0;background:none;color:var(--text);font:inherit;width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;cursor:pointer;}
 .nav-btn:active{background:rgba(255,255,255,.08);}
 .nav-btn.primary{color:var(--primary);}
@@ -139,14 +95,7 @@ body[data-parser="pay"] .keyboard > #payChips{display:grid;grid-template-columns
 .chip.has-count{background:rgba(10,132,255,.1);}
 .chip .count{font-size:11px;color:var(--primary);font-weight:700;min-width:14px;text-align:center;}
 body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
-.keyboard{
-  flex:none;
-  background:var(--border);
-  padding:1px 0 0;
-  border-top:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-}
+.keyboard{flex:none;background:var(--border);padding:1px 0 0;padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--border);display:flex;flex-direction:column;}
 .keyboard > .panel{gap:1px;}
 .keyboard .row{display:flex;gap:1px;background:var(--border);}
 .keyboard .key{flex:1;height:40px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);font:inherit;font-size:16px;font-weight:600;border:0;cursor:pointer;}
