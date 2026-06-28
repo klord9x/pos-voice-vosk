@@ -44,17 +44,21 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
   var dismissed = false;
 
   /* --- helpers --- */
-  function preventScroll(e) { e.preventDefault(); }
+  // Chỉ block touchmove ở ngoài #app (welcome + spacer)
+  // KHÔNG block touchstart → tap/click trong app vẫn hoạt động bình thường
+  function preventScroll(e) {
+    if (app && app.contains(e.target)) return; // trong app → cho qua
+    e.preventDefault();
+  }
 
   function lock() {
     document.documentElement.classList.add('scroll-locked');
     document.body.classList.add('scroll-locked');
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
     document.body.style.overscrollBehavior = 'none';
+    // Chỉ block touchmove (scroll), KHÔNG block touchstart
     document.addEventListener('touchmove', preventScroll, { passive: false });
-    document.addEventListener('touchstart', preventScroll, { passive: false });
   }
 
   function unlock() {
@@ -62,11 +66,10 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
     document.body.classList.remove('scroll-locked');
     document.documentElement.style.overflow = 'auto';
     document.body.style.overflow = 'auto';
-    document.body.style.touchAction = '';
     document.body.style.overscrollBehavior = '';
     document.removeEventListener('touchmove', preventScroll);
-    document.removeEventListener('touchstart', preventScroll);
   }
+
 
   function showApp() {
     if (dismissed) return;
