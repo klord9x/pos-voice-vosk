@@ -9,24 +9,50 @@ var API_URL = 'https://script.google.com/macros/s/AKfycbwk_Zm5bTDLw0BRhN0qQ0unrC
   var app = document.getElementById('app');
   if(!app) return;
 
-  // Tạo spacer tạm ở cuối app để đảm bảo body có scroll
+  // Tạo spacer lớn để đảm bảo có scroll
   var spacer = document.createElement('div');
-  spacer.style.cssText = 'height:80px;flex-shrink:0;pointer-events:none;opacity:0;';
+  spacer.style.cssText = 'height:120px;flex-shrink:0;pointer-events:none;opacity:0;';
   app.appendChild(spacer);
 
-  // Scroll xuống để kích hoạt Chrome ẩn address bar + toolbar
-  window.scrollTo(0, 80);
+  // Hàm scroll xuống nhiều lần để kích hoạt
+  function doScroll(attempts){
+    if(attempts <= 0){
+      // Xong, xóa spacer và khóa
+      spacer.remove();
+      document.body.classList.add('scroll-locked');
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      app.style.minHeight = '100dvh';
+      return;
+    }
+    // Scroll xuống 1px rồi lên 0 — mô phỏng "pull down"
+    document.documentElement.scrollTop = 1;
+    document.body.scrollTop = 1;
+    setTimeout(function(){
+      document.documentElement.scrollTop = 100;
+      document.body.scrollTop = 100;
+      setTimeout(function(){
+        doScroll(attempts - 1);
+      }, 150);
+    }, 50);
+  }
 
-  // Sau khi bar đã ẩn, xóa spacer và khóa scroll
-  setTimeout(function(){
-    spacer.remove();
-    document.body.classList.add('scroll-locked');
-    // Scroll về top để không cắt header (overflow:hidden đã ngăn Chrome hiện lại bar)
-    window.scrollTo(0, 0);
-    // Đảm bảo app phủ kín viewport mới (bar ẩn → dvh tăng)
-    app.style.minHeight = '100dvh';
-  }, 800);
+  // Chờ DOM ready rồi bắt đầu
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ doScroll(4); });
+  } else {
+    doScroll(4);
+  }
 })();
+// Thêm vào sau đoạn trên
+document.addEventListener('touchstart', function once(){
+  document.removeEventListener('touchstart', once);
+  window.scrollTo(0, 100);
+  setTimeout(function(){
+    document.body.classList.add('scroll-locked');
+    window.scrollTo(0, 0);
+  }, 600);
+}, {passive: true});
 
 function apiCall(action, payload){
   if(!payload){

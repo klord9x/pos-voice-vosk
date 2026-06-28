@@ -17,11 +17,10 @@ html{
 body{
   height:auto;
   min-height:100%;
-  overflow:auto; /* lúc đầu cho phép scroll */
+  overflow:auto; /* QUAN TRỌNG: để scroll hoạt động */
   background:var(--bg);color:var(--text);
   font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
 }
-/* Class khóa scroll sau khi đã ẩn bar */
 body.scroll-locked{
   overflow:hidden !important;
   touch-action:none !important;
