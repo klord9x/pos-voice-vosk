@@ -120,6 +120,7 @@ var SALES_HISTORY = [];
 var STATE = 'search';
 var PREV_STATE = 'search';
 var SEARCH_QUERY = '';
+var BACKSPACE_INTERVAL = null;
 var SUGGESTIONS = [];
 var SUGGEST_ACTIVE_IDX = 0;
 var PENDING_PRODUCT = null;
@@ -1166,6 +1167,20 @@ function onClearSearch(){
   PENDING_PRODUCT = null;
   renderCommand();
   liveSearch();
+}
+
+function onBackspaceHoldStart(e){
+  e.preventDefault();
+  if(BACKSPACE_INTERVAL) return;
+  onBackspace();
+  BACKSPACE_INTERVAL = setInterval(function(){
+    onBackspace();
+  }, 90);
+}
+
+function onBackspaceHoldEnd(){
+  clearInterval(BACKSPACE_INTERVAL);
+  BACKSPACE_INTERVAL = null;
 }
 
 var SUGGEST_LAST_TAP = 0;

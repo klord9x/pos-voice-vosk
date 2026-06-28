@@ -146,7 +146,6 @@
           <button class="key" onclick="onSearchKey('8')">8</button>
           <button class="key" onclick="onSearchKey('9')">9</button>
           <button class="key" onclick="onSearchKey('0')">0</button>
-          <button class="key" onclick="onSearchKey('.')">.</button>
         </div>
         <div class="row qwerty">
           <button class="key" onclick="onSearchKey('Q')">Q</button>
@@ -161,7 +160,6 @@
           <button class="key" onclick="onSearchKey('P')">P</button>
         </div>
         <div class="row asdf">
-          <span class="spacer"></span>
           <button class="key" onclick="onSearchKey('A')">A</button>
           <button class="key" onclick="onSearchKey('S')">S</button>
           <button class="key" onclick="onSearchKey('D')">D</button>
@@ -171,10 +169,8 @@
           <button class="key" onclick="onSearchKey('J')">J</button>
           <button class="key" onclick="onSearchKey('K')">K</button>
           <button class="key" onclick="onSearchKey('L')">L</button>
-          <span class="spacer"></span>
         </div>
         <div class="row zxcv">
-          <button class="key wide" onclick="onBackspace()">⌫</button>
           <button class="key" onclick="onSearchKey('Z')">Z</button>
           <button class="key" onclick="onSearchKey('X')">X</button>
           <button class="key" onclick="onSearchKey('C')">C</button>
@@ -182,7 +178,11 @@
           <button class="key" onclick="onSearchKey('B')">B</button>
           <button class="key" onclick="onSearchKey('N')">N</button>
           <button class="key" onclick="onSearchKey('M')">M</button>
-          <button class="key wide primary" onclick="onEnterKey()">↵</button>
+          <button class="key" onclick="onSearchKey('.')">.</button>
+        </div>
+        <div class="row func">
+          <button class="key backspace" onclick="onBackspace()" onmousedown="onBackspaceHoldStart(event)" onmouseup="onBackspaceHoldEnd()" onmouseleave="onBackspaceHoldEnd()" ontouchstart="onBackspaceHoldStart(event)" ontouchend="onBackspaceHoldEnd()" ontouchcancel="onBackspaceHoldEnd()">⌫</button>
+          <button class="key commit primary" onclick="onEnterKey()">↵</button>
         </div>
       </div>
 
