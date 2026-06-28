@@ -32,7 +32,7 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
+/* ===== Welcome + Main same page: scroll to main, lock when bar hidden ===== */
 (function(){
   var welcome = document.getElementById('welcomeScreen');
   var app = document.getElementById('app');
@@ -41,7 +41,7 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
   var vv = window.visualViewport;
   var baseline = vv ? vv.height : window.innerHeight;
   var locked = false;
-  var appVisible = false;
+  var mainTop = 0;
 
   function preventScroll(e){ e.preventDefault(); }
 
@@ -63,48 +63,79 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     document.removeEventListener('touchstart', preventScroll);
   }
 
-  function showApp(){
-    if(appVisible) return;
-    appVisible = true;
-    app.classList.add('visible');
-    app.style.minHeight = '100dvh';
-    window.scrollTo(0, 0);
-    setTimeout(lock, 50);
-  }
-
-  function hideApp(){
-    if(!appVisible) return;
-    appVisible = false;
-    app.classList.remove('visible');
-    unlock();
+  function snapToMain(){
+    // Scroll đến đúng top của main section
+    window.scrollTo(0, mainTop);
+    setTimeout(function(){
+      lock();
+      app.classList.add('visible');
+    }, 100);
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
     var barHidden = current - baseline > 25;
+    var scrollY = window.scrollY;
 
-    if(barHidden && !appVisible){
-      showApp();
+    if(!locked && barHidden && scrollY > mainTop - 100){
+      locked = true;
+      snapToMain();
       return;
     }
-    if(!barHidden && appVisible){
-      hideApp();
+
+    if(locked && !barHidden){
+      // Bar hiện lại → unlock cho user tự cuộn xuống lại
+      locked = false;
+      app.classList.remove('visible');
+      unlock();
     }
   }
 
-  if(vv) vv.addEventListener('resize', onViewportResize);
-  else window.addEventListener('resize', onViewportResize);
+  function onScroll(){
+    if(locked) return;
+    var current = vv ? vv.height : window.innerHeight;
+    var barHidden = current - baseline > 25;
+    var scrollY = window.scrollY;
 
-  // Fallback: nếu bar đã ẩn sẵn khi load
+    if(barHidden && scrollY > mainTop - 50){
+      locked = true;
+      snapToMain();
+    }
+  }
+
+  // Tính vị trí main section sau khi DOM ready
+  function calcMainTop(){
+    var mainSection = document.querySelector('.main-section');
+    if(mainSection){
+      mainTop = mainSection.offsetTop;
+    } else {
+      // Fallback: main ở 100dvh
+      mainTop = window.innerHeight;
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      calcMainTop();
+      if(vv) vv.addEventListener('resize', onViewportResize);
+      else window.addEventListener('resize', onViewportResize);
+      window.addEventListener('scroll', onScroll, { passive: true });
+    });
+  } else {
+    calcMainTop();
+    if(vv) vv.addEventListener('resize', onViewportResize);
+    else window.addEventListener('resize', onViewportResize);
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // Fallback
   setTimeout(function(){
     var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 25){
-      showApp();
-    } else {
-      // Bar vẫn hiện, để welcome hiện, app ẩn
-      hideApp();
+    if(current - baseline > 25 && window.scrollY > mainTop - 100){
+      locked = true;
+      snapToMain();
     }
-  }, 300);
+  }, 500);
 })();
 
 /* ===== PWA: register service worker ===== */

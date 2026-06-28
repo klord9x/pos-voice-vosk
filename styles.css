@@ -5,46 +5,15 @@ html{
   min-height:-webkit-fill-available;
 }
 body{
-  height:100%;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
-  background:var(--bg);color:var(--text);overflow:auto;
-  font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
-}
-
-/* ===== Welcome Screen ===== */
-.welcome{
-  position:relative;
-  z-index:300;
+  height:auto;
+  min-height:100%;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
   background:var(--bg);
-  min-height:100dvh;
+  color:var(--text);
+  font-family:Inter,system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
-.welcome-top{
-  min-height:80dvh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding-top:env(safe-area-inset-top);
-  padding-bottom:40px;
-}
-.welcome-logo{font-size:80px;margin-bottom:20px;}
-.welcome-title{font-size:28px;font-weight:700;color:var(--text);margin-bottom:10px;}
-.welcome-hint{font-size:15px;color:var(--muted);margin-bottom:24px;}
-.welcome-arrow{font-size:36px;color:var(--primary);animation:bounce 1.4s infinite;}
-.welcome-bottom{
-  min-height:40dvh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding-top:40px;
-  padding-bottom:env(safe-area-inset-bottom);
-  border-top:1px solid var(--border);
-  text-align:center;
-}
-.welcome-msg{font-size:16px;color:var(--muted);padding:0 20px;line-height:1.6;}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
 
 /* ===== Scroll lock ===== */
 html.scroll-locked, body.scroll-locked{
@@ -53,11 +22,48 @@ html.scroll-locked, body.scroll-locked{
   overscroll-behavior:none !important;
 }
 
+/* ===== Welcome Section: absolute top ===== */
+.welcome{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:100vh;
+  height:100dvh;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:40px;
+  z-index:1;
+}
+.welcome-logo{font-size:80px;margin-bottom:20px;}
+.welcome-title{font-size:28px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.welcome-hint{font-size:15px;color:var(--muted);margin-bottom:24px;}
+.welcome-arrow{font-size:36px;color:var(--primary);animation:bounce 1.4s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}
+
+/* ===== Main Section: absolute at 100dvh ===== */
+.main-section{
+  position:absolute;
+  top:100vh;
+  top:100dvh;
+  left:0;right:0;
+  min-height:100vh;
+  min-height:100dvh;
+  z-index:2;
+}
+
+/* ===== Spacer để body có đủ chiều cao scroll ===== */
+.page-spacer{
+  height:100vh;
+  height:100dvh;
+}
+
 /* ===== Main App ===== */
 .app{
   position:fixed;
   top:0;left:0;right:0;bottom:0;
-  z-index:400;
   max-width:520px;
   margin:0 auto;
   display:flex;
