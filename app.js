@@ -499,14 +499,7 @@ function addToCartDirect(product, qty, unit){
   renderCart();
   updateTotal();
   var el = document.querySelector('#cartItems .cart-row.active');
-  if(el){
-    el.scrollIntoView({block:'nearest'});
-    var qtyEl = el.querySelector('.qty');
-    if(qtyEl) qtyEl.classList.add('qty-flash');
-    setTimeout(function(){
-      if(qtyEl) qtyEl.classList.remove('qty-flash');
-    }, 200);
-  }
+  if(el) el.scrollIntoView({block:'nearest'});
 }
 
 function deleteCartItem(idx){
