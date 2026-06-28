@@ -32,74 +32,75 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
+/* ===== Welcome Screen: phát hiện Chrome iOS ẩn bar qua viewport resize ===== */
 (function(){
   var welcome = document.getElementById('welcomeScreen');
   var app = document.getElementById('app');
+  var loading = document.getElementById('loadingScreen');
   if(!welcome || !app) return;
 
-  var vv = window.visualViewport;
-  var baseline = vv ? vv.height : window.innerHeight;
-  var locked = false;
-  var appVisible = false;
+  var dismissed = false;
+  var initialHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  var screenH = window.screen.height;
+  // Nếu viewport đã gần full screen (bar đã ẩn sẵn hoặc PWA standalone)
+  var barAlreadyHidden = initialHeight > screenH * 0.92;
 
-  function preventScroll(e){ e.preventDefault(); }
+  function dismissWelcome() {
+    if(dismissed) return;
+    dismissed = true;
 
-  function lock(){
-    document.documentElement.classList.add('scroll-locked');
-    document.body.classList.add('scroll-locked');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('touchmove', preventScroll, { passive: false });
-    document.addEventListener('touchstart', preventScroll, { passive: false });
-  }
-
-  function unlock(){
-    document.documentElement.classList.remove('scroll-locked');
-    document.body.classList.remove('scroll-locked');
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    document.removeEventListener('touchmove', preventScroll);
-    document.removeEventListener('touchstart', preventScroll);
-  }
-
-  function showApp(){
-    if(appVisible) return;
-    appVisible = true;
-    app.classList.add('visible');
-    app.style.minHeight = '100dvh';
+    // Scroll về top trước khi hiện app
     window.scrollTo(0, 0);
-    setTimeout(lock, 50);
+
+    // Khóa body scroll hoàn toàn
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    document.body.style.overscrollBehavior = 'none';
+
+    // Ẩn welcome, hiện app
+    welcome.style.display = 'none';
+    app.style.display = 'flex';
+
+    // Đảm bảo app phủ kín viewport mới (sau khi bar ẩn)
+    app.style.minHeight = '100dvh';
   }
 
-  function hideApp(){
-    if(!appVisible) return;
-    appVisible = false;
-    app.classList.remove('visible');
-    unlock();
+  // Nếu bar đã ẩn hoặc không phải Chrome iOS → dismiss ngay
+  if(barAlreadyHidden || !/CriOS/.test(navigator.userAgent)) {
+    setTimeout(dismissWelcome, 50);
+    return;
   }
 
-  function onViewportResize(){
-    var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baseline > 25;
-
-    if(barHidden && !appVisible){
-      showApp();
-      return;
+  // Phát hiện bar ẩn qua visualViewport resize
+  function onViewportChange() {
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if(h > initialHeight + 25) {
+      dismissWelcome();
     }
-    if(!barHidden && appVisible){
-      hideApp();
-    }
   }
 
-  if(vv) vv.addEventListener('resize', onViewportResize);
-  else window.addEventListener('resize', onViewportResize);
+  if(window.visualViewport) {
+    window.visualViewport.addEventListener('resize', onViewportChange);
+  }
+  window.addEventListener('resize', onViewportChange);
 
-  // Fallback: nếu bar đã ẩn sẵn khi load
+  // Bắt body scroll: nếu user scroll xuống > 40px, kích hoạt dismiss
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 40) {
+      setTimeout(onViewportChange, 100);
+    }
+  }, {passive: true});
+
+  // Bắt touch end: kiểm tra viewport sau khi user thả tay
+  welcome.addEventListener('touchend', function(){
+    setTimeout(onViewportChange, 200);
+  }, {passive: true});
+
+  // Auto dismiss sau 5s nếu không tương tác
   setTimeout(function(){
-    var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 25) showApp();
-  }, 300);
+    if(!dismissed) dismissWelcome();
+  }, 5000);
 })();
 
 /* ===== PWA: register service worker ===== */
