@@ -498,6 +498,8 @@ function addToCartDirect(product, qty, unit){
   EDIT_IDX = hlIdx;
   renderCart();
   updateTotal();
+  var el = document.querySelector('#cartItems .cart-row.active');
+  if(el) el.scrollIntoView({block:'nearest'});
 }
 
 function deleteCartItem(idx){
