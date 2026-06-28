@@ -32,7 +32,7 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome -> App: chỉ khi bar ẩn mới hiện app, không toggle ngược ===== */
+/* ===== Welcome ↔ App: bar hiện = welcome, bar ẩn = app ===== */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
@@ -48,21 +48,34 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     return;
   }
 
-  var revealed = false;
+  var appVisible = false;
   var vv = window.visualViewport;
   var baselineHeight = vv ? vv.height : window.innerHeight;
 
-  function revealApp(){
-    if (revealed) return;
-    revealed = true;
+  function showApp(){
+    if (appVisible) return;
+    appVisible = true;
     app.classList.add('revealed');
     document.body.classList.add('app-locked');
     window.scrollTo(0, 0);
   }
 
+  function hideApp(){
+    if (!appVisible) return;
+    appVisible = false;
+    app.classList.remove('revealed');
+    document.body.classList.remove('app-locked');
+  }
+
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    if (current - baselineHeight > 25) revealApp();
+    var barHidden = current - baselineHeight > 25;
+
+    if (barHidden && !appVisible) {
+      showApp();
+    } else if (!barHidden && appVisible) {
+      hideApp();
+    }
   }
 
   if (vv) {
@@ -79,11 +92,11 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     }, 150);
   });
 
-  // Fallback: scroll đến đáy cũng vào app
+  // Fallback: scroll đến đáy → vào app
   window.addEventListener('scroll', function(){
-    if (revealed) return;
+    if (appVisible) return;
     var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
-    if (atBottom) revealApp();
+    if (atBottom) showApp();
   }, { passive: true });
 })();
 
