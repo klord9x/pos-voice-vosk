@@ -985,6 +985,8 @@ function renderSuggestions(results){
     }
   }
   updateActiveSuggestion();
+  var contentArea = document.getElementById('contentArea');
+  if(contentArea) contentArea.scrollTop = 0;
 }
 
 function updateActiveSuggestion(){
