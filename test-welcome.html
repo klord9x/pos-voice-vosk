@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Test Welcome Scroll</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  height:auto;
+  min-height:100%;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  font-family:system-ui,sans-serif;
+}
+.welcome{
+  min-height:150vh; /* cao hơn viewport để có scroll */
+  background:linear-gradient(180deg, #1B1B1B 0%, #333 50%, #1B1B1B 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.section{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  padding:40px 20px;
+  text-align:center;
+  color:#fff;
+}
+.section-1{min-height:80vh;display:flex;flex-direction:column;justify-content:center;}
+.section-2{min-height:40vh;display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;}
+.logo{font-size:80px;margin-bottom:20px;}
+.title{font-size:28px;font-weight:700;margin-bottom:12px;}
+.hint{font-size:16px;color:#aaa;margin-bottom:30px;}
+.arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s infinite;}
+.note{font-size:14px;color:#666;margin-top:40px;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}
+</style>
+</head>
+<body>
+
+<div class="welcome">
+  <div class="section section-1">
+    <div class="logo">🎤</div>
+    <div class="title">POS Giọng Nói</div>
+    <div class="hint">Vuốt xuống để tiếp tục</div>
+    <div class="arrow">↓</div>
+  </div>
+  <div class="section section-2">
+    <div class="hint">Nội dung tiếp theo...</div>
+    <div class="note">Nếu Chrome iOS ẩn được address bar, bạn sẽ thấy màn hình tràn viền</div>
+  </div>
+</div>
+
+</body>
+</html>
