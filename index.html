@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Test Welcome Scroll — auto-nudge lock</title>
+<title>Test — absolute sections, lock scroll at main</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
@@ -14,36 +14,59 @@ html,body{
   -webkit-overflow-scrolling:touch;
   font-family:system-ui,sans-serif;
 }
+
+/* ===== Welcome: absolute ở top ===== */
 .welcome{
-  min-height:150vh;
-  background:linear-gradient(180deg, #1B1B1B 0%, #333 50%, #1B1B1B 100%);
+  position:absolute;
+  top:0;left:0;right:0;
+  height:100vh;
+  height:100dvh;
+  background:linear-gradient(180deg, #1B1B1B 0%, #333 100%);
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.section{
-  width:100%;
-  max-width:520px;
-  margin:0 auto;
-  padding:40px 20px;
-  text-align:center;
-  color:#fff;
-}
-.section-1{min-height:80vh;display:flex;flex-direction:column;justify-content:center;}
-.section-2{
-  min-height:100vh;min-height:100dvh;
-  display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;
+  padding-bottom:40px;
+  z-index:1;
 }
 .logo{font-size:80px;margin-bottom:20px;}
-.title{font-size:28px;font-weight:700;margin-bottom:12px;}
+.title{font-size:28px;font-weight:700;color:#fff;margin-bottom:12px;}
 .hint{font-size:16px;color:#aaa;margin-bottom:30px;}
 .arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s infinite;}
-.note{font-size:14px;color:#666;margin-top:40px;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}
 
-html.locked, body.locked { touch-action: none; }
+/* ===== Main: absolute ở dưới welcome ===== */
+.main{
+  position:absolute;
+  top:100vh;
+  top:100dvh;
+  left:0;right:0;
+  min-height:100vh;
+  min-height:100dvh;
+  background:#1B1B1B;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+  z-index:2;
+}
+.main-hint{font-size:18px;color:#fff;margin-bottom:12px;}
+.main-note{font-size:14px;color:#666;text-align:center;}
+
+/* ===== Scroll spacer: để body có đủ chiều cao scroll ===== */
+.spacer{
+  height:200vh;
+  height:200dvh;
+}
+
+html.locked, body.locked {
+  overflow: hidden !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+}
+
 .status{
   position:fixed;bottom:8px;left:8px;right:8px;z-index:999;
   font-size:11px;color:#0F0;font-family:monospace;
@@ -55,87 +78,72 @@ html.locked, body.locked { touch-action: none; }
 </head>
 <body>
 
-<div class="welcome">
-  <div class="section section-1">
-    <div class="logo">🎤</div>
-    <div class="title">POS Giọng Nói</div>
-    <div class="hint">Vuốt xuống để tiếp tục</div>
-    <div class="arrow">↓</div>
-  </div>
-  <div class="section section-2" id="mainSection">
-    <div class="hint">Nội dung tiếp theo...</div>
-    <div class="note">Nếu Chrome iOS ẩn được address bar, bạn sẽ thấy màn hình tràn viền</div>
-  </div>
+<div class="welcome" id="welcome">
+  <div class="logo">🎤</div>
+  <div class="title">POS Giọng Nói</div>
+  <div class="hint">Vuốt xuống để tiếp tục</div>
+  <div class="arrow">↓</div>
 </div>
+
+<div class="main" id="main">
+  <div class="main-hint">✅ Đã vào màn hình chính</div>
+  <div class="main-note">Menu bar đã ẩn. Không thể scroll lên lại welcome.<br>Vuốt lên sẽ không hiện bar.</div>
+</div>
+
+<div class="spacer"></div>
 
 <div class="status" id="status">baseline: đang đo…</div>
 
 <script>
 (function(){
   var statusEl = document.getElementById('status');
-  var mainSection = document.getElementById('mainSection');
   var vv = window.visualViewport;
   var baseline = vv ? vv.height : window.innerHeight;
   var locked = false;
-  var lockY = 0;
 
   function log(msg){ statusEl.textContent = msg; }
   log('baseline: ' + Math.round(baseline) + 'px — cuộn xuống đi...');
 
   function preventScroll(e){ e.preventDefault(); }
 
-  function nudgeDown(){
-    // Mở khóa tạm để cho phép scroll
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    // Cuộn xuống 2px để kích hoạt Chrome ẩn bar
-    window.scrollTo(0, window.scrollY + 2);
-    // Đợi Chrome phản ứng rồi khóa lại
-    setTimeout(function(){
-      if(!locked) return;
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-      // Kiểm tra lại viewport
-      var h = vv ? vv.height : window.innerHeight;
-      if(h - baseline < 30){
-        // Vẫn chưa ẩn, thử lại
-        setTimeout(nudgeDown, 300);
-      }
-    }, 400);
-  }
-
-  function lockHere(reason){
+  function lockAtMain(reason){
     if(locked) return;
     locked = true;
-    lockY = window.scrollY;
 
-    document.documentElement.classList.add('locked');
-    document.body.classList.add('locked');
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('touchmove', preventScroll, { passive: false });
-    document.addEventListener('touchstart', preventScroll, { passive: false });
+    // Scroll đến đúng top của main section (100vh)
+    var target = window.innerHeight; // 100vh
+    window.scrollTo(0, target);
 
-    window.removeEventListener('scroll', onScroll);
+    // Đợi scroll xong rồi khóa
+    setTimeout(function(){
+      document.documentElement.classList.add('locked');
+      document.body.classList.add('locked');
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('touchstart', preventScroll, { passive: false });
 
-    var h = vv ? vv.height : window.innerHeight;
-    log('🔒 LOCKED (' + reason + ') tại scrollY=' + Math.round(lockY) +
-        ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px)');
+      var h = vv ? vv.height : window.innerHeight;
+      log('🔒 LOCKED (' + reason + ') at scrollY=' + Math.round(window.scrollY) +
+          ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px)');
+    }, 100);
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
     if(!locked){
       log('viewport=' + Math.round(current) + 'px | scrollY=' + Math.round(window.scrollY));
-      if(current - baseline > 30 && window.scrollY > 0){
-        lockHere('viewport-resize (bar đã ẩn)');
+      if(current - baseline > 30 && window.scrollY > 50){
+        lockAtMain('viewport-resize (bar đã ẩn)');
       }
       return;
     }
-    // Đã locked — watchdog: nếu bar hiện lại (viewport co) → tự cuộn xuống ẩn lại
+    // Đã locked — watchdog
     if(current - baseline < 30){
-      log('⚠️ bar hiện lại (viewport=' + Math.round(current) + 'px) → tự nudge xuống...');
-      nudgeDown();
+      log('⚠️ bar hiện lại (viewport=' + Math.round(current) + 'px)');
+      // KHÔNG cố cuộn — scroll position đã ở main, welcome bị khuất bởi absolute
+      // Chỉ cần đảm bảo không lộ welcome
+      window.scrollTo(0, window.innerHeight);
     } else {
       log('🔒 locked, viewport=' + Math.round(current) + 'px (+' + Math.round(current - baseline) + 'px)');
     }
@@ -144,13 +152,12 @@ html.locked, body.locked { touch-action: none; }
   function onScroll(){
     if(locked) return;
     var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 30 && window.scrollY > 0){
-      lockHere('scroll + viewport tăng');
+    if(current - baseline > 30 && window.scrollY > 50){
+      lockAtMain('scroll + viewport tăng');
       return;
     }
-    var deepInMain = window.scrollY > (mainSection.offsetTop + 40);
-    if(deepInMain){
-      lockHere('scroll sâu vào main (fallback)');
+    if(window.scrollY > window.innerHeight * 0.6){
+      lockAtMain('scroll sâu (fallback)');
     }
   }
 
