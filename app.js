@@ -32,62 +32,69 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome screen (scrollable, normal flow) -> chờ user kéo xuống hoặc Chrome tự ẩn bar -> reveal #app (fixed) =====
-   PWA standalone (đã add Home Screen) thì bỏ qua hẳn, dùng safe-area như cũ. */
+/* ===== Welcome → Main transition: detect Chrome iOS bar hide ===== */
 (function(){
-  var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
-  if (!app || !welcome) return;
+  var app = document.getElementById('app');
+  if(!welcome || !app) return;
 
-  var isStandalone = window.navigator.standalone === true ||
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.matchMedia('(display-mode: fullscreen)').matches;
+  var dismissed = false;
+  var initialH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  var screenH = window.screen.height;
+  var barHidden = initialH > screenH * 0.92;
 
-  if (isStandalone) {
-    document.body.classList.add('app-locked');
-    app.classList.add('revealed');
+  function lockBody(){
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.overscrollBehavior = 'none';
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    document.body.style.overscrollBehavior = 'none';
+  }
+
+  function showApp(){
+    if(dismissed) return;
+    dismissed = true;
+    window.scrollTo(0, 0);
+    welcome.style.display = 'none';
+    app.classList.add('visible');
+    lockBody();
+    // Đảm bảo app phủ kín viewport mới
+    app.style.minHeight = '100dvh';
+  }
+
+  // Nếu bar đã ẩn hoặc không phải Chrome iOS → hiện app ngay
+  if(barHidden || !/CriOS/.test(navigator.userAgent)){
+    setTimeout(showApp, 100);
     return;
   }
 
-  var revealed = false;
-  var vv = window.visualViewport;
-  var baselineHeight = vv ? vv.height : window.innerHeight;
-
-  function revealApp(){
-    if (revealed) return;
-    revealed = true;
-    app.classList.add('revealed');
-    document.body.classList.add('app-locked');
-    window.scrollTo(0, 0);
+  // Phát hiện bar ẩn qua visualViewport resize
+  function onResize(){
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if(h > initialH + 20) showApp();
   }
-
-  function onViewportResize(){
-    var current = vv ? vv.height : window.innerHeight;
-    // Chrome ẩn bar xong -> visualViewport cao thêm hẳn so với lúc đầu
-    if (current - baselineHeight > 30) revealApp();
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', onResize);
   }
+  window.addEventListener('resize', onResize);
 
-  if (vv) {
-    vv.addEventListener('resize', onViewportResize);
-  } else {
-    window.addEventListener('resize', onViewportResize);
-  }
-
-  // Vẫn tự thử nudge nhẹ sau khi load, để không bắt buộc user phải tự kéo tay
-  window.addEventListener('load', function(){
-    setTimeout(function(){
-      window.scrollTo(0, 1);
-      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
-    }, 150);
-  });
-
-  // Fallback: nếu user tự kéo hết welcome-spacer (chạm đáy scroll) mà bar vẫn chưa ẩn được
-  // (vd Safari không có cơ chế này) thì vẫn cho vào app luôn, không bắt chờ vô thời hạn.
+  // Phát hiện qua body scroll
   window.addEventListener('scroll', function(){
-    if (revealed) return;
-    var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
-    if (atBottom) revealApp();
-  }, { passive: true });
+    if(window.scrollY > 40){
+      setTimeout(onResize, 100);
+    }
+  }, {passive: true});
+
+  // Touch end: kiểm tra viewport sau khi thả tay
+  welcome.addEventListener('touchend', function(){
+    setTimeout(onResize, 200);
+  }, {passive: true});
+
+  // Click bất kỳ trên welcome
+  welcome.addEventListener('click', function(){ showApp(); });
+
+  // Fallback 5s
+  setTimeout(showApp, 5000);
 })();
 
 /* ===== PWA: register service worker ===== */
@@ -1368,4 +1375,3 @@ apiCall('getProducts').then(function(products){
 }).catch(function(err){
   document.getElementById('loadingScreen').innerHTML = '<div class="loading-text" style="color:#FF453A;">Lỗi tải: ' + err.message + '</div>';
 });
-
