@@ -32,69 +32,74 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome → Main transition: detect Chrome iOS bar hide ===== */
+/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
 (function(){
   var welcome = document.getElementById('welcomeScreen');
   var app = document.getElementById('app');
   if(!welcome || !app) return;
 
-  var dismissed = false;
-  var initialH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  var screenH = window.screen.height;
-  var barHidden = initialH > screenH * 0.92;
+  var vv = window.visualViewport;
+  var baseline = vv ? vv.height : window.innerHeight;
+  var locked = false;
+  var appVisible = false;
 
-  function lockBody(){
+  function preventScroll(e){ e.preventDefault(); }
+
+  function lock(){
+    document.documentElement.classList.add('scroll-locked');
+    document.body.classList.add('scroll-locked');
     document.documentElement.style.overflow = 'hidden';
-    document.documentElement.style.overscrollBehavior = 'none';
     document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-    document.body.style.overscrollBehavior = 'none';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+  }
+
+  function unlock(){
+    document.documentElement.classList.remove('scroll-locked');
+    document.body.classList.remove('scroll-locked');
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.removeEventListener('touchmove', preventScroll);
+    document.removeEventListener('touchstart', preventScroll);
   }
 
   function showApp(){
-    if(dismissed) return;
-    dismissed = true;
-    window.scrollTo(0, 0);
-    welcome.style.display = 'none';
+    if(appVisible) return;
+    appVisible = true;
     app.classList.add('visible');
-    lockBody();
-    // Đảm bảo app phủ kín viewport mới
     app.style.minHeight = '100dvh';
+    window.scrollTo(0, 0);
+    setTimeout(lock, 50);
   }
 
-  // Nếu bar đã ẩn hoặc không phải Chrome iOS → hiện app ngay
-  if(barHidden || !/CriOS/.test(navigator.userAgent)){
-    setTimeout(showApp, 100);
-    return;
+  function hideApp(){
+    if(!appVisible) return;
+    appVisible = false;
+    app.classList.remove('visible');
+    unlock();
   }
 
-  // Phát hiện bar ẩn qua visualViewport resize
-  function onResize(){
-    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    if(h > initialH + 20) showApp();
-  }
-  if(window.visualViewport){
-    window.visualViewport.addEventListener('resize', onResize);
-  }
-  window.addEventListener('resize', onResize);
+  function onViewportResize(){
+    var current = vv ? vv.height : window.innerHeight;
+    var barHidden = current - baseline > 25;
 
-  // Phát hiện qua body scroll
-  window.addEventListener('scroll', function(){
-    if(window.scrollY > 40){
-      setTimeout(onResize, 100);
+    if(barHidden && !appVisible){
+      showApp();
+      return;
     }
-  }, {passive: true});
+    if(!barHidden && appVisible){
+      hideApp();
+    }
+  }
 
-  // Touch end: kiểm tra viewport sau khi thả tay
-  welcome.addEventListener('touchend', function(){
-    setTimeout(onResize, 200);
-  }, {passive: true});
+  if(vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
 
-  // Click bất kỳ trên welcome
-  welcome.addEventListener('click', function(){ showApp(); });
-
-  // Fallback 5s
-  setTimeout(showApp, 5000);
+  // Fallback: nếu bar đã ẩn sẵn khi load
+  setTimeout(function(){
+    var current = vv ? vv.height : window.innerHeight;
+    if(current - baseline > 25) showApp();
+  }, 300);
 })();
 
 /* ===== PWA: register service worker ===== */
