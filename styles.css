@@ -60,13 +60,17 @@ html.scroll-locked, body.scroll-locked{
   z-index:400;
   max-width:520px;
   margin:0 auto;
-  display:none;
+  display:flex;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
   background:var(--bg);
+  visibility:hidden;
+  opacity:0;
+  transition:opacity .2s;
 }
 .app.visible{
-  display:flex;
+  visibility:visible;
+  opacity:1;
 }
 
 /* ===== Header ===== */

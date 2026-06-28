@@ -98,7 +98,12 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
   // Fallback: nếu bar đã ẩn sẵn khi load
   setTimeout(function(){
     var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 25) showApp();
+    if(current - baseline > 25){
+      showApp();
+    } else {
+      // Bar vẫn hiện, để welcome hiện, app ẩn
+      hideApp();
+    }
   }, 300);
 })();
 
