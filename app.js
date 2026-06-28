@@ -32,7 +32,7 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome ↔ App: bar hiện = welcome, bar ẩn = app ===== */
+/* ===== Welcome ↔ App: phát hiện bar ẩn/hiện qua nhiều cơ chế ===== */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
@@ -51,6 +51,8 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
   var appVisible = false;
   var vv = window.visualViewport;
   var baselineHeight = vv ? vv.height : window.innerHeight;
+  var screenHeight = window.screen.height;
+  var lastViewport = baselineHeight;
 
   function showApp(){
     if (appVisible) return;
@@ -67,37 +69,60 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
     document.body.classList.remove('app-locked');
   }
 
-  function onViewportResize(){
+  function checkBarState(){
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baselineHeight > 25;
+    var barHidden = current > screenHeight * 0.92 || current - baselineHeight > 20;
 
     if (barHidden && !appVisible) {
       showApp();
     } else if (!barHidden && appVisible) {
       hideApp();
     }
+    lastViewport = current;
   }
 
+  // Cơ chế 1: visualViewport resize
   if (vv) {
-    vv.addEventListener('resize', onViewportResize);
-  } else {
-    window.addEventListener('resize', onViewportResize);
+    vv.addEventListener('resize', checkBarState);
   }
+  window.addEventListener('resize', checkBarState);
 
-  // Nudge nhẹ sau load
+  // Cơ chế 2: scroll event (Chrome iOS thường trigger khi bar ẩn/hiện)
+  window.addEventListener('scroll', function(){
+    if (appVisible) return;
+    // Nếu scroll xuống đủ và viewport tăng
+    var current = vv ? vv.height : window.innerHeight;
+    if (window.scrollY > 50 && current - baselineHeight > 15) {
+      showApp();
+    }
+  }, { passive: true });
+
+  // Cơ chế 3: touch end (sau khi user thả tay, kiểm tra lại)
+  document.addEventListener('touchend', function(){
+    setTimeout(checkBarState, 200);
+  }, { passive: true });
+
+  // Cơ chế 4: nudge sau load
   window.addEventListener('load', function(){
     setTimeout(function(){
       window.scrollTo(0, 1);
-      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
+      setTimeout(checkBarState, 300);
     }, 150);
   });
 
-  // Fallback: scroll đến đáy → vào app
+  // Cơ chế 5: fallback scroll đến đáy
   window.addEventListener('scroll', function(){
     if (appVisible) return;
     var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
     if (atBottom) showApp();
   }, { passive: true });
+
+  // Cơ chế 6: kiểm tra định kỳ mỗi 500ms trong 5s đầu
+  var checkInterval = setInterval(function(){
+    checkBarState();
+    if (appVisible) clearInterval(checkInterval);
+  }, 500);
+  setTimeout(function(){ clearInterval(checkInterval); }, 5000);
 })();
 
 /* ===== PWA: register service worker ===== */
