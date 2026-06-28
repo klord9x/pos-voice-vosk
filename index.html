@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Test Welcome Scroll — lock at main</title>
+<title>Test Welcome Scroll — auto-nudge lock</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
@@ -15,7 +15,7 @@ html,body{
   font-family:system-ui,sans-serif;
 }
 .welcome{
-  min-height:150vh; /* cao hơn viewport để có scroll */
+  min-height:150vh;
   background:linear-gradient(180deg, #1B1B1B 0%, #333 50%, #1B1B1B 100%);
   display:flex;
   flex-direction:column;
@@ -33,7 +33,7 @@ html,body{
 }
 .section-1{min-height:80vh;display:flex;flex-direction:column;justify-content:center;}
 .section-2{
-  min-height:100vh;min-height:100dvh; /* để khi khoá lại, nó vừa khít 1 màn hình, tràn viền */
+  min-height:100vh;min-height:100dvh;
   display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;
 }
 .logo{font-size:80px;margin-bottom:20px;}
@@ -51,6 +51,7 @@ html.locked, body.locked { touch-action: none; }
   pointer-events:none;white-space:pre-wrap;
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -76,27 +77,38 @@ html.locked, body.locked { touch-action: none; }
   var vv = window.visualViewport;
   var baseline = vv ? vv.height : window.innerHeight;
   var locked = false;
+  var lockY = 0;
 
   function log(msg){ statusEl.textContent = msg; }
   log('baseline: ' + Math.round(baseline) + 'px — cuộn xuống đi...');
 
   function preventScroll(e){ e.preventDefault(); }
 
-  function nudgeScroll(){
+  function nudgeDown(){
+    // Mở khóa tạm để cho phép scroll
     document.documentElement.style.overflow = 'auto';
     document.body.style.overflow = 'auto';
-    window.scrollTo(0, window.scrollY + 1);
+    // Cuộn xuống 2px để kích hoạt Chrome ẩn bar
+    window.scrollTo(0, window.scrollY + 2);
+    // Đợi Chrome phản ứng rồi khóa lại
     setTimeout(function(){
+      if(!locked) return;
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
-    }, 250);
+      // Kiểm tra lại viewport
+      var h = vv ? vv.height : window.innerHeight;
+      if(h - baseline < 30){
+        // Vẫn chưa ẩn, thử lại
+        setTimeout(nudgeDown, 300);
+      }
+    }, 400);
   }
 
   function lockHere(reason){
-    if (locked) return;
+    if(locked) return;
     locked = true;
+    lockY = window.scrollY;
 
-    // Khoá cả 2 chiều — KHÔNG gọi scrollTo, giữ nguyên vị trí đang đứng
     document.documentElement.classList.add('locked');
     document.body.classList.add('locked');
     document.documentElement.style.overflow = 'hidden';
@@ -107,42 +119,42 @@ html.locked, body.locked { touch-action: none; }
     window.removeEventListener('scroll', onScroll);
 
     var h = vv ? vv.height : window.innerHeight;
-    log('🔒 LOCKED (' + reason + ') tại scrollY=' + Math.round(window.scrollY) +
-        ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px so baseline)');
-
-    // KHÔNG remove listener viewport-resize nữa — biến nó thành watchdog,
-    // theo dõi tiếp để tự vá nếu bar bị vuốt hiện lại sau khi đã lock.
+    log('🔒 LOCKED (' + reason + ') tại scrollY=' + Math.round(lockY) +
+        ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px)');
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    if (!locked) {
-      log('viewport=' + Math.round(current) + 'px (cần +30) | scrollY=' + Math.round(window.scrollY));
-      if (current - baseline > 30 && window.scrollY > 0) lockHere('viewport-resize (bar đã ẩn)');
+    if(!locked){
+      log('viewport=' + Math.round(current) + 'px | scrollY=' + Math.round(window.scrollY));
+      if(current - baseline > 30 && window.scrollY > 0){
+        lockHere('viewport-resize (bar đã ẩn)');
+      }
       return;
     }
-    // Đã locked rồi — đóng vai trò watchdog: nếu bar bị vuốt hiện lại (viewport co về gần baseline) thì tự vá
-    if (current - baseline < 30) {
-      log('⚠️ bar hiện lại (viewport=' + Math.round(current) + 'px) — đang tự vá lại...');
-      nudgeScroll();
+    // Đã locked — watchdog: nếu bar hiện lại (viewport co) → tự cuộn xuống ẩn lại
+    if(current - baseline < 30){
+      log('⚠️ bar hiện lại (viewport=' + Math.round(current) + 'px) → tự nudge xuống...');
+      nudgeDown();
     } else {
-      log('🔒 vẫn locked, viewport=' + Math.round(current) + 'px (+' + Math.round(current - baseline) + 'px)');
+      log('🔒 locked, viewport=' + Math.round(current) + 'px (+' + Math.round(current - baseline) + 'px)');
     }
   }
 
-  // Fallback nếu bar không tự ẩn được nhưng user đã cuộn rõ ràng vào hẳn section-2
   function onScroll(){
-    if (locked) return;
+    if(locked) return;
     var current = vv ? vv.height : window.innerHeight;
-    if (current - baseline > 30 && window.scrollY > 0) {
-      lockHere('scroll + viewport đã tăng (bắt qua scroll event)');
+    if(current - baseline > 30 && window.scrollY > 0){
+      lockHere('scroll + viewport tăng');
       return;
     }
     var deepInMain = window.scrollY > (mainSection.offsetTop + 40);
-    if (deepInMain) lockHere('scroll sâu vào main (fallback cuối, bar có thể chưa ẩn)');
+    if(deepInMain){
+      lockHere('scroll sâu vào main (fallback)');
+    }
   }
 
-  if (vv) vv.addEventListener('resize', onViewportResize);
+  if(vv) vv.addEventListener('resize', onViewportResize);
   else window.addEventListener('resize', onViewportResize);
   window.addEventListener('scroll', onScroll, { passive: true });
 })();
