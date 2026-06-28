@@ -23,7 +23,8 @@ html.scroll-locked,body.scroll-locked{overflow:hidden!important;touch-action:non
 .header-center:active{background:rgba(255,255,255,.06);}
 .header-count{font-size:13px;color:var(--muted);line-height:1.2;}
 .header-total{font-size:16px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;}
-.cart{height:160px;flex:none;overflow-y:auto;background:var(--surface);border-bottom:1px solid var(--border);}
+.cart{height:calc(160px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);flex:none;overflow-y:auto;background:var(--surface);border-bottom:1px solid var(--border);}
+
 .cart::-webkit-scrollbar{width:4px;}
 .cart::-webkit-scrollbar-thumb{background:#444;}
 .cart::-webkit-scrollbar-track{background:transparent;}
