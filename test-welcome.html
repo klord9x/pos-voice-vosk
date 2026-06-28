@@ -1,59 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Test Welcome Scroll</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Demo: ẩn menu bar bằng scroll thật rồi khoá cứng</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{
-  height:auto;
-  min-height:100%;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-  font-family:system-ui,sans-serif;
-}
-.welcome{
-  min-height:150vh; /* cao hơn viewport để có scroll */
-  background:linear-gradient(180deg, #1B1B1B 0%, #333 50%, #1B1B1B 100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding-top:env(safe-area-inset-top);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.section{
-  width:100%;
-  max-width:520px;
-  margin:0 auto;
-  padding:40px 20px;
-  text-align:center;
-  color:#fff;
-}
-.section-1{min-height:80vh;display:flex;flex-direction:column;justify-content:center;}
-.section-2{min-height:40vh;display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;}
-.logo{font-size:80px;margin-bottom:20px;}
-.title{font-size:28px;font-weight:700;margin-bottom:12px;}
-.hint{font-size:16px;color:#aaa;margin-bottom:30px;}
-.arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s infinite;}
-.note{font-size:14px;color:#666;margin-top:40px;}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#111;color:#eee;font-family:-apple-system,system-ui,sans-serif;}
+
+  /* ===== SECTION 1: WELCOME — normal flow, cao hơn viewport để cuộn được thật ===== */
+  .welcome{
+    height:100vh;height:100dvh; /* khối nhìn thấy đầu tiên đúng 1 màn hình */
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;background:#111;
+  }
+  .arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(14px);opacity:1}}
+  .welcome-text{font-size:15px;color:#9A9A9A;}
+  .welcome-spacer{height:120px;} /* phần dư để body có cái mà cuộn — bắt buộc phải có */
+
+  /* ===== SECTION 2: MAIN — position:fixed, nằm ngoài flow, ẩn ban đầu ===== */
+  .main{
+    position:fixed;top:0;left:0;right:0;
+    height:100vh;height:100dvh;
+    background:#0A84FF;color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    font-size:22px;font-weight:700;text-align:center;padding:24px;
+    visibility:hidden;
+  }
+  .main.revealed{visibility:visible;}
+  .main small{font-size:14px;font-weight:400;opacity:.85;}
+
+  /* Khi đã reveal: khoá cứng, không cho cuộn lại, ẩn hẳn welcome khỏi DOM hiển thị */
+  body.locked{overflow:hidden;}
+  body.locked .welcome{display:none;}
+
+  /* Debug status — góc dưới trái, để xem trên điện thoại không cần console */
+  .status{
+    position:fixed;bottom:8px;left:8px;right:8px;z-index:999;
+    font-size:11px;color:#0F0;font-family:monospace;
+    background:rgba(0,0,0,.6);padding:6px 8px;border-radius:6px;
+    pointer-events:none;white-space:pre-wrap;
+  }
 </style>
 </head>
 <body>
 
-<div class="welcome">
-  <div class="section section-1">
-    <div class="logo">🎤</div>
-    <div class="title">POS Giọng Nói</div>
-    <div class="hint">Vuốt xuống để tiếp tục</div>
-    <div class="arrow">↓</div>
+  <div class="welcome">
+    <div class="arrow">⌄</div>
+    <div class="welcome-text">Kéo xuống để vào app</div>
+    <div class="welcome-spacer"></div>
   </div>
-  <div class="section section-2">
-    <div class="hint">Nội dung tiếp theo...</div>
-    <div class="note">Nếu Chrome iOS ẩn được address bar, bạn sẽ thấy màn hình tràn viền</div>
-  </div>
-</div>
 
+  <div class="main" id="main">
+    ✅ MAIN SECTION
+    <small>Đã khoá cứng — không cuộn lại được nữa</small>
+  </div>
+
+  <div class="status" id="status">baseline: đang đo…</div>
+
+<script>
+(function(){
+  var main = document.getElementById('main');
+  var statusEl = document.getElementById('status');
+  var vv = window.visualViewport;
+  var baseline = vv ? vv.height : window.innerHeight;
+  var revealed = false;
+
+  function log(msg){ statusEl.textContent = msg; }
+  log('baseline viewport: ' + Math.round(baseline) + 'px — chờ cuộn...');
+
+  function reveal(reason){
+    if (revealed) return;
+    revealed = true;
+    main.classList.add('revealed');
+    document.body.classList.add('locked');
+    window.scrollTo(0, 0);
+    var h = vv ? vv.height : window.innerHeight;
+    log('REVEALED qua "' + reason + '" — viewport hiện tại: ' + Math.round(h) + 'px (tăng ' + Math.round(h - baseline) + 'px so với baseline)');
+  }
+
+  function onViewportResize(){
+    var current = vv ? vv.height : window.innerHeight;
+    if (!revealed) log('viewport: ' + Math.round(current) + 'px (baseline ' + Math.round(baseline) + 'px, cần tăng >30px)');
+    if (current - baseline > 30) reveal('visualViewport.resize');
+  }
+
+  if (vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
+
+  // Tự nudge nhẹ sau khi load — không cần user tự kéo tay vẫn có thể tự kích hoạt
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      window.scrollTo(0, 1);
+      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
+    }, 150);
+  });
+
+  // Fallback: nếu kéo hết spacer mà bar vẫn không ẩn (vd test trên Safari), vẫn cho vào main
+  window.addEventListener('scroll', function(){
+    if (revealed) return;
+    var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
+    if (atBottom) reveal('scroll-đến-đáy (fallback)');
+  }, { passive: true });
+})();
+</script>
 </body>
 </html>
