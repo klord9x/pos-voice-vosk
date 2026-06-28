@@ -118,6 +118,7 @@ body[data-parser="pay"] .chip{height:100%;min-height:0;font-size:20px;}
 #kbSearch .row.zxcv{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;background:var(--border);}
 #kbSearch .row.func{display:flex;gap:1px;background:var(--border);}
 #kbSearch .row.func .key.backspace{flex:1;}
+#kbSearch .row.func .key.space{flex:2;}
 #kbSearch .row.func .key.commit.primary{flex:1;}
 body[data-parser="qty"] .keyboard .key{height:56px;font-size:20px;}
 body[data-parser="qty"] .keyboard .row.action-row{height:56px;}

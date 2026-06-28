@@ -1084,6 +1084,20 @@ function onSearchKey(c){
   liveSearch();
 }
 
+function onSpaceKey(){
+  vibrate();
+  if(STATE !== 'search') return;
+  if(VOICE_ACTIVE){
+    VOICE_ACTIVE = false;
+    VOICE_DONE = false;
+    if(recognition) recognition.stop();
+  }
+  if(SEARCH_QUERY.length > 0 && SEARCH_QUERY[SEARCH_QUERY.length - 1] === ' ') return;
+  SEARCH_QUERY += ' ';
+  renderCommand();
+  liveSearch();
+}
+
 function onBackspace(){
   vibrate();
   if(STATE === 'qty'){
