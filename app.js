@@ -79,10 +79,9 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
   /* --- bar detect --- */
   function onViewportResize() {
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baseline > 30;   // bar ẩn → viewport tăng
+    var barHidden = current - baseline > 30;
 
     if (!locked && barHidden && window.scrollY > 50) {
-      // Bar ẩn lần đầu → show app + lock
       locked = true;
       showApp();
       setTimeout(lock, 100);
@@ -91,11 +90,9 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
 
     if (locked) {
       if (!barHidden) {
-        // Bar hiện lại → unlock để user cuộn lại nếu cần
         locked = false;
         unlock();
       }
-      // Nếu vẫn barHidden thì giữ lock, không làm gì thêm
     }
   }
 
@@ -110,8 +107,10 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
     }
   }
 
-  // Nếu bar đã ẩn ngay từ đầu (hoặc không phải Chrome iOS) → show app liền
-  if ((baseline - (vv ? vv.height : window.innerHeight)) < -30 || !/CriOS/.test(navigator.userAgent)) {
+  // Nếu bar đã ẩn ngay từ đầu (baseline > screen.height * 0.92)
+  // hoặc không phải Chrome iOS → show app liền
+  var barAlreadyHidden = baseline > window.screen.height * 0.92;
+  if (barAlreadyHidden || !/CriOS/.test(navigator.userAgent)) {
     setTimeout(showApp, 100);
     return;
   }
@@ -120,12 +119,10 @@ document.addEventListener('dragstart', function (e) { e.preventDefault(); }, fal
   else window.addEventListener('resize', onViewportResize);
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // Touch end trên welcome
   welcome.addEventListener('touchend', function () {
     setTimeout(onViewportResize, 200);
   }, { passive: true });
 
-  // Click bất kỳ trên welcome
   welcome.addEventListener('click', function () { showApp(); });
 
   // Fallback 5s
