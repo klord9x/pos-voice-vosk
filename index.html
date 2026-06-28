@@ -14,7 +14,6 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" href="/icons/icon-192.png">
 <link rel="stylesheet" href="/styles.css">
-<base target="_blank">
 </head>
 <body data-parser="search">
 
@@ -23,13 +22,15 @@
     <div class="welcome-icon">⌄</div>
     <div class="welcome-text">Kéo xuống để bắt đầu</div>
   </div>
+  <div class="welcome-spacer"></div>
+</div>
+
+<div class="loading" id="loadingScreen">
+  <div class="spinner"></div>
+  <div class="loading-text">Đang tải danh mục…</div>
 </div>
 
 <div class="app" id="app">
-  <div class="loading" id="loadingScreen">
-    <div class="spinner"></div>
-    <div class="loading-text">Đang tải danh mục…</div>
-  </div>
   <!-- HEADER -->
   <header class="header" id="headerArea">
     <button class="nav-btn" id="holdPrev" onclick="onHoldPrev(event)">◀</button>
@@ -249,6 +250,5 @@
 
 
 <script src="/app.js"></script>
-<div class="page-spacer"></div>
 </body>
 </html>
