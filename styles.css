@@ -3,6 +3,52 @@
   --muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;
   --success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;
 }
+/* ===== Welcome Screen ===== */
+.welcome{
+  position:fixed;
+  inset:0;
+  z-index:300;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  background:var(--bg);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.welcome-content{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:40px;
+  min-height:100dvh;
+}
+.welcome-logo{font-size:64px;margin-bottom:16px;}
+.welcome-title{font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.welcome-hint{font-size:14px;color:var(--muted);margin-bottom:12px;}
+.welcome-arrow{font-size:28px;color:var(--primary);animation:bounce 1.5s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
+.welcome-spacer{
+  flex:none;
+  height:120px; /* tạo đủ scroll */
+  width:100%;
+}
+
+/* Ẩn welcome */
+.welcome.hidden{
+  display:none;
+}
+
+/* Body ban đầu cho phép scroll */
+body{overflow:auto;}
+/* Khi app khởi động xong, khóa scroll */
+body.app-ready{
+  overflow:hidden !important;
+  touch-action:none !important;
+  overscroll-behavior:none !important;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
   -webkit-touch-callout:none!important;-webkit-user-select:none!important;
   user-select:none!important;touch-action:manipulation;}

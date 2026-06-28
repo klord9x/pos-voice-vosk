@@ -80,6 +80,61 @@ function apiCall(action, payload){
 }
 
 /* ===== Mobile browser guards: chặn long-press menu, double-tap zoom, select, drag ===== */
+/* ===== Welcome Screen: scroll để kích hoạt Chrome iOS ẩn bar ===== */
+(function(){
+  var welcome = document.getElementById('welcomeScreen');
+  var app = document.getElementById('app');
+  if(!welcome) return;
+
+  var dismissed = false;
+
+  function dismissWelcome(){
+    if(dismissed) return;
+    dismissed = true;
+
+    // Khóa scroll body
+    document.body.classList.add('app-ready');
+
+    // Ẩn welcome
+    welcome.classList.add('hidden');
+
+    // Scroll về top để app chính hiển thị đúng
+    window.scrollTo(0, 0);
+
+    // Nếu là Chrome iOS, thử scroll thêm 1 lần nữa để chắc chắn bar ẩn
+    if(/CriOS/.test(navigator.userAgent)){
+      setTimeout(function(){
+        window.scrollTo(0, 1);
+        setTimeout(function(){ window.scrollTo(0, 0); }, 50);
+      }, 50);
+    }
+  }
+
+  // Bắt sự kiện: scroll xuống đủ (> 60px)
+  welcome.addEventListener('scroll', function(){
+    if(welcome.scrollTop > 60){
+      dismissWelcome();
+    }
+  }, {passive: true});
+
+  // Hoặc chạm bất kỳ (touch) cũng dismiss
+  welcome.addEventListener('touchstart', function(e){
+    // Nếu user chạm vào spacer (vùng dưới), cho phép dismiss ngay
+    if(e.target.classList.contains('welcome-spacer')){
+      dismissWelcome();
+    }
+  }, {passive: true});
+
+  // Hoặc click (cho desktop test)
+  welcome.addEventListener('click', function(e){
+    dismissWelcome();
+  });
+
+  // Auto-dismiss sau 3 giây nếu user không tương tác (trường hợp bar đã ẩn sẵn)
+  setTimeout(function(){
+    if(!dismissed) dismissWelcome();
+  }, 3000);
+})();
 document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
