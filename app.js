@@ -1,5 +1,5 @@
 /* ===== API config (Cloudflare Pages frontend -> Apps Script JSON API backend) ===== */
-var API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // .../exec
+var API_URL = 'https://script.google.com/macros/s/AKfycbwk_Zm5bTDLw0BRhN0qQ0unrCWOcBxhjF9xcyMK83INbcwx4l4bi9YJuY7qh2OJzbfE/exec'; // .../exec
 
 function apiCall(action, payload){
   if(!payload){
