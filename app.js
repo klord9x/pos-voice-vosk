@@ -32,7 +32,7 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== 2 sections liền kề: snap to main khi bar ẩn, snap to welcome khi bar hiện ===== */
+/* ===== Welcome ↔ App: lock/unlock theo bar ẩn/hiện ===== */
 (function(){
   var app = document.getElementById('app');
   var welcome = document.getElementById('welcomeScreen');
@@ -49,84 +49,75 @@ document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false
   }
 
   var vv = window.visualViewport;
-  var baselineHeight = vv ? vv.height : window.innerHeight;
-  var mainTop = 0;
+  var baseline = vv ? vv.height : window.innerHeight;
   var locked = false;
+
+  function preventScroll(e){ e.preventDefault(); }
 
   function lock(){
     locked = true;
-    document.body.classList.add('app-locked');
+    document.documentElement.classList.add('locked');
+    document.body.classList.add('locked');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventScroll, { passive: false });
   }
 
   function unlock(){
     locked = false;
-    document.body.classList.remove('app-locked');
+    document.documentElement.classList.remove('locked');
+    document.body.classList.remove('locked');
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.removeEventListener('touchmove', preventScroll);
+    document.removeEventListener('touchstart', preventScroll);
   }
 
-  function snapToMain(){
-    if (!locked) lock();
-    app.classList.add('revealed');
-    window.scrollTo({ top: mainTop, behavior: 'smooth' });
+  function goToMain(){
+    window.scrollTo(0, window.innerHeight);
   }
 
-  function snapToWelcome(){
-    app.classList.remove('revealed');
-    unlock();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  function goToWelcome(){
+    window.scrollTo(0, 0);
   }
 
-  function checkBar(){
+  function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    var barHidden = current - baselineHeight > 20;
-    var atMain = window.scrollY >= mainTop - 50;
+    var barHidden = current - baseline > 25;
 
-    if (barHidden && atMain && !locked) {
-      snapToMain();
-    } else if (!barHidden && locked) {
-      snapToWelcome();
+    if(!locked && barHidden && window.scrollY > 50){
+      locked = true;
+      goToMain();
+      setTimeout(lock, 100);
+      return;
+    }
+
+    if(locked && !barHidden){
+      locked = false;
+      unlock();
+      goToWelcome();
     }
   }
 
-  function calcPositions(){
-    mainTop = app.offsetTop;
-  }
-
-  // Init
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', calcPositions);
-  } else {
-    calcPositions();
-  }
-
-  // Listeners
-  if (vv) vv.addEventListener('resize', checkBar);
-  window.addEventListener('resize', checkBar);
-  window.addEventListener('scroll', function(){
-    if (locked) return;
+  function onScroll(){
+    if(locked) return;
     var current = vv ? vv.height : window.innerHeight;
-    if (current - baselineHeight > 20 && window.scrollY > mainTop - 100) {
-      snapToMain();
+    if(current - baseline > 25 && window.scrollY > window.innerHeight * 0.6){
+      locked = true;
+      goToMain();
+      setTimeout(lock, 100);
     }
-  }, { passive: true });
+  }
 
-  // Touch end check
-  document.addEventListener('touchend', function(){
-    setTimeout(checkBar, 200);
-  }, { passive: true });
+  if(vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
+  window.addEventListener('scroll', onScroll, { passive: true });
 
-  // Nudge
+  // Nudge sau load
   window.addEventListener('load', function(){
-    setTimeout(function(){
-      window.scrollTo(0, 1);
-    }, 150);
+    setTimeout(function(){ window.scrollTo(0, 1); }, 150);
   });
-
-  // Fallback interval
-  var interval = setInterval(function(){
-    checkBar();
-    if (locked) clearInterval(interval);
-  }, 500);
-  setTimeout(function(){ clearInterval(interval); }, 5000);
 })();
 
 /* ===== PWA: register service worker ===== */
