@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Test — absolute sections, lock scroll at main</title>
+<title>Test — user scroll when bar shows</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
@@ -15,7 +15,6 @@ html,body{
   font-family:system-ui,sans-serif;
 }
 
-/* ===== Welcome: absolute ở top ===== */
 .welcome{
   position:absolute;
   top:0;left:0;right:0;
@@ -36,7 +35,6 @@ html,body{
 .arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}
 
-/* ===== Main: absolute ở dưới welcome ===== */
 .main{
   position:absolute;
   top:100vh;
@@ -55,11 +53,7 @@ html,body{
 .main-hint{font-size:18px;color:#fff;margin-bottom:12px;}
 .main-note{font-size:14px;color:#666;text-align:center;}
 
-/* ===== Scroll spacer: để body có đủ chiều cao scroll ===== */
-.spacer{
-  height:200vh;
-  height:200dvh;
-}
+.spacer{height:200vh;height:200dvh;}
 
 html.locked, body.locked {
   overflow: hidden !important;
@@ -87,7 +81,7 @@ html.locked, body.locked {
 
 <div class="main" id="main">
   <div class="main-hint">✅ Đã vào màn hình chính</div>
-  <div class="main-note">Menu bar đã ẩn. Không thể scroll lên lại welcome.<br>Vuốt lên sẽ không hiện bar.</div>
+  <div class="main-note">Bar ẩn = khóa scroll.<br>Bar hiện = mở scroll cho bạn tự cuộn xuống lại.</div>
 </div>
 
 <div class="spacer"></div>
@@ -106,58 +100,61 @@ html.locked, body.locked {
 
   function preventScroll(e){ e.preventDefault(); }
 
-  function lockAtMain(reason){
-    if(locked) return;
-    locked = true;
+  function lock(){
+    document.documentElement.classList.add('locked');
+    document.body.classList.add('locked');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+  }
 
-    // Scroll đến đúng top của main section (100vh)
-    var target = window.innerHeight; // 100vh
-    window.scrollTo(0, target);
+  function unlock(){
+    document.documentElement.classList.remove('locked');
+    document.body.classList.remove('locked');
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.removeEventListener('touchmove', preventScroll);
+    document.removeEventListener('touchstart', preventScroll);
+  }
 
-    // Đợi scroll xong rồi khóa
-    setTimeout(function(){
-      document.documentElement.classList.add('locked');
-      document.body.classList.add('locked');
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('touchstart', preventScroll, { passive: false });
-
-      var h = vv ? vv.height : window.innerHeight;
-      log('🔒 LOCKED (' + reason + ') at scrollY=' + Math.round(window.scrollY) +
-          ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px)');
-    }, 100);
+  function goToMain(){
+    window.scrollTo(0, window.innerHeight);
   }
 
   function onViewportResize(){
     var current = vv ? vv.height : window.innerHeight;
-    if(!locked){
-      log('viewport=' + Math.round(current) + 'px | scrollY=' + Math.round(window.scrollY));
-      if(current - baseline > 30 && window.scrollY > 50){
-        lockAtMain('viewport-resize (bar đã ẩn)');
-      }
+    var barHidden = current - baseline > 30;
+
+    if(!locked && barHidden && window.scrollY > 50){
+      // Bar ẩn lần đầu → lock
+      locked = true;
+      goToMain();
+      setTimeout(lock, 100);
+      log('🔒 LOCKED | viewport=' + Math.round(current) + 'px (+' + Math.round(current - baseline) + 'px)');
       return;
     }
-    // Đã locked — watchdog
-    if(current - baseline < 30){
-      log('⚠️ bar hiện lại (viewport=' + Math.round(current) + 'px)');
-      // KHÔNG cố cuộn — scroll position đã ở main, welcome bị khuất bởi absolute
-      // Chỉ cần đảm bảo không lộ welcome
-      window.scrollTo(0, window.innerHeight);
-    } else {
-      log('🔒 locked, viewport=' + Math.round(current) + 'px (+' + Math.round(current - baseline) + 'px)');
+
+    if(locked){
+      if(!barHidden){
+        // Bar hiện lại → unlock cho user tự scroll
+        locked = false;
+        unlock();
+        log('🔓 UNLOCKED — bar hiện, cuộn xuống để ẩn lại');
+      } else {
+        log('🔒 locked, viewport=' + Math.round(current) + 'px');
+      }
     }
   }
 
   function onScroll(){
     if(locked) return;
     var current = vv ? vv.height : window.innerHeight;
-    if(current - baseline > 30 && window.scrollY > 50){
-      lockAtMain('scroll + viewport tăng');
-      return;
-    }
-    if(window.scrollY > window.innerHeight * 0.6){
-      lockAtMain('scroll sâu (fallback)');
+    if(current - baseline > 30 && window.scrollY > window.innerHeight * 0.6){
+      locked = true;
+      goToMain();
+      setTimeout(lock, 100);
+      log('🔒 LOCKED (scroll) | viewport=' + Math.round(current) + 'px');
     }
   }
 
