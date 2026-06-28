@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Test Welcome Scroll</title>
+<title>Test Welcome Scroll — lock at main</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
@@ -31,13 +31,24 @@ html,body{
   color:#fff;
 }
 .section-1{min-height:80vh;display:flex;flex-direction:column;justify-content:center;}
-.section-2{min-height:40vh;display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;}
+.section-2{
+  min-height:100vh;min-height:100dvh; /* để khi khoá lại, nó vừa khít 1 màn hình, tràn viền */
+  display:flex;flex-direction:column;justify-content:center;border-top:1px solid #444;
+}
 .logo{font-size:80px;margin-bottom:20px;}
 .title{font-size:28px;font-weight:700;margin-bottom:12px;}
 .hint{font-size:16px;color:#aaa;margin-bottom:30px;}
 .arrow{font-size:40px;color:#0A84FF;animation:bounce 1.2s infinite;}
 .note{font-size:14px;color:#666;margin-top:40px;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}
+
+/* debug — xoá khi không cần nữa */
+.status{
+  position:fixed;bottom:8px;left:8px;right:8px;z-index:999;
+  font-size:11px;color:#0F0;font-family:monospace;
+  background:rgba(0,0,0,.6);padding:6px 8px;border-radius:6px;
+  pointer-events:none;white-space:pre-wrap;
+}
 </style>
 </head>
 <body>
@@ -49,11 +60,68 @@ html,body{
     <div class="hint">Vuốt xuống để tiếp tục</div>
     <div class="arrow">↓</div>
   </div>
-  <div class="section section-2">
+  <div class="section section-2" id="mainSection">
     <div class="hint">Nội dung tiếp theo...</div>
     <div class="note">Nếu Chrome iOS ẩn được address bar, bạn sẽ thấy màn hình tràn viền</div>
   </div>
 </div>
 
+<div class="status" id="status">baseline: đang đo…</div>
+
+<script>
+(function(){
+  var statusEl = document.getElementById('status');
+  var mainSection = document.getElementById('mainSection');
+  var vv = window.visualViewport;
+  var baseline = vv ? vv.height : window.innerHeight;
+  var locked = false;
+
+  function log(msg){ statusEl.textContent = msg; }
+  log('baseline: ' + Math.round(baseline) + 'px — cuộn xuống đi...');
+
+  function preventScroll(e){ e.preventDefault(); }
+
+  function lockHere(reason){
+    if (locked) return;
+    locked = true;
+
+    // Khoá cả 2 chiều — KHÔNG gọi scrollTo, giữ nguyên vị trí đang đứng
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+
+    if (vv) vv.removeEventListener('resize', onViewportResize);
+    window.removeEventListener('scroll', onScroll);
+
+    var h = vv ? vv.height : window.innerHeight;
+    log('🔒 LOCKED (' + reason + ') tại scrollY=' + Math.round(window.scrollY) +
+        ' | viewport=' + Math.round(h) + 'px (+' + Math.round(h - baseline) + 'px so baseline)');
+  }
+
+  function onViewportResize(){
+    if (locked) return;
+    var current = vv ? vv.height : window.innerHeight;
+    var deepEnough = window.scrollY > (mainSection.offsetTop - window.innerHeight * 0.3);
+    log('viewport=' + Math.round(current) + 'px (cần +30) | scrollY=' + Math.round(window.scrollY) +
+        ' | mainSection.top=' + Math.round(mainSection.offsetTop) + (deepEnough ? ' [đủ sâu]' : ' [chưa tới]'));
+    if (current - baseline > 30 && deepEnough) lockHere('viewport-resize tại main');
+  }
+
+  // Fallback nếu bar không tự ẩn được nhưng user đã cuộn rõ ràng vào hẳn section-2
+  function onScroll(){
+    if (locked) return;
+    var deepInMain = window.scrollY > (mainSection.offsetTop + 40);
+    if (deepInMain) {
+      // chỉ lock theo scroll thường nếu viewport CŨNG đã tăng (tránh lock nhầm khi bar chưa ẩn)
+      var current = vv ? vv.height : window.innerHeight;
+      if (current - baseline > 30) lockHere('scroll sâu vào main + viewport đã tăng');
+    }
+  }
+
+  if (vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
 </body>
 </html>
