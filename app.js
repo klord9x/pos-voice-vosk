@@ -1,59 +1,6 @@
 /* ===== API config (Cloudflare Pages frontend -> Apps Script JSON API backend) ===== */
 var API_URL = 'https://script.google.com/macros/s/AKfycbwk_Zm5bTDLw0BRhN0qQ0unrCWOcBxhjF9xcyMK83INbcwx4l4bi9YJuY7qh2OJzbfE/exec'; // .../exec
 
-/* ===== Chrome iOS: auto-hide address bar then lock scroll ===== */
-(function(){
-  var isChromeIOS = /CriOS/.test(navigator.userAgent);
-  if(!isChromeIOS) return;
-
-  var app = document.getElementById('app');
-  if(!app) return;
-
-  // Tạo spacer lớn để đảm bảo có scroll
-  var spacer = document.createElement('div');
-  spacer.style.cssText = 'height:120px;flex-shrink:0;pointer-events:none;opacity:0;';
-  app.appendChild(spacer);
-
-  // Hàm scroll xuống nhiều lần để kích hoạt
-  function doScroll(attempts){
-    if(attempts <= 0){
-      // Xong, xóa spacer và khóa
-      spacer.remove();
-      document.body.classList.add('scroll-locked');
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      app.style.minHeight = '100dvh';
-      return;
-    }
-    // Scroll xuống 1px rồi lên 0 — mô phỏng "pull down"
-    document.documentElement.scrollTop = 1;
-    document.body.scrollTop = 1;
-    setTimeout(function(){
-      document.documentElement.scrollTop = 100;
-      document.body.scrollTop = 100;
-      setTimeout(function(){
-        doScroll(attempts - 1);
-      }, 150);
-    }, 50);
-  }
-
-  // Chờ DOM ready rồi bắt đầu
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ doScroll(4); });
-  } else {
-    doScroll(4);
-  }
-})();
-// Thêm vào sau đoạn trên
-document.addEventListener('touchstart', function once(){
-  document.removeEventListener('touchstart', once);
-  window.scrollTo(0, 100);
-  setTimeout(function(){
-    document.body.classList.add('scroll-locked');
-    window.scrollTo(0, 0);
-  }, 600);
-}, {passive: true});
-
 function apiCall(action, payload){
   if(!payload){
     // Simple GET, no preflight
@@ -80,128 +27,67 @@ function apiCall(action, payload){
 }
 
 /* ===== Mobile browser guards: chặn long-press menu, double-tap zoom, select, drag ===== */
-/* ===== Welcome Screen: phát hiện Chrome iOS ẩn bar qua viewport resize ===== */
-(function(){
-  var welcome = document.getElementById('welcomeScreen');
-  var app = document.getElementById('app');
-  var loading = document.getElementById('loadingScreen');
-  if(!welcome || !app) return;
-
-  var dismissed = false;
-  var initialHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  var screenH = window.screen.height;
-  // Nếu viewport đã gần full screen (bar đã ẩn sẵn hoặc PWA standalone)
-  var barAlreadyHidden = initialHeight > screenH * 0.92;
-
-  function dismissWelcome() {
-    if(dismissed) return;
-    dismissed = true;
-
-    // Scroll về top trước khi hiện app
-    window.scrollTo(0, 0);
-
-    // Khóa body scroll hoàn toàn
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-    document.body.style.overscrollBehavior = 'none';
-
-    // Ẩn welcome, hiện app
-    welcome.style.display = 'none';
-    app.style.display = 'flex';
-
-    // Đảm bảo app phủ kín viewport mới (sau khi bar ẩn)
-    app.style.minHeight = '100dvh';
-  }
-
-  // Nếu bar đã ẩn hoặc không phải Chrome iOS → dismiss ngay
-  if(barAlreadyHidden || !/CriOS/.test(navigator.userAgent)) {
-    setTimeout(dismissWelcome, 50);
-    return;
-  }
-
-  // Phát hiện bar ẩn qua visualViewport resize
-  function onViewportChange() {
-    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    if(h > initialHeight + 25) {
-      dismissWelcome();
-    }
-  }
-
-  if(window.visualViewport) {
-    window.visualViewport.addEventListener('resize', onViewportChange);
-  }
-  window.addEventListener('resize', onViewportChange);
-
-  // Bắt body scroll: nếu user scroll xuống > 40px, kích hoạt dismiss
-  window.addEventListener('scroll', function(){
-    if(window.scrollY > 40) {
-      setTimeout(onViewportChange, 100);
-    }
-  }, {passive: true});
-
-  // Bắt touch end: kiểm tra viewport sau khi user thả tay
-  welcome.addEventListener('touchend', function(){
-    setTimeout(onViewportChange, 200);
-  }, {passive: true});
-
-  // Auto dismiss sau 5s nếu không tương tác
-  setTimeout(function(){
-    if(!dismissed) dismissWelcome();
-  }, 5000);
-})();
 document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Ẩn toolbar trên/dưới Chrome iOS (chỉ áp dụng khi mở bằng tab browser thường, KHÔNG áp dụng khi đã chạy như PWA standalone — case đó đã xử lý bằng safe-area trong CSS) ===== */
+/* ===== Welcome screen (scrollable, normal flow) -> chờ user kéo xuống hoặc Chrome tự ẩn bar -> reveal #app (fixed) =====
+   PWA standalone (đã add Home Screen) thì bỏ qua hẳn, dùng safe-area như cũ. */
 (function(){
+  var app = document.getElementById('app');
+  var welcome = document.getElementById('welcomeScreen');
+  if (!app || !welcome) return;
+
   var isStandalone = window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches ||
     window.matchMedia('(display-mode: fullscreen)').matches;
-  if (isStandalone) return;
 
-  var app = document.getElementById('app');
-
-  function forceScrollNudge(){
-    // .app vốn overflow:hidden nên không có gì để cuộn — tạm tạo dư khoảng để cuộn được 1px,
-    // đủ để Chrome hiểu là "người dùng đang cuộn" và tự thu gọn toolbar.
-    document.documentElement.style.overflow = 'auto';
-    document.body.style.overflow = 'auto';
-    document.body.style.height = (window.innerHeight + 50) + 'px';
-    window.scrollTo(0, 1);
+  if (isStandalone) {
+    document.body.classList.add('app-locked');
+    app.classList.add('revealed');
+    return;
   }
 
-  function lockExpandedHeight(){
-    var h = window.innerHeight;
-    document.documentElement.style.height = h + 'px';
-    document.body.style.height = h + 'px';
-    if (app) app.style.height = h + 'px';
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
+  var revealed = false;
+  var vv = window.visualViewport;
+  var baselineHeight = vv ? vv.height : window.innerHeight;
+
+  function revealApp(){
+    if (revealed) return;
+    revealed = true;
+    app.classList.add('revealed');
+    document.body.classList.add('app-locked');
     window.scrollTo(0, 0);
   }
 
-  function tryCollapseAndLock(){
-    forceScrollNudge();
-    setTimeout(function(){
-      window.scrollTo(0, 1); // nudge lần 2 — vài bản Chrome iOS cần 2 lần mới chịu ẩn bar
-      setTimeout(lockExpandedHeight, 300);
-    }, 100);
+  function onViewportResize(){
+    var current = vv ? vv.height : window.innerHeight;
+    // Chrome ẩn bar xong -> visualViewport cao thêm hẳn so với lúc đầu
+    if (current - baselineHeight > 30) revealApp();
   }
 
+  if (vv) {
+    vv.addEventListener('resize', onViewportResize);
+  } else {
+    window.addEventListener('resize', onViewportResize);
+  }
+
+  // Vẫn tự thử nudge nhẹ sau khi load, để không bắt buộc user phải tự kéo tay
   window.addEventListener('load', function(){
-    setTimeout(tryCollapseAndLock, 50);
+    setTimeout(function(){
+      window.scrollTo(0, 1);
+      setTimeout(function(){ window.scrollTo(0, 1); }, 250);
+    }, 150);
   });
 
-  // Xoay màn hình → viewport đổi kích thước → phải đo và khoá lại từ đầu
-  window.addEventListener('orientationchange', function(){
-    if (app) app.style.height = '';
-    document.documentElement.style.height = '';
-    document.body.style.height = '';
-    setTimeout(tryCollapseAndLock, 300);
-  });
+  // Fallback: nếu user tự kéo hết welcome-spacer (chạm đáy scroll) mà bar vẫn chưa ẩn được
+  // (vd Safari không có cơ chế này) thì vẫn cho vào app luôn, không bắt chờ vô thời hạn.
+  window.addEventListener('scroll', function(){
+    if (revealed) return;
+    var atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 10);
+    if (atBottom) revealApp();
+  }, { passive: true });
 })();
 
 /* ===== PWA: register service worker ===== */
