@@ -32,75 +32,74 @@ document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, fa
 document.addEventListener('selectstart', function(e){ e.preventDefault(); }, false);
 document.addEventListener('dragstart', function(e){ e.preventDefault(); }, false);
 
-/* ===== Welcome Screen: phát hiện Chrome iOS ẩn bar qua viewport resize ===== */
+/* ===== Welcome ↔ App toggle: bar hiện = welcome, bar ẩn = app ===== */
 (function(){
   var welcome = document.getElementById('welcomeScreen');
   var app = document.getElementById('app');
-  var loading = document.getElementById('loadingScreen');
   if(!welcome || !app) return;
 
-  var dismissed = false;
-  var initialHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  var screenH = window.screen.height;
-  // Nếu viewport đã gần full screen (bar đã ẩn sẵn hoặc PWA standalone)
-  var barAlreadyHidden = initialHeight > screenH * 0.92;
+  var vv = window.visualViewport;
+  var baseline = vv ? vv.height : window.innerHeight;
+  var locked = false;
+  var appVisible = false;
 
-  function dismissWelcome() {
-    if(dismissed) return;
-    dismissed = true;
+  function preventScroll(e){ e.preventDefault(); }
 
-    // Scroll về top trước khi hiện app
-    window.scrollTo(0, 0);
-
-    // Khóa body scroll hoàn toàn
-    document.body.style.overflow = 'hidden';
+  function lock(){
+    document.documentElement.classList.add('scroll-locked');
+    document.body.classList.add('scroll-locked');
     document.documentElement.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-    document.body.style.overscrollBehavior = 'none';
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventScroll, { passive: false });
+  }
 
-    // Ẩn welcome, hiện app
-    welcome.style.display = 'none';
-    app.style.display = 'flex';
+  function unlock(){
+    document.documentElement.classList.remove('scroll-locked');
+    document.body.classList.remove('scroll-locked');
+    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = 'auto';
+    document.removeEventListener('touchmove', preventScroll);
+    document.removeEventListener('touchstart', preventScroll);
+  }
 
-    // Đảm bảo app phủ kín viewport mới (sau khi bar ẩn)
+  function showApp(){
+    if(appVisible) return;
+    appVisible = true;
+    app.classList.add('visible');
     app.style.minHeight = '100dvh';
+    window.scrollTo(0, 0);
+    setTimeout(lock, 50);
   }
 
-  // Nếu bar đã ẩn hoặc không phải Chrome iOS → dismiss ngay
-  if(barAlreadyHidden || !/CriOS/.test(navigator.userAgent)) {
-    setTimeout(dismissWelcome, 50);
-    return;
+  function hideApp(){
+    if(!appVisible) return;
+    appVisible = false;
+    app.classList.remove('visible');
+    unlock();
   }
 
-  // Phát hiện bar ẩn qua visualViewport resize
-  function onViewportChange() {
-    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    if(h > initialHeight + 25) {
-      dismissWelcome();
+  function onViewportResize(){
+    var current = vv ? vv.height : window.innerHeight;
+    var barHidden = current - baseline > 25;
+
+    if(barHidden && !appVisible){
+      showApp();
+      return;
+    }
+    if(!barHidden && appVisible){
+      hideApp();
     }
   }
 
-  if(window.visualViewport) {
-    window.visualViewport.addEventListener('resize', onViewportChange);
-  }
-  window.addEventListener('resize', onViewportChange);
+  if(vv) vv.addEventListener('resize', onViewportResize);
+  else window.addEventListener('resize', onViewportResize);
 
-  // Bắt body scroll: nếu user scroll xuống > 40px, kích hoạt dismiss
-  window.addEventListener('scroll', function(){
-    if(window.scrollY > 40) {
-      setTimeout(onViewportChange, 100);
-    }
-  }, {passive: true});
-
-  // Bắt touch end: kiểm tra viewport sau khi user thả tay
-  welcome.addEventListener('touchend', function(){
-    setTimeout(onViewportChange, 200);
-  }, {passive: true});
-
-  // Auto dismiss sau 5s nếu không tương tác
+  // Fallback: nếu bar đã ẩn sẵn khi load
   setTimeout(function(){
-    if(!dismissed) dismissWelcome();
-  }, 5000);
+    var current = vv ? vv.height : window.innerHeight;
+    if(current - baseline > 25) showApp();
+  }, 300);
 })();
 
 /* ===== PWA: register service worker ===== */
