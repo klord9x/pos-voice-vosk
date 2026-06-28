@@ -3,27 +3,34 @@
   --muted:#9A9A9A;--disabled:#666666;--primary:#0A84FF;
   --success:#8FD67A;--danger:#FF453A;--key-bg:#2A2A2A;
 }
-/* ===== Welcome Screen ===== */
-.welcome{
-  position:fixed;
-  inset:0;
-  z-index:300;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none!important;-webkit-user-select:none!important;
+  user-select:none!important;touch-action:manipulation;}
+
+/* ===== Body scrollable lúc đầu để Chrome iOS ẩn bar ===== */
+html,body{
+  height:auto;
+  min-height:100%;
+  overflow:auto;
   background:var(--bg);
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
+  color:var(--text);
+  font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
 }
-.welcome-content{
-  flex:none;
+
+/* ===== Welcome Screen: normal flow, body scrollable ===== */
+.welcome{
+  position:relative;
+  z-index:300;
+  background:var(--bg);
+}
+.welcome-inner{
+  min-height:100dvh;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   padding-top:env(safe-area-inset-top);
   padding-bottom:40px;
-  min-height:100dvh;
 }
 .welcome-logo{font-size:64px;margin-bottom:16px;}
 .welcome-title{font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px;}
@@ -31,62 +38,26 @@
 .welcome-arrow{font-size:28px;color:var(--primary);animation:bounce 1.5s infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(8px);}}
 .welcome-spacer{
-  flex:none;
-  height:120px; /* tạo đủ scroll */
+  height:120px; /* tạo đủ scroll cho body */
   width:100%;
 }
 
-/* Ẩn welcome */
-.welcome.hidden{
-  display:none;
-}
-
-/* Body ban đầu cho phép scroll */
-body{overflow:auto;}
-/* Khi app khởi động xong, khóa scroll */
-body.app-ready{
-  overflow:hidden !important;
-  touch-action:none !important;
-  overscroll-behavior:none !important;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
-  -webkit-touch-callout:none!important;-webkit-user-select:none!important;
-  user-select:none!important;touch-action:manipulation;}
-
-/* ===== iOS height fix ===== */
-html{
-  height:100%;
-  min-height:100dvh;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
-}
-body{
-  height:auto;
-  min-height:100%;
-  overflow:auto; /* QUAN TRỌNG: để scroll hoạt động */
-  background:var(--bg);color:var(--text);
-  font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;
-}
-body.scroll-locked{
-  overflow:hidden !important;
-  touch-action:none !important;
-  overscroll-behavior:none !important;
-}
-
+/* ===== App: fixed, ẩn ban đầu, hiện sau khi bar ẩn ===== */
 .app{
-  min-height:100dvh; /* phủ kín dynamic viewport */
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
   max-width:520px;
   margin:0 auto;
   display:flex;
   flex-direction:column;
   padding-top:env(safe-area-inset-top);
-  /* KHÔNG position:fixed */
+  /* KHÔNG padding-bottom */
 }
 
-/* ===== Header: bỏ padding-top riêng vì app đã lo safe-area ===== */
+/* ===== Header ===== */
 .header{
-  height:48px; /* cố định, không cộng env() */
-  padding-top:0; /* bỏ vì .app đã lo safe-area */
+  height:48px;
+  flex:none;
   display:grid;
   grid-template-columns:40px 1fr auto auto;
   align-items:center;
