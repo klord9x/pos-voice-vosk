@@ -1052,11 +1052,6 @@ function renderSuggestions(results){
   SUGGEST_ACTIVE_IDX = 0;
   var max = 8;
 
-  var nameCount = {};
-  (SUGGESTIONS||[]).forEach(function(s){
-    nameCount[s.product.name] = (nameCount[s.product.name]||0) + 1;
-  });
-
   for(var i = 0; i < max; i++){
     var el = document.getElementById('suggest'+i);
     if(!el) continue;
@@ -1065,12 +1060,8 @@ function renderSuggestions(results){
     var priceEl = document.getElementById('s'+i+'price');
     if(SUGGESTIONS && SUGGESTIONS[i]){
       var p = SUGGESTIONS[i].product;
-      var isDup = nameCount[p.name] > 1;
       nameEl.textContent = p.name;
-      if(unitEl){
-        unitEl.textContent = isDup ? (p.unit||'') : '';
-        unitEl.classList.toggle('show', isDup && !!p.unit);
-      }
+      if(unitEl) unitEl.textContent = p.unit || '';
       priceEl.textContent = fmtShort(p.price);
     }
   }
