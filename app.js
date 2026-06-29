@@ -1200,7 +1200,7 @@ function onEnterKey(){
     if(!SEARCH_QUERY.trim() && SUGGESTIONS && SUGGESTIONS.length > 0){
       // Tap on recent product → add to cart
       var sug = SUGGESTIONS[SUGGEST_ACTIVE_IDX] || SUGGESTIONS[0];
-      addToCartDirect(sug.product, 1, 'đv');
+      addToCartDirect(sug.product, 1, sug.product.unit || 'đv');
       SEARCH_QUERY = '';
       PENDING_PRODUCT = null;
       SUGGEST_ACTIVE_IDX = 0;
@@ -1213,7 +1213,7 @@ function onEnterKey(){
       var sug = SUGGESTIONS[SUGGEST_ACTIVE_IDX] || SUGGESTIONS[0];
       var parsed = parseSegment(SEARCH_QUERY);
       var qty = (parsed && parsed.qty > 0) ? parsed.qty : 1;
-      addToCartDirect(sug.product, qty, 'đv');
+      addToCartDirect(sug.product, qty, sug.product.unit || 'đv');
       SEARCH_QUERY = '';
       PENDING_PRODUCT = null;
       SUGGEST_ACTIVE_IDX = 0;
