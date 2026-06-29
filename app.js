@@ -58,6 +58,48 @@ var MATCH_OK = 0.55;
 var MATCH_LOW = 0.32;
 var QTY_CONFIG = [];
 var SALES_HISTORY = [];
+var SEARCH_INDEX = [];
+
+function buildSearchIndex(){
+  var len = PRODUCTS.length;
+  SEARCH_INDEX = new Array(len);
+  for(var i = 0; i < len; i++){
+    var p = PRODUCTS[i];
+    var text = (p.name + ' ' + (p.keywords||[]).join(' ') + ' ' + p.code)
+      .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+    SEARCH_INDEX[i] = {searchText: text, product: p};
+  }
+}
+
+function simpleSearch(query, limit){
+  if(!query) return [];
+  limit = limit || 8;
+  var q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+  var matched = [];
+  var maxPool = limit * 3;
+  for(var i = 0; i < SEARCH_INDEX.length && matched.length < maxPool; i++){
+    var item = SEARCH_INDEX[i];
+    if(item.searchText.indexOf(q) !== -1){
+      matched.push(item);
+    }
+  }
+  if(matched.length === 0) return [];
+  matched.sort(function(a, b){
+    return rankSearch(b.searchText, q) - rankSearch(a.searchText, q);
+  });
+  var out = new Array(Math.min(limit, matched.length));
+  for(var i = 0; i < out.length; i++){
+    out[i] = {product: matched[i].product, score: 1.0, matchType: 'search'};
+  }
+  return out;
+}
+
+function rankSearch(text, query){
+  if(text === query) return 300;
+  if(text.indexOf(query) === 0) return 200;
+  if(text.indexOf(' ' + query) !== -1) return 100;
+  return 50;
+}
 
 var STATE = 'search';
 var PREV_STATE = 'search';
@@ -1168,21 +1210,22 @@ function getRecentProducts(limit){
   limit = limit || 8;
   var seen = {};
   var result = [];
+  var codeMap = {};
+  for(var i = 0; i < PRODUCTS.length; i++){
+    codeMap[PRODUCTS[i].code] = PRODUCTS[i];
+  }
   for(var i = 0; i < SALES_HISTORY.length && result.length < limit; i++){
     var code = SALES_HISTORY[i].code;
-    if(!seen[code]){
-      var prod = PRODUCTS.filter(function(p){ return p.code === code; })[0];
-      if(prod){
-        seen[code] = true;
-        result.push({product: prod, score: 1.0, matchType: 'recent'});
-      }
+    if(!seen[code] && codeMap[code]){
+      seen[code] = true;
+      result.push({product: codeMap[code], score: 1.0, matchType: 'recent'});
     }
   }
   for(var i = 0; i < PRODUCTS.length && result.length < limit; i++){
-    var code = PRODUCTS[i].code;
-    if(!seen[code]){
-      seen[code] = true;
-      result.push({product: PRODUCTS[i], score: 0.8, matchType: 'top'});
+    var p = PRODUCTS[i];
+    if(!seen[p.code]){
+      seen[p.code] = true;
+      result.push({product: p, score: 0.8, matchType: 'top'});
     }
   }
   return result;
@@ -1203,16 +1246,29 @@ function liveSearch(){
     renderSuggestions(recent);
     return;
   }
-  var parsed = parseSegment(SEARCH_QUERY);
-  var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
-  var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = matchProductTop3(searchPhrase, parsed ? parsed.unit : null, SEARCH_INPUT_MODE);
-  if(results && results.length > 0){
-    PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
+  if(SEARCH_INPUT_MODE === 'voice'){
+    var parsed = parseSegment(SEARCH_QUERY);
+    var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
+    var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
+    var results = matchProductTop3(searchPhrase, parsed ? parsed.unit : null, 'voice');
+    if(results && results.length > 0){
+      PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
+    } else {
+      PENDING_PRODUCT = null;
+    }
+    renderSuggestions(results);
   } else {
-    PENDING_PRODUCT = null;
+    var parsed = parseSegment(SEARCH_QUERY);
+    var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
+    var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
+    var results = simpleSearch(searchPhrase, 8);
+    if(results && results.length > 0){
+      PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
+    } else {
+      PENDING_PRODUCT = null;
+    }
+    renderSuggestions(results);
   }
-  renderSuggestions(results);
 }
 
 function onSearchKey(c){
@@ -1468,6 +1524,7 @@ function saveInvoiceBtn(){
 
 apiCall('getProducts').then(function(products){
   PRODUCTS = products || [];
+  buildSearchIndex();
   document.getElementById('loadingScreen').classList.add('hidden');
   if(ORDERS.length === 0){
     var firstOrder = createOrder(NEXT_ORDER_ID++);
