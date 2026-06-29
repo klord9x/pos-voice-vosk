@@ -1,5 +1,5 @@
 /* ===== API config (Cloudflare Pages frontend -> Apps Script JSON API backend) ===== */
-var API_URL = 'https://script.google.com/macros/s/AKfycbys7kdjacvbgQFxRay2X3HvURxfWcg3MW7hbxuOY-sHMfIyQ5K0PjXvgoISPBX2qhmAUw/exec'; // .../exec
+var API_URL = 'https://script.google.com/macros/s/AKfycbxZTYYC7Z5sHkeRcjY3dCyCM4a-BOCSUYfG2BpwHN4_2FJmfTZqj1Ub0rvegp_R6DKTnQ/exec'; // .../exec
 
 function apiCall(action, payload){
   if(!payload){

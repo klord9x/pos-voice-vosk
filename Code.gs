@@ -293,9 +293,9 @@ function getProducts() {
   for (var i = 0; i < data.length; i++) {
     var code = data[i][0];
     var name = data[i][1];
-    var keywordsRaw = data[i][2];
-    var price = data[i][3];
-    var unit = data[i][4];
+    var price = data[i][2];
+    var unit = data[i][3];
+    var keywordsRaw = data[i][4];
     if (!name) continue;
 
     var sheetKeywords = keywordsRaw
