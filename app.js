@@ -202,7 +202,7 @@ function search(query, limit){
 
   var results = [];
   for(var i = 0; i < Math.min(limit, scored.length); i++){
-    results.push({product: SEARCH_INDEX[scored[i].idx].product, score: 1.0, matchType: 'search'});
+    results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
   }
 
   // Cache prefix
@@ -1140,6 +1140,7 @@ function initSpeechRecognition(){
   recognition.lang = 'vi-VN';
   recognition.continuous = false;
   recognition.interimResults = true;
+  recognition.maxAlternatives = 5;
 
   recognition.onstart = function(){
     VOICE_ACTIVE = true;
@@ -1148,15 +1149,24 @@ function initSpeechRecognition(){
   };
 
   recognition.onresult = function(event){
-    var interim = '', final = '';
+    var interim = '';
+    var finalCandidates = [];
     for(var i = event.resultIndex; i < event.results.length; i++){
-      if(event.results[i].isFinal) final += event.results[i][0].transcript;
-      else interim += event.results[i][0].transcript;
+      if(event.results[i].isFinal){
+        var alts = event.results[i];
+        for(var j = 0; j < alts.length; j++){
+          var t = alts[j].transcript.trim();
+          if(t) finalCandidates.push(t);
+        }
+      } else {
+        interim += event.results[i][0].transcript;
+      }
     }
-    if(final.trim()){
+    if(finalCandidates.length > 0){
       VOICE_DONE = true;
       SEARCH_INPUT_MODE = 'voice';
-      SEARCH_QUERY = final.trim();
+      var best = pickBestVoiceResult(finalCandidates);
+      SEARCH_QUERY = best || finalCandidates[0];
       renderCommand();
       liveSearch();
     }
@@ -1175,6 +1185,62 @@ function initSpeechRecognition(){
     renderCommand();
     if(SEARCH_QUERY) liveSearch();
   };
+}
+
+function pickBestVoiceResult(candidates){
+  var bestText = candidates[0] || '';
+  var bestScore = -1;
+  for(var t = 0; t < candidates.length; t++){
+    var text = candidates[t];
+    if(!text) continue;
+    var result = scoreVoiceMatch(text);
+    if(result.score > bestScore){
+      bestScore = result.score;
+      bestText = text;
+    }
+    if(result.score < 8000){
+      var variations = generateVoiceVariants(text);
+      for(var v = 0; v < variations.length; v++){
+        var vr = scoreVoiceMatch(variations[v]);
+        if(vr.score > bestScore){
+          bestScore = vr.score;
+          bestText = variations[v];
+        }
+      }
+    }
+  }
+  return bestText;
+}
+
+function scoreVoiceMatch(text){
+  var results = search(text, 1);
+  if(results.length === 0) return {score: -1, text: text};
+  return {score: results[0].score, text: text};
+}
+
+function generateVoiceVariants(text){
+  var variants = [];
+  var words = text.split(/\s+/).filter(Boolean);
+  // Gộp 2 từ ngắn: "cô ca" → "coca"
+  if(words.length >= 2){
+    for(var i = 0; i < words.length - 1; i++){
+      if(words[i].length <= 3 && words[i+1].length <= 3){
+        var merged = words.slice(0,i).concat([words[i]+words[i+1]]).concat(words.slice(i+2)).join(' ');
+        if(merged !== text) variants.push(merged);
+      }
+    }
+  }
+  // Tách từ dài không space: "cocacola" → "coca cola"
+  if(words.length === 1 && text.length > 6){
+    var commonSplits = {'cocacola':'coca cola','stingvang':'sting vang','stingdo':'sting do','pepsi':'pepsi'};
+    if(commonSplits[text]) variants.push(commonSplits[text]);
+  }
+  // Thử bỏ từ cuối (thường là từ thừa API tự thêm)
+  if(words.length >= 3){
+    variants.push(words.slice(0, -1).join(' '));
+    if(words.length >= 4) variants.push(words.slice(0, -2).join(' '));
+  }
+  return variants;
 }
 
 function startVoiceInput(){
