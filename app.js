@@ -1077,11 +1077,13 @@ function renderSuggestions(results){
 function stopMarquee(el){
   if(!el) return;
   var t = el.dataset.marqueeTimer;
-  if(t) clearTimeout(parseInt(t));
+  if(t) clearTimeout(t);
+  var raf = el.dataset.marqueeRAF;
+  if(raf) cancelAnimationFrame(raf);
   el.dataset.marquee = '';
   el.dataset.marqueeTimer = '';
-  el.style.transition = '';
-  el.style.transform = '';
+  el.dataset.marqueeRAF = '';
+  el.scrollLeft = 0;
   el.style.textOverflow = 'ellipsis';
 }
 
@@ -1090,27 +1092,39 @@ function startMarquee(el){
   if(!el) return;
   el.dataset.marqueeTimer = setTimeout(function(){
     el.style.textOverflow = 'clip';
-    el.style.transition = 'none';
-    el.style.transform = 'translateX(0)';
-    void el.offsetWidth;
+    el.scrollLeft = 0;
     var cw = el.offsetWidth;
     var sw = el.scrollWidth;
     if(sw <= cw){ el.style.textOverflow = 'ellipsis'; return; }
     el.dataset.marquee = '1';
-    var dist = Math.round(sw - cw + 20);
-    el.style.transition = 'transform 3.5s ease-in-out';
-    el.style.transform = 'translateX(-'+dist+'px)';
-    el.dataset.marqueeTimer = setTimeout(function(){
-      el.style.transition = 'transform 0.6s ease-in-out';
-      el.style.transform = 'translateX(0)';
-      el.dataset.marqueeTimer = setTimeout(function(){
-        el.dataset.marquee = '';
-        el.dataset.marqueeTimer = '';
-        el.style.transition = '';
-        el.style.transform = '';
-        el.style.textOverflow = 'ellipsis';
-      }, 600);
-    }, 3500);
+    var target = sw - cw + 20;
+    var duration = 3500;
+    var startTime = null;
+    function slide(t){
+      if(!startTime) startTime = t;
+      var p = Math.min((t - startTime) / duration, 1);
+      el.scrollLeft = target * p;
+      if(p < 1) el.dataset.marqueeRAF = requestAnimationFrame(slide);
+      else {
+        el.dataset.marqueeTimer = setTimeout(function(){
+          var rt = 600, rs = null;
+          function back(t2){
+            if(!rs) rs = t2;
+            var p2 = Math.min((t2 - rs) / rt, 1);
+            el.scrollLeft = target * (1 - p2);
+            if(p2 < 1) el.dataset.marqueeRAF = requestAnimationFrame(back);
+            else {
+              el.dataset.marquee = '';
+              el.dataset.marqueeTimer = '';
+              el.dataset.marqueeRAF = '';
+              el.style.textOverflow = 'ellipsis';
+            }
+          }
+          el.dataset.marqueeRAF = requestAnimationFrame(back);
+        }, 500);
+      }
+    }
+    el.dataset.marqueeRAF = requestAnimationFrame(slide);
   }, 400);
 }
 
