@@ -1089,30 +1089,28 @@ function startMarquee(el){
   stopMarquee(el);
   if(!el) return;
   el.dataset.marqueeTimer = setTimeout(function(){
-    var cw = el.offsetWidth;
-    var sw = el.scrollWidth;
-    if(sw <= cw) return;
-    el.dataset.marquee = '1';
-    el.style.overflow = 'hidden';
     el.style.textOverflow = 'clip';
     el.style.transition = 'none';
     el.style.transform = 'translateX(0)';
-    var dist = sw - cw + 20;
-    requestAnimationFrame(function(){
-      el.style.transition = 'transform 3.5s ease-in-out';
-      el.style.transform = 'translateX(-'+dist+'px)';
+    void el.offsetWidth;
+    var cw = el.offsetWidth;
+    var sw = el.scrollWidth;
+    if(sw <= cw){ el.style.textOverflow = 'ellipsis'; return; }
+    el.dataset.marquee = '1';
+    var dist = Math.round(sw - cw + 20);
+    el.style.transition = 'transform 3.5s ease-in-out';
+    el.style.transform = 'translateX(-'+dist+'px)';
+    el.dataset.marqueeTimer = setTimeout(function(){
+      el.style.transition = 'transform 0.6s ease-in-out';
+      el.style.transform = 'translateX(0)';
       el.dataset.marqueeTimer = setTimeout(function(){
-        el.style.transition = 'transform 0.6s ease-in-out';
-        el.style.transform = 'translateX(0)';
-        el.dataset.marqueeTimer = setTimeout(function(){
-          el.dataset.marquee = '';
-          el.dataset.marqueeTimer = '';
-          el.style.transition = '';
-          el.style.transform = '';
-          el.style.textOverflow = 'ellipsis';
-        }, 600);
-      }, 3500);
-    });
+        el.dataset.marquee = '';
+        el.dataset.marqueeTimer = '';
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.textOverflow = 'ellipsis';
+      }, 600);
+    }, 3500);
   }, 400);
 }
 
