@@ -108,6 +108,16 @@ function genVariants(name, code, unit, keywords){
   var wn = w2n(std);
   if(wn !== std) parts.push(wn);
 
+  // Auto abbreviation from name words
+  var nameWords = normalizeText(name).split(/\s+/).filter(Boolean);
+  if(nameWords.length >= 2){
+    for(var ai = 2; ai <= Math.min(nameWords.length, 6); ai++){
+      var abbr = '';
+      for(var aj = 0; aj < ai; aj++) abbr += nameWords[aj][0] || '';
+      if(abbr.length >= 2) parts.push(abbr);
+    }
+  }
+
   // Unit
   if(unit) parts.push(normalizeText(unit));
 
