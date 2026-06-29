@@ -569,6 +569,7 @@ function onCartRowTap(idx){
     NUMPAD_DRAFT = '';
     NUMPAD_QTY = String(item.qty);
     updateQtyCommand();
+    renderQuickQty();
     setParser('qty');
     updateActiveSuggestion();
     renderCart();
@@ -696,6 +697,22 @@ function onQtyClear(){
   vibrate();
   NUMPAD_DRAFT = '';
   updateQtyCommand();
+}
+
+function renderQuickQty(){
+  var grid = document.querySelector('#quickQtyArea .qgrid');
+  if(!grid) return;
+  var isWeight = false;
+  if(PENDING_PRODUCT){
+    var u = (PENDING_PRODUCT.unit || '').toLowerCase();
+    isWeight = u === 'kg' || u === 'kí' || u === 'ký' || u === 'lít' || u === 'lit';
+  }
+  var values = isWeight ? [0.5, 1, 1.5, 2, 2.5, 3] : [2, 5, 10, 15, 20, 30];
+  var html = '';
+  for(var i = 0; i < values.length; i++){
+    html += '<button class="qq" onclick="onQuickQty('+values[i]+')">'+values[i]+'</button>';
+  }
+  grid.innerHTML = html;
 }
 
 function onNumpadKey(k){
@@ -1052,7 +1069,7 @@ function liveSearch(){
   if(!SEARCH_QUERY.trim()){
     var recent = getRecentProducts(8);
     if(recent.length > 0){
-      PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: 'đv'};
+      PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'};
     } else {
       PENDING_PRODUCT = null;
     }
@@ -1064,7 +1081,7 @@ function liveSearch(){
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
   var results = matchProductTop3(searchPhrase);
   if(results && results.length > 0){
-    PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: 'đv'};
+    PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
     PENDING_PRODUCT = null;
   }
@@ -1154,10 +1171,11 @@ function onSuggestionTap(idx){
   if(now - SUGGEST_LAST_TAP < 300 && SUGGEST_ACTIVE_IDX === idx){
     SUGGEST_LAST_TAP = 0;
     var sug = SUGGESTIONS[idx];
-    PENDING_PRODUCT = {product: sug.product, qty: 1, unit: 'đv'};
+    PENDING_PRODUCT = {product: sug.product, qty: 1, unit: sug.product.unit || 'đv'};
     NUMPAD_DRAFT = '';
     NUMPAD_QTY = '1';
     updateQtyCommand();
+    renderQuickQty();
     setParser('qty');
     updateActiveSuggestion();
     return;
@@ -1165,7 +1183,7 @@ function onSuggestionTap(idx){
   SUGGEST_LAST_TAP = now;
   SUGGEST_ACTIVE_IDX = idx;
   updateActiveSuggestion();
-  PENDING_PRODUCT = {product: SUGGESTIONS[idx].product, qty: 1, unit: 'đv'};
+  PENDING_PRODUCT = {product: SUGGESTIONS[idx].product, qty: 1, unit: SUGGESTIONS[idx].product.unit || 'đv'};
 }
 
 function onEnterKey(){
