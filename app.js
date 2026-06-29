@@ -58,6 +58,183 @@ var MATCH_OK = 0.55;
 var MATCH_LOW = 0.32;
 var QTY_CONFIG = [];
 var SALES_HISTORY = [];
+var SEARCH_INDEX = [];
+var SEARCH_CACHE = {};
+var SEARCH_TIMER = null;
+
+var NUM_WORDS = {khong:'0',ko:'0',mot:'1',một:'1',mốt:'1',hai:'2',ba:'3',
+  bon:'4',bốn:'4',nam:'5',năm:'5',sau:'6',sáu:'6',bay:'7',bảy:'7',
+  tam:'8',tám:'8',chin:'9',chín:'9',muoi:'10',mười:'10',tram:'100',trăm:'100',
+  nghin:'1000',nghìn:'1000'};
+
+var FILLER_WORDS = ['oi','ơi','nha','nhe','nhé','lay','lấy','ban','bán','mua','gium','giùm',
+  'cho em','cho anh','cho chi','cho chị'];
+
+function n2w(s){
+  var m = {'3':'ba','2':'hai','1':'mot','4':'bon','5':'nam','6':'sau','7':'bay','8':'tam','9':'chin','10':'muoi','100':'tram','1000':'nghin'};
+  var r = s; Object.keys(m).forEach(function(k){ r = r.replace(new RegExp('\\b'+k+'\\b','g'), m[k]); }); return r;
+}
+
+function w2n(s){
+  var r = s; Object.keys(NUM_WORDS).forEach(function(k){ r = r.replace(new RegExp('\\b'+k+'\\b','g'), NUM_WORDS[k]); }); return r;
+}
+
+function normalizeText(s){
+  return String(s||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d')
+    .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+function normalizeQuery(s){
+  // Standard normalize
+  var q = normalizeText(s);
+  // Spoken numbers → digits
+  Object.keys(NUM_WORDS).forEach(function(k){ q = q.replace(new RegExp('\\b'+normalizeText(k)+'\\b','g'), NUM_WORDS[k]); });
+  // Filler removal
+  FILLER_WORDS.forEach(function(f){ q = q.replace(new RegExp('\\b'+normalizeText(f)+'\\b','g'), ''); });
+  q = q.replace(/\s+/g,' ').trim();
+  return q;
+}
+
+function genVariants(name, code, unit, keywords){
+  var std = normalizeText(name + ' ' + code);
+  var parts = [std];
+
+  // Number-to-word variant
+  var nw = n2w(std);
+  if(nw !== std) parts.push(nw);
+
+  // Word-to-number variant
+  var wn = w2n(std);
+  if(wn !== std) parts.push(wn);
+
+  // Unit
+  if(unit) parts.push(normalizeText(unit));
+
+  // Keywords
+  if(keywords && keywords.length)
+    parts.push(keywords.map(function(k){ return normalizeText(k); }).join(' '));
+
+  return parts.join(' ').replace(/\s+/g,' ').trim();
+}
+
+function rankSearch(item, q, qWords){
+  var st = item.searchText;
+  var nm = item.normalizedName;
+  var cd = item.codeNorm;
+
+  // 1. Exact code match
+  if(q === cd) return 100000;
+  // 2. Exact name match
+  if(q === nm) return 50000;
+  // 3. Name starts with query
+  if(nm.indexOf(q) === 0) return 20000;
+  // 4. Name contains query (as contiguous substring)
+  if(nm.indexOf(q) !== -1) return 15000;
+
+  // 5. Ordered word match in name
+  var sw = nm.split(' ');
+  var o = 0, wi = 0;
+  for(var i = 0; i < sw.length && wi < qWords.length; i++)
+    if(sw[i] === qWords[wi]){ o++; wi++; }
+  var orderRatio = qWords.length > 0 ? o / qWords.length : 0;
+  if(orderRatio >= 0.5) return 10000 + orderRatio * 5000;
+
+  // 6. Keywords / variant match
+  if(st.indexOf(q) !== -1) return 5000;
+
+  return 1000;
+}
+
+function levenshtein(a,b){
+  var m=a.length,n=b.length;
+  if(m===0)return n;if(n===0)return m;
+  var dp=[]; for(var i=0;i<=m;i++){dp.push([i]);}
+  for(var j=0;j<=n;j++){dp[0][j]=j;}
+  for(i=1;i<=m;i++) for(j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+function buildSearchIndex(){
+  var len = PRODUCTS.length;
+  SEARCH_INDEX = new Array(len);
+  for(var i = 0; i < len; i++){
+    var p = PRODUCTS[i];
+    SEARCH_INDEX[i] = {
+      product: p,
+      codeNorm: normalizeText(p.code),
+      normalizedName: normalizeText(p.name),
+      searchText: genVariants(p.name, p.code, p.unit, p.keywords)
+    };
+  }
+}
+
+function search(query, limit){
+  limit = limit || 8;
+  if(!query) return [];
+
+  var q = normalizeQuery(query);
+  var qWords = q.split(/\s+/).filter(Boolean);
+  if(qWords.length === 0) return [];
+
+  // Check prefix cache
+  if(SEARCH_CACHE[q]) return SEARCH_CACHE[q].slice(0, limit);
+
+  var hits = [];
+  for(var i = 0; i < SEARCH_INDEX.length; i++){
+    var item = SEARCH_INDEX[i];
+    var ok = true;
+    for(var j = 0; j < qWords.length; j++)
+      if(item.searchText.indexOf(qWords[j]) === -1){ ok = false; break; }
+    if(!ok) continue;
+    hits.push(item);
+  }
+
+  var results = [];
+  if(hits.length > 0){
+    hits.sort(function(a,b){
+      return rankSearch(b,q,qWords) - rankSearch(a,q,qWords);
+    });
+    for(var i = 0; i < Math.min(limit, hits.length); i++)
+      results.push({product: hits[i].product, score: 1.0, matchType: 'search'});
+  }
+
+  // Fuzzy fallback if < limit results
+  if(results.length < limit && qWords.length >= 2){
+    var fuzzyPool = [];
+    for(var i = 0; i < SEARCH_INDEX.length && fuzzyPool.length < 30; i++){
+      var item = SEARCH_INDEX[i];
+      var ok = true;
+      for(var j = 0; j < qWords.length; j++)
+        if(item.searchText.indexOf(qWords[j]) === -1){ ok = false; break; }
+      if(!ok) fuzzyPool.push(item);
+    }
+    // Score by Levenshtein on normalizedName
+    var fuzzScores = fuzzyPool.map(function(item){
+      var d = levenshtein(q, item.normalizedName);
+      return {item:item, dist:d};
+    });
+    fuzzScores.sort(function(a,b){ return a.dist - b.dist; });
+    var existing = {}; results.forEach(function(r){ existing[r.product.code]=true; });
+    for(var i = 0; i < fuzzScores.length && results.length < limit; i++){
+      if(!existing[fuzzScores[i].item.product.code]){
+        results.push({product: fuzzScores[i].item.product, score: 0.5, matchType: 'fuzzy'});
+        existing[fuzzScores[i].item.product.code] = true;
+      }
+    }
+  }
+
+  // Cache prefix
+  SEARCH_CACHE[q] = results.slice();
+  // Clean old cache entries (>50)
+  var keys = Object.keys(SEARCH_CACHE);
+  if(keys.length > 50){
+    delete SEARCH_CACHE[keys[0]];
+  }
+
+  return results;
+}
 
 var STATE = 'search';
 var PREV_STATE = 'search';
@@ -1206,7 +1383,7 @@ function liveSearch(){
   var parsed = parseSegment(SEARCH_QUERY);
   var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = matchProductTop3(searchPhrase, parsed ? parsed.unit : null, SEARCH_INPUT_MODE);
+  var results = search(searchPhrase, 8);
   if(results && results.length > 0){
     PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
@@ -1226,7 +1403,8 @@ function onSearchKey(c){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += c;
   renderCommand();
-  liveSearch();
+  clearTimeout(SEARCH_TIMER);
+  SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
 }
 
 function onSpaceKey(){
@@ -1241,7 +1419,8 @@ function onSpaceKey(){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += ' ';
   renderCommand();
-  liveSearch();
+  clearTimeout(SEARCH_TIMER);
+  SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
 }
 
 function onBackspace(){
@@ -1264,7 +1443,8 @@ function onBackspace(){
     SEARCH_INPUT_MODE = 'type';
     SEARCH_QUERY = SEARCH_QUERY.slice(0, -1);
     renderCommand();
-    liveSearch();
+    clearTimeout(SEARCH_TIMER);
+    SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
   }
 }
 
@@ -1468,6 +1648,7 @@ function saveInvoiceBtn(){
 
 apiCall('getProducts').then(function(products){
   PRODUCTS = products || [];
+  buildSearchIndex();
   document.getElementById('loadingScreen').classList.add('hidden');
   if(ORDERS.length === 0){
     var firstOrder = createOrder(NEXT_ORDER_ID++);
