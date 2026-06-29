@@ -327,54 +327,38 @@ function saveInvoice(items) {
   var sh = ss.getSheetByName(SHEET_INVOICE);
   if (!sh) throw new Error('Không tìm thấy sheet ' + SHEET_INVOICE);
 
-  var totalRow = findTotalRow_(sh);
-  var availableRows = totalRow - INVOICE_DATA_START_ROW;
-
-  if (availableRows > 0) {
-    sh.getRange(INVOICE_DATA_START_ROW, 1, availableRows, 5).clearContent();
+  var lastRow = sh.getLastRow();
+  if (lastRow >= INVOICE_DATA_START_ROW) {
+    var lastColA = sh.getRange(lastRow, 1).getValue();
+    if (String(lastColA || '').toUpperCase().indexOf('TỔNG TIỀN') !== -1 ||
+        String(lastColA || '').toUpperCase().indexOf('TONG TIEN') !== -1) {
+      lastRow--;
+    }
   }
 
-  if (items.length > availableRows) {
-    var rowsToAdd = items.length - availableRows;
-    sh.insertRowsBefore(totalRow, rowsToAdd);
-    totalRow += rowsToAdd;
-  }
+  var startRow = Math.max(lastRow + 1, INVOICE_DATA_START_ROW);
 
-  var total = 0;
+  var now = new Date();
+  var timestamp = Utilities.formatDate(now, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
+
   var rows = items.map(function(it) {
-    total += Number(it.total) || 0;
-    return [it.spokenText || it.name, it.qty, it.name, it.price, it.total];
+    return [it.spokenText || it.name, it.qty, it.name, it.price, it.total, timestamp];
   });
 
-  sh.getRange(INVOICE_DATA_START_ROW, 1, rows.length, 5).setValues(rows);
+  var range = sh.getRange(startRow, 1, rows.length, 6);
+  range.setValues(rows);
 
-  var totalCell = sh.getRange(totalRow, 5);
-  totalCell.setValue(total);
-  totalCell.setNumberFormat('#,##0" đ"');
+  var total = items.reduce(function(s, it) { return s + (Number(it.total) || 0); }, 0);
+
+  var props = PropertiesService.getScriptProperties();
+  var colorIdx = props.getProperty('invoiceColor') || '0';
+  var bgColor = colorIdx === '0' ? '#ffffff' : '#f2f2f2';
+  range.setBackground(bgColor);
+  props.setProperty('invoiceColor', colorIdx === '0' ? '1' : '0');
 
   return { total: total, itemCount: items.length };
 }
 
 function clearInvoice() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName(SHEET_INVOICE);
-  var totalRow = findTotalRow_(sh);
-  var availableRows = totalRow - INVOICE_DATA_START_ROW;
-  if (availableRows > 0) {
-    sh.getRange(INVOICE_DATA_START_ROW, 1, availableRows, 5).clearContent();
-  }
-  sh.getRange(totalRow, 5).clearContent();
   return true;
-}
-
-function findTotalRow_(sh) {
-  var lastRow = sh.getLastRow();
-  var colA = sh.getRange(1, 1, lastRow, 1).getValues();
-  for (var i = 0; i < colA.length; i++) {
-    var v = String(colA[i][0] || '').toUpperCase();
-    if (v.indexOf('TỔNG TIỀN') !== -1 || v.indexOf('TONG TIEN') !== -1) {
-      return i + 1;
-    }
-  }
-  return lastRow + 1;
 }
