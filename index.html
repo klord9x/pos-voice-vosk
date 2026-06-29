@@ -161,6 +161,7 @@
           <button class="key" onclick="onSearchKey('J')">J</button>
           <button class="key" onclick="onSearchKey('K')">K</button>
           <button class="key" onclick="onSearchKey('L')">L</button>
+          <button class="key" onclick="onSearchKey('.')">.</button>
         </div>
         <div class="row zxcv">
           <button class="key" onclick="onSearchKey('Z')">Z</button>
@@ -170,10 +171,9 @@
           <button class="key" onclick="onSearchKey('B')">B</button>
           <button class="key" onclick="onSearchKey('N')">N</button>
           <button class="key" onclick="onSearchKey('M')">M</button>
-          <button class="key" onclick="onSearchKey('.')">.</button>
+          <button class="key backspace" onclick="onBackspace()" onmousedown="onBackspaceHoldStart(event)" onmouseup="onBackspaceHoldEnd()" onmouseleave="onBackspaceHoldEnd()" ontouchstart="onBackspaceHoldStart(event)" ontouchend="onBackspaceHoldEnd()" ontouchcancel="onBackspaceHoldEnd()">⌫</button>
         </div>
         <div class="row func">
-          <button class="key backspace" onclick="onBackspace()" onmousedown="onBackspaceHoldStart(event)" onmouseup="onBackspaceHoldEnd()" onmouseleave="onBackspaceHoldEnd()" ontouchstart="onBackspaceHoldStart(event)" ontouchend="onBackspaceHoldEnd()" ontouchcancel="onBackspaceHoldEnd()">⌫</button>
           <button class="key space" onclick="onSpaceKey()">Space</button>
           <button class="key commit primary" onclick="onEnterKey()">↵</button>
         </div>
