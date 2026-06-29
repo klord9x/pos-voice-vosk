@@ -238,11 +238,13 @@ function search(query, limit){
     }
   }
 
-  // Cache prefix
-  SEARCH_CACHE[q] = results.slice();
-  var keys = Object.keys(SEARCH_CACHE);
-  if(keys.length > 50){
-    delete SEARCH_CACHE[keys[0]];
+  // Cache prefix — chỉ cache khi limit > 1 (tránh voice scoring pollute)
+  if(limit > 1){
+    SEARCH_CACHE[q] = results.slice();
+    var keys = Object.keys(SEARCH_CACHE);
+    if(keys.length > 50){
+      delete SEARCH_CACHE[keys[0]];
+    }
   }
 
   return results;
