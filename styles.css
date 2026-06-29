@@ -51,7 +51,9 @@ body{overflow:hidden;}
 .content::-webkit-scrollbar{width:4px;}
 .content::-webkit-scrollbar-thumb{background:#444;}
 .content > .panel,.keyboard > .panel{display:none;}
+body[data-parser="search"] .content{overflow:hidden;}
 body[data-parser="search"] .content > [data-parser="search"],body[data-parser="search"] .keyboard > [data-parser="search"]{display:flex;flex-direction:column;}
+body[data-parser="qty"] .content{overflow:hidden;}
 body[data-parser="qty"] .content > [data-parser="qty"]{display:flex;flex-direction:column;}
 body[data-parser="qty"] .content > [data-parser="search"]{display:flex;flex-direction:column;}
 body[data-parser="qty"] .keyboard > [data-parser="qty"]{display:flex;flex-direction:column;}
@@ -68,7 +70,7 @@ body[data-parser="pay"] .keyboard > #payChips{
 }
 body[data-parser="pay"] .keyboard > #kbPay{flex:5 1 0;min-height:0;}
 body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
-.suggest{flex:1;overflow-y:auto;}
+.suggest{flex:1;overflow-y:auto;min-height:0;}
 .suggest::-webkit-scrollbar{width:4px;}
 .suggest::-webkit-scrollbar-thumb{background:#444;}
 .suggest .item{height:40px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);cursor:pointer;position:relative;}
