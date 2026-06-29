@@ -131,7 +131,8 @@ try{
 var PHONETIC_INITIAL = {
   'tr':'CH','ch':'CH','s':'X','x':'X','gi':'Z','d':'Z','r':'Z','z':'Z',
   'đ':'D','v':'V','b':'V','l':'L','n':'N','ph':'F','f':'F','kh':'K','k':'K',
-  'th':'T','t':'T','gh':'G','g':'G','ngh':'NG','ng':'NG','nh':'NH','qu':'Q'
+  'th':'T','t':'T','gh':'G','g':'G','ngh':'NG','ng':'NG','nh':'NH','qu':'Q',
+  'c':'K' // c/k/qu cùng là âm /k/ trong tiếng Việt -> gập chung 1 nhóm
 };
 var PHONETIC_RHYME = {
   'ă':'A','â':'A','a':'A','ê':'E','e':'E','ô':'O','o':'O','ơ':'O',
@@ -142,7 +143,11 @@ var PHONETIC_RHYME = {
   'ăng':'ANG','âng':'ANG','ang':'ANG','êng':'ENG','eng':'ENG',
   'ông':'ONG','ơng':'ONG','ong':'ONG','ưng':'UNG','ung':'UNG',
   'ing':'ING','yng':'ING','nh':'NH','n':'N','ch':'CH','c':'C','t':'T',
-  'p':'P','ng':'NG'
+  'p':'P','ng':'NG',
+  // Trung hòa phụ âm cuối -c/-t (đặc trưng giọng Nam: "húc"≈"hút", "khác"≈"khát")
+  // -> gập về CÙNG mã với cặp -t tương ứng để toPhoneticKey() coi là 1 âm
+  'ăc':'AT','âc':'AT','ac':'AT','êc':'ET','ec':'ET',
+  'ôc':'OT','ơc':'OT','oc':'OT','ưc':'UT','uc':'UT','ic':'IT','yc':'IT'
 };
 
 function toPhoneticKey(text){
@@ -193,22 +198,66 @@ function levRatio(a,b){
   return 1-levenshtein(a,b)/maxLen;
 }
 
+// Lấy nhóm âm đầu (theo PHONETIC_INITIAL) của 1 từ, dùng để so khớp "cùng nhóm âm"
+// thay vì so ký tự thô -> "uc" (rớt h) vẫn được tính nếu phần còn lại khớp tốt
+function initialClass(word){
+  if(!word)return '';
+  var two=word.substring(0,2),three=word.substring(0,3);
+  if(PHONETIC_INITIAL[three])return PHONETIC_INITIAL[three];
+  if(PHONETIC_INITIAL[two])return PHONETIC_INITIAL[two];
+  if(PHONETIC_INITIAL[word[0]])return PHONETIC_INITIAL[word[0]];
+  return word[0]?word[0].toUpperCase():'';
+}
+
 function firstCharRatio(a,b){
   var wa=a.split(' ').filter(Boolean),wb=b.split(' ').filter(Boolean);
   var n=Math.min(wa.length,wb.length);
   if(n===0)return 0;
   var match=0;
-  for(var i=0;i<n;i++){if(wa[i][0]===wb[i][0])match++;}
+  for(var i=0;i<n;i++){
+    if(initialClass(wa[i])===initialClass(wb[i]))match++;
+    else if(wa[i][0]===wb[i][0])match+=1; // fallback: vẫn cho điểm nếu trùng ký tự thô
+  }
   return match/Math.max(wa.length,wb.length,1);
 }
 
-function combinedScore(a,b){return 0.5*levRatio(a,b)+0.5*firstCharRatio(a,b);}
+// Rớt cụm phụ âm đầu (1-2 ký tự) của mỗi từ -> bắt lỗi gõ thiếu / nói lướt âm đầu
+// (vd "huc"->"uc", "hao"->"ao"); chỉ áp dụng khi từ còn đủ dài để không biến dạng quá mức
+function dropLeadingConsonants(text){
+  var s=normalizeVN(text);
+  var words=s.split(' ').filter(Boolean);
+  var changed=false;
+  var out=words.map(function(w){
+    var m=w.match(/^[bcdghklmnpqrstvx]{1,2}(?=[aeiouy])/);
+    if(m && w.length>m[0].length+1){changed=true;return w.slice(m[0].length);}
+    return w;
+  });
+  return changed?out.join(' '):s;
+}
+
+// Gập đuôi mũi -ng/-nh về -n (đặc trưng giọng Nam: "ăn"≈"ăng"≈"anh")
+// dùng như phương án phụ (không thay primary key) để không làm lệch các trường hợp cần phân biệt rõ
+function relaxFinal(key){
+  return key.replace(/(NG|NH)(?=\s|$)/g,'N');
+}
+
+// mode: 'voice' (giọng nói, lỗi thường là nhận lầm cả âm tiết) hoặc 'type' (gõ tay, lỗi thường là sai/thiếu ký tự)
+function combinedScore(a,b,mode){
+  var lr=levRatio(a,b),fr=firstCharRatio(a,b),pr=phoneticScore(a,b);
+  if(mode==='voice')return 0.30*lr+0.20*fr+0.50*pr;
+  return 0.45*lr+0.35*fr+0.20*pr;
+}
 
 function phoneticScore(a,b){
   var pa=toPhoneticKey(a),pb=toPhoneticKey(b);
   if(pa===pb)return 1.0;
-  var maxLen=Math.max(pa.length,pb.length,1);
-  return 1-levenshtein(pa,pb)/maxLen;
+  var strict=1-levenshtein(pa,pb)/Math.max(pa.length,pb.length,1);
+  var ra=relaxFinal(pa),rb=relaxFinal(pb);
+  if(ra!==pa||rb!==pb){
+    var relaxed=1-levenshtein(ra,rb)/Math.max(ra.length,rb.length,1);
+    return Math.max(strict,relaxed*0.92); // *0.92: khớp nới giọng vùng miền, tin thấp hơn khớp đúng
+  }
+  return strict;
 }
 
 function abbreviationScore(query,productWords){
@@ -221,24 +270,33 @@ function abbreviationScore(query,productWords){
   return 0;
 }
 
-function matchProductTop3(phrase){
+function matchProductTop3(phrase,unitHint,mode){
+  mode=mode||'type';
   var pn=normalizeVN(phrase);
+  var pnAlt=dropLeadingConsonants(phrase); // bản suy đoán: rớt phụ âm đầu mỗi từ
+  var hasAlt=pnAlt!==pn;
   var scored=[];
   PRODUCTS.forEach(function(p){
     var candidates=[normalizeVN(p.name)].concat((p.keywords||[]).map(normalizeVN));
     var pWords=normalizeVN(p.name).split(' ').filter(Boolean);
     var pScore=0,matchType='';
     candidates.forEach(function(c){
-      var s=combinedScore(pn,c);
+      var s=combinedScore(pn,c,mode);
       if(pn===c||c.indexOf(pn)!==-1||pn.indexOf(c)!==-1){s=Math.max(s,0.95);}
-      var ps=phoneticScore(pn,c);
-      if(ps>0.85){s=Math.max(s,ps*0.9+0.1);}
       if(s>pScore){pScore=s;matchType='lev';}
+      if(hasAlt){
+        var sAlt=combinedScore(pnAlt,c,mode)*0.95; // giảm nhẹ vì là bản suy đoán, không phải input thật
+        if(sAlt>pScore){pScore=sAlt;matchType='lev-alt';}
+      }
     });
     var abbrScore=abbreviationScore(pn,pWords);
     if(abbrScore>pScore){pScore=abbrScore;matchType='abbr';}
     var phoneticKeyScore=phoneticScore(pn,p.name);
     if(phoneticKeyScore>pScore){pScore=phoneticKeyScore;matchType='phonetic';}
+    if(unitHint){
+      var uh=normalizeVN(unitHint),pu=normalizeVN(p.unit||'');
+      if(pu&&uh===pu){pScore=Math.min(1,pScore+0.15);matchType=matchType+'+unit';}
+    }
     scored.push({product:p,score:pScore,matchType:matchType});
   });
   scored.sort(function(a,b){return b.score-a.score;});
@@ -916,6 +974,7 @@ var recognition = null;
 var SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
 var VOICE_ACTIVE = false;
 var VOICE_DONE = false;
+var SEARCH_INPUT_MODE = 'type'; // 'voice' khi câu tìm vừa đến từ giọng nói, 'type' khi gõ tay
 
 function initSpeechRecognition(){
   if(!SpeechRecognitionImpl) return;
@@ -938,6 +997,7 @@ function initSpeechRecognition(){
     }
     if(final.trim()){
       VOICE_DONE = true;
+      SEARCH_INPUT_MODE = 'voice';
       SEARCH_QUERY = final.trim();
       renderCommand();
       liveSearch();
@@ -991,27 +1051,14 @@ function renderSuggestions(results){
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
   var max = 8;
-
-  // Đếm số lần xuất hiện mỗi tên SP trong list hiện tại để biết SP nào bị trùng tên
-  var nameCount = {};
-  (SUGGESTIONS||[]).forEach(function(s){
-    nameCount[s.product.name] = (nameCount[s.product.name]||0) + 1;
-  });
-
   for(var i = 0; i < max; i++){
     var el = document.getElementById('suggest'+i);
     if(!el) continue;
     var nameEl = document.getElementById('s'+i+'name');
-    var unitEl = document.getElementById('s'+i+'unit');
     var priceEl = document.getElementById('s'+i+'price');
     if(SUGGESTIONS && SUGGESTIONS[i]){
-      var p = SUGGESTIONS[i].product;
-      var isDup = nameCount[p.name] > 1;
-      nameEl.textContent = p.name;
-      if(unitEl){
-        unitEl.textContent = p.unit || '';
-      }
-      priceEl.textContent = fmtShort(p.price);
+      nameEl.textContent = SUGGESTIONS[i].product.name;
+      priceEl.textContent = fmtShort(SUGGESTIONS[i].product.price);
     }
   }
   updateActiveSuggestion();
@@ -1092,7 +1139,7 @@ function liveSearch(){
   var parsed = parseSegment(SEARCH_QUERY);
   var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = matchProductTop3(searchPhrase);
+  var results = matchProductTop3(searchPhrase, parsed ? parsed.unit : null, SEARCH_INPUT_MODE);
   if(results && results.length > 0){
     PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
@@ -1109,6 +1156,7 @@ function onSearchKey(c){
     VOICE_DONE = false;
     if(recognition) recognition.stop();
   }
+  SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += c;
   renderCommand();
   liveSearch();
@@ -1123,6 +1171,7 @@ function onSpaceKey(){
     if(recognition) recognition.stop();
   }
   if(SEARCH_QUERY.length > 0 && SEARCH_QUERY[SEARCH_QUERY.length - 1] === ' ') return;
+  SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += ' ';
   renderCommand();
   liveSearch();
@@ -1145,6 +1194,7 @@ function onBackspace(){
     if(recognition) recognition.stop();
   }
   if(SEARCH_QUERY.length > 0){
+    SEARCH_INPUT_MODE = 'type';
     SEARCH_QUERY = SEARCH_QUERY.slice(0, -1);
     renderCommand();
     liveSearch();
@@ -1367,4 +1417,3 @@ apiCall('getProducts').then(function(products){
 }).catch(function(err){
   document.getElementById('loadingScreen').innerHTML = '<div class="loading-text" style="color:#FF453A;">Lỗi tải: ' + err.message + '</div>';
 });
-
