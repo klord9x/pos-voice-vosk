@@ -1048,6 +1048,7 @@ function renderCommand(){
 }
 
 function renderSuggestions(results){
+  stopMarquee();
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
   var max = 8;
@@ -1070,6 +1071,59 @@ function renderSuggestions(results){
   if(suggestArea) suggestArea.scrollTop = 0;
 }
 
+var MARQUEE_TIMER = null;
+var MARQUEE_EL = null;
+
+function stopMarquee(){
+  clearTimeout(MARQUEE_TIMER);
+  MARQUEE_TIMER = null;
+  if(MARQUEE_EL){
+    MARQUEE_EL.dataset.marquee = '';
+    MARQUEE_EL.style.transition = '';
+    MARQUEE_EL.style.transform = '';
+    MARQUEE_EL.style.textOverflow = 'ellipsis';
+    MARQUEE_EL = null;
+  }
+}
+
+function startMarquee(el){
+  stopMarquee();
+  if(!el) return;
+  MARQUEE_EL = el;
+  MARQUEE_TIMER = setTimeout(function(){
+    if(!MARQUEE_EL) return;
+    var cw = MARQUEE_EL.offsetWidth;
+    var sw = MARQUEE_EL.scrollWidth;
+    if(sw <= cw){ MARQUEE_EL = null; return; }
+    MARQUEE_EL.dataset.marquee = '1';
+    MARQUEE_EL.style.overflow = 'hidden';
+    MARQUEE_EL.style.textOverflow = 'clip';
+    MARQUEE_EL.style.transition = 'none';
+    MARQUEE_EL.style.transform = 'translateX(0)';
+    var dist = sw - cw + 20;
+    requestAnimationFrame(function(){
+      if(!MARQUEE_EL) return;
+      MARQUEE_EL.style.transition = 'transform 3.5s ease-in-out';
+      MARQUEE_EL.style.transform = 'translateX(-'+dist+'px)';
+      MARQUEE_TIMER = setTimeout(function(){
+        if(!MARQUEE_EL) return;
+        MARQUEE_EL.style.transition = 'transform 0.6s ease-in-out';
+        MARQUEE_EL.style.transform = 'translateX(0)';
+        MARQUEE_TIMER = setTimeout(function(){
+          if(MARQUEE_EL){
+            MARQUEE_EL.dataset.marquee = '';
+            MARQUEE_EL.style.transition = '';
+            MARQUEE_EL.style.transform = '';
+            MARQUEE_EL.style.textOverflow = 'ellipsis';
+          }
+          MARQUEE_EL = null;
+          MARQUEE_TIMER = null;
+        }, 600);
+      }, 3500);
+    });
+  }, 400);
+}
+
 function updateActiveSuggestion(){
   var max = 8;
   var focusIdx = SUGGEST_ACTIVE_IDX;
@@ -1084,16 +1138,21 @@ function updateActiveSuggestion(){
           el.classList.add('active');
           var ind = el.querySelector('.indicator');
           if(ind) ind.textContent = '▶';
+          startMarquee(el.querySelector('.name'));
         } else {
           el.style.display = 'none';
           var ind = el.querySelector('.indicator');
           if(ind) ind.textContent = '';
         }
       } else {
+        var isActive = i === focusIdx && focusIdx >= 0;
         el.style.display = 'grid';
-        el.classList.toggle('active', i === focusIdx && focusIdx >= 0);
+        el.classList.toggle('active', isActive);
         var ind = el.querySelector('.indicator');
-        if(ind) ind.textContent = i === focusIdx && focusIdx >= 0 ? '▶' : '';
+        if(ind) ind.textContent = isActive ? '▶' : '';
+        if(isActive){
+          startMarquee(el.querySelector('.name'));
+        }
       }
     } else {
       el.style.display = 'none';
