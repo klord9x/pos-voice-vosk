@@ -348,6 +348,9 @@ function saveInvoice(items) {
   var range = sh.getRange(startRow, 1, rows.length, 6);
   range.setValues(rows);
 
+  var fmtRange = sh.getRange(startRow, 4, rows.length, 2);
+  fmtRange.setNumberFormat('#,##0');
+
   var total = items.reduce(function(s, it) { return s + (Number(it.total) || 0); }, 0);
 
   var props = PropertiesService.getScriptProperties();
