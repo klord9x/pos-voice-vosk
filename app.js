@@ -1290,8 +1290,6 @@ function goToPrevState(){
 
 function saveInvoiceBtn(){
   if(ITEMS.length === 0) return;
-  var header = document.querySelector('.header');
-  header.style.opacity = '0.5';
   var payload = ITEMS.map(function(it){
     return {
       spokenText: it.spokenText,
@@ -1302,27 +1300,22 @@ function saveInvoiceBtn(){
       total: it.total
     };
   });
-  apiCall('saveInvoice', {items: payload}).then(function(res){
-    header.style.opacity = '1';
-    ORDERS.splice(ACTIVE_ORDER_INDEX, 1);
-    var newOrder = createOrder(NEXT_ORDER_ID++);
-    ORDERS.push(newOrder);
-    ACTIVE_ORDER_INDEX = ORDERS.length - 1;
-    ITEMS = [];
-    PENDING_PRODUCT = null;
-    EDIT_IDX = -1;
-    SEARCH_QUERY = '';
-    SUGGEST_ACTIVE_IDX = 0;
-    setParser('search');
-    renderCart();
-    updateTotal();
-    renderCommand();
-    liveSearch();
-    updateHoldHeader();
-  }).catch(function(err){
-    header.style.opacity = '1';
-    flashOwnerError('Lỗi lưu đơn: ' + err.message);
-  });
+  apiCall('saveInvoice', {items: payload});
+  ORDERS.splice(ACTIVE_ORDER_INDEX, 1);
+  var newOrder = createOrder(NEXT_ORDER_ID++);
+  ORDERS.push(newOrder);
+  ACTIVE_ORDER_INDEX = ORDERS.length - 1;
+  ITEMS = [];
+  PENDING_PRODUCT = null;
+  EDIT_IDX = -1;
+  SEARCH_QUERY = '';
+  SUGGEST_ACTIVE_IDX = 0;
+  setParser('search');
+  renderCart();
+  updateTotal();
+  renderCommand();
+  liveSearch();
+  updateHoldHeader();
 }
 
 apiCall('getProducts').then(function(products){
