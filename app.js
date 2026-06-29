@@ -140,8 +140,20 @@ function rankSearch(item, q, qWords){
   var orderRatio = qWords.length > 0 ? o / qWords.length : 0;
   if(orderRatio >= 0.5) return 10000 + orderRatio * 5000;
 
-  // 6. Keywords / variant match
-  if(st.indexOf(q) !== -1) return 5000;
+  // 6. ALL qWords in searchText (word-level match)
+  var allInSt = true;
+  for(var j = 0; j < qWords.length; j++)
+    if(st.indexOf(qWords[j]) === -1){ allInSt = false; break; }
+  if(allInSt) return 8000;
+
+  // 7. Partial word match in searchText
+  if(qWords.length >= 1){
+    var matchedWords = 0;
+    for(var j = 0; j < qWords.length; j++)
+      if(st.indexOf(qWords[j]) !== -1) matchedWords++;
+    var wordRatio = matchedWords / qWords.length;
+    return 5000 + Math.round(wordRatio * 3000);
+  }
 
   return 1000;
 }
@@ -181,53 +193,20 @@ function search(query, limit){
   // Check prefix cache
   if(SEARCH_CACHE[q]) return SEARCH_CACHE[q].slice(0, limit);
 
-  var hits = [];
+  // Score ALL products by rankSearch, take top N
+  var scored = new Array(SEARCH_INDEX.length);
   for(var i = 0; i < SEARCH_INDEX.length; i++){
-    var item = SEARCH_INDEX[i];
-    var ok = true;
-    for(var j = 0; j < qWords.length; j++)
-      if(item.searchText.indexOf(qWords[j]) === -1){ ok = false; break; }
-    if(!ok) continue;
-    hits.push(item);
+    scored[i] = {idx:i, score: rankSearch(SEARCH_INDEX[i], q, qWords)};
   }
+  scored.sort(function(a,b){ return b.score - a.score; });
 
   var results = [];
-  if(hits.length > 0){
-    hits.sort(function(a,b){
-      return rankSearch(b,q,qWords) - rankSearch(a,q,qWords);
-    });
-    for(var i = 0; i < Math.min(limit, hits.length); i++)
-      results.push({product: hits[i].product, score: 1.0, matchType: 'search'});
-  }
-
-  // Fuzzy fallback if < limit results
-  if(results.length < limit && qWords.length >= 2){
-    var fuzzyPool = [];
-    for(var i = 0; i < SEARCH_INDEX.length && fuzzyPool.length < 30; i++){
-      var item = SEARCH_INDEX[i];
-      var ok = true;
-      for(var j = 0; j < qWords.length; j++)
-        if(item.searchText.indexOf(qWords[j]) === -1){ ok = false; break; }
-      if(!ok) fuzzyPool.push(item);
-    }
-    // Score by Levenshtein on normalizedName
-    var fuzzScores = fuzzyPool.map(function(item){
-      var d = levenshtein(q, item.normalizedName);
-      return {item:item, dist:d};
-    });
-    fuzzScores.sort(function(a,b){ return a.dist - b.dist; });
-    var existing = {}; results.forEach(function(r){ existing[r.product.code]=true; });
-    for(var i = 0; i < fuzzScores.length && results.length < limit; i++){
-      if(!existing[fuzzScores[i].item.product.code]){
-        results.push({product: fuzzScores[i].item.product, score: 0.5, matchType: 'fuzzy'});
-        existing[fuzzScores[i].item.product.code] = true;
-      }
-    }
+  for(var i = 0; i < Math.min(limit, scored.length); i++){
+    results.push({product: SEARCH_INDEX[scored[i].idx].product, score: 1.0, matchType: 'search'});
   }
 
   // Cache prefix
   SEARCH_CACHE[q] = results.slice();
-  // Clean old cache entries (>50)
   var keys = Object.keys(SEARCH_CACHE);
   if(keys.length > 50){
     delete SEARCH_CACHE[keys[0]];
