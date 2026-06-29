@@ -71,7 +71,7 @@ body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
 .suggest{flex:1;overflow-y:auto;}
 .suggest::-webkit-scrollbar{width:4px;}
 .suggest::-webkit-scrollbar-thumb{background:#444;}
-.suggest .item{height:40px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);cursor:pointer;position:relative;}
+.suggest .item{height:40px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);cursor:pointer;position:relative;}
 .suggest .item:last-child{border-bottom:none;}
 .suggest .item:active{background:rgba(255,255,255,.04);}
 .suggest .item .indicator{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:12px;display:none;}
@@ -79,6 +79,7 @@ body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
 .suggest .item.active{background:rgba(10,132,255,.1);padding-left:28px;}
 .suggest .item .name{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .suggest .item .price{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.suggest .item .unit{font-size:11px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 7px;border-radius:4px;white-space:nowrap;}
 
 .quick-qty{flex:1;padding:12px;background:var(--bg);overflow-y:auto;}
 .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}

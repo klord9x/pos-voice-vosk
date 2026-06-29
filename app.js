@@ -991,14 +991,27 @@ function renderSuggestions(results){
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
   var max = 8;
+
+  // Đếm số lần xuất hiện mỗi tên SP trong list hiện tại để biết SP nào bị trùng tên
+  var nameCount = {};
+  (SUGGESTIONS||[]).forEach(function(s){
+    nameCount[s.product.name] = (nameCount[s.product.name]||0) + 1;
+  });
+
   for(var i = 0; i < max; i++){
     var el = document.getElementById('suggest'+i);
     if(!el) continue;
     var nameEl = document.getElementById('s'+i+'name');
+    var unitEl = document.getElementById('s'+i+'unit');
     var priceEl = document.getElementById('s'+i+'price');
     if(SUGGESTIONS && SUGGESTIONS[i]){
-      nameEl.textContent = SUGGESTIONS[i].product.name;
-      priceEl.textContent = fmtShort(SUGGESTIONS[i].product.price);
+      var p = SUGGESTIONS[i].product;
+      var isDup = nameCount[p.name] > 1;
+      nameEl.textContent = p.name;
+      if(unitEl){
+        unitEl.textContent = p.unit || '';
+      }
+      priceEl.textContent = fmtShort(p.price);
     }
   }
   updateActiveSuggestion();
