@@ -62,7 +62,7 @@ var SEARCH_INDEX = [];
 var SEARCH_CACHE = {};
 var SEARCH_TIMER = null;
 
-var NUM_WORDS = {khong:'0',ko:'0',mot:'1',một:'1',mốt:'1',hai:'2',ba:'3',
+var NUM_WORDS = {mot:'1',một:'1',mốt:'1',hai:'2',ba:'3',
   bon:'4',bốn:'4',nam:'5',năm:'5',sau:'6',sáu:'6',bay:'7',bảy:'7',
   tam:'8',tám:'8',chin:'9',chín:'9',muoi:'10',mười:'10',tram:'100',trăm:'100',
   nghin:'1000',nghìn:'1000'};
@@ -130,7 +130,11 @@ function rankSearch(item, q, qWords){
   // 3. Name starts with query
   if(nm.indexOf(q) === 0) return 20000;
   // 4. Name contains query (as contiguous substring)
-  if(nm.indexOf(q) !== -1) return 15000;
+  if(nm.indexOf(q) !== -1) {
+    var pos = nm.indexOf(q);
+    var earlyRatio = 1 - (pos / nm.length);
+    return 16000 + Math.round(earlyRatio * 999);
+  }
 
   // 5. Ordered word match in name
   var sw = nm.split(' ');
@@ -138,7 +142,12 @@ function rankSearch(item, q, qWords){
   for(var i = 0; i < sw.length && wi < qWords.length; i++)
     if(sw[i] === qWords[wi]){ o++; wi++; }
   var orderRatio = qWords.length > 0 ? o / qWords.length : 0;
-  if(orderRatio >= 0.5) return 10000 + orderRatio * 5000;
+  if(orderRatio >= 0.5) {
+    var base = 10000 + orderRatio * 5000;
+    var firstPos = nm.indexOf(qWords[0]);
+    var er = firstPos >= 0 ? 1 - (firstPos / nm.length) : 0;
+    return base + Math.round(er * 499);
+  }
 
   // 6. ALL qWords in searchText (word-level match)
   var allInSt = true;
@@ -151,8 +160,10 @@ function rankSearch(item, q, qWords){
     var matchedWords = 0;
     for(var j = 0; j < qWords.length; j++)
       if(st.indexOf(qWords[j]) !== -1) matchedWords++;
-    var wordRatio = matchedWords / qWords.length;
-    return 5000 + Math.round(wordRatio * 3000);
+    if(matchedWords > 0){
+      var wordRatio = matchedWords / qWords.length;
+      return 5000 + Math.round(wordRatio * 3000);
+    }
   }
 
   return 1000;
@@ -183,7 +194,7 @@ function buildSearchIndex(){
 }
 
 function search(query, limit){
-  limit = limit || 8;
+  limit = limit || 100;
   if(!query) return [];
 
   var q = normalizeQuery(query);
@@ -193,16 +204,28 @@ function search(query, limit){
   // Check prefix cache
   if(SEARCH_CACHE[q]) return SEARCH_CACHE[q].slice(0, limit);
 
-  // Score ALL products by rankSearch, take top N
+  // Score ALL products by rankSearch
   var scored = new Array(SEARCH_INDEX.length);
   for(var i = 0; i < SEARCH_INDEX.length; i++){
     scored[i] = {idx:i, score: rankSearch(SEARCH_INDEX[i], q, qWords)};
   }
   scored.sort(function(a,b){ return b.score - a.score; });
 
+  // Threshold filter: score >= 8000 (word-level match trở lên)
   var results = [];
-  for(var i = 0; i < Math.min(limit, scored.length); i++){
-    results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
+  for(var i = 0; i < scored.length && results.length < limit; i++){
+    if(scored[i].score >= 8000){
+      results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
+    }
+  }
+
+  // Nếu < 8 kết quả, thêm top level 7 (partial word match)
+  if(results.length < 8){
+    for(var i = 0; i < scored.length && results.length < Math.min(limit, 20); i++){
+      if(scored[i].score >= 5000 && scored[i].score < 8000){
+        results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
+      }
+    }
   }
 
   // Cache prefix
@@ -1274,26 +1297,70 @@ function renderCommand(){
 function renderSuggestions(results){
   var oldActive = document.querySelector('#suggestArea .item.active .name');
   if(oldActive) stopMarquee(oldActive);
+
+  // Remove previously created dynamic items
+  var container = document.getElementById('suggestArea');
+  if(container){
+    var dynamics = container.querySelectorAll('.item[data-dynamic]');
+    for(var d = 0; d < dynamics.length; d++) dynamics[d].remove();
+  }
+
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
-  var max = 8;
 
-  for(var i = 0; i < max; i++){
-    var el = document.getElementById('suggest'+i);
-    if(!el) continue;
-    var nameEl = document.getElementById('s'+i+'name');
-    var unitEl = document.getElementById('s'+i+'unit');
-    var priceEl = document.getElementById('s'+i+'price');
-    if(SUGGESTIONS && SUGGESTIONS[i]){
-      var p = SUGGESTIONS[i].product;
+  var PREDEFINED = 8;
+  for(var i = 0; i < SUGGESTIONS.length; i++){
+    var p = SUGGESTIONS[i].product;
+    var el;
+
+    if(i < PREDEFINED){
+      el = document.getElementById('suggest'+i);
+      if(!el) continue;
+      el.style.display = '';
+      el.dataset.index = i;
+      document.getElementById('s'+i+'name').textContent = p.name;
+      var ue = document.getElementById('s'+i+'unit');
+      if(ue) ue.textContent = p.unit || '';
+      document.getElementById('s'+i+'price').textContent = fmtShort(p.price);
+    } else {
+      if(!container) continue;
+      el = document.createElement('div');
+      el.className = 'item';
+      el.setAttribute('data-dynamic', '1');
+      el.dataset.index = i;
+      (function(idx){ el.onclick = function(){ onSuggestionTap(idx); }; })(i);
+
+      var ind = document.createElement('span');
+      ind.className = 'indicator';
+      el.appendChild(ind);
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'name';
       nameEl.textContent = p.name;
-      if(unitEl) unitEl.textContent = p.unit || '';
+      el.appendChild(nameEl);
+
+      var unitEl = document.createElement('span');
+      unitEl.className = 'unit';
+      unitEl.textContent = p.unit || '';
+      el.appendChild(unitEl);
+
+      var priceEl = document.createElement('span');
+      priceEl.className = 'price';
       priceEl.textContent = fmtShort(p.price);
+      el.appendChild(priceEl);
+
+      container.appendChild(el);
     }
   }
+
+  // Hide unused predefined slots
+  for(var j = SUGGESTIONS.length; j < PREDEFINED; j++){
+    var hideEl = document.getElementById('suggest'+j);
+    if(hideEl){ hideEl.style.display = 'none'; hideEl.dataset.index = -1; }
+  }
+
   updateActiveSuggestion();
-  var suggestArea = document.getElementById('suggestArea');
-  if(suggestArea) suggestArea.scrollTop = 0;
+  if(container) container.scrollTop = 0;
 }
 
 function stopMarquee(el){
@@ -1351,15 +1418,16 @@ function startMarquee(el){
 }
 
 function updateActiveSuggestion(){
-  var max = 8;
+  var items = document.querySelectorAll('#suggestArea .item');
   var focusIdx = SUGGEST_ACTIVE_IDX;
   var isQty = document.body.getAttribute('data-parser') === 'qty';
-  for(var i = 0; i < max; i++){
-    var el = document.getElementById('suggest'+i);
-    if(!el) continue;
-    if(SUGGESTIONS && SUGGESTIONS[i]){
+  for(var i = 0; i < items.length; i++){
+    var el = items[i];
+    var idx = parseInt(el.dataset.index);
+    if(isNaN(idx) || idx < 0) continue;
+    if(SUGGESTIONS && SUGGESTIONS[idx]){
       if(isQty){
-        if(i === focusIdx && focusIdx >= 0){
+        if(idx === focusIdx && focusIdx >= 0){
           el.style.display = 'grid';
           el.classList.add('active');
           var ind = el.querySelector('.indicator');
@@ -1371,7 +1439,7 @@ function updateActiveSuggestion(){
           if(ind) ind.textContent = '';
         }
       } else {
-        var isActive = i === focusIdx && focusIdx >= 0;
+        var isActive = idx === focusIdx && focusIdx >= 0;
         el.style.display = 'grid';
         el.classList.toggle('active', isActive);
         var ind = el.querySelector('.indicator');
@@ -1415,24 +1483,32 @@ function liveSearch(){
     renderSuggestions([]);
     return;
   }
-  if(!SEARCH_QUERY.trim()){
-    var recent = getRecentProducts(8);
-    if(recent.length > 0){
-      PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'};
-    } else {
-      PENDING_PRODUCT = null;
-    }
+  var qText = SEARCH_QUERY.trim();
+  var recent;
+
+  // Query rỗng hoặc < 2 ký tự → recent products
+  if(!qText || qText.length < 2){
+    recent = getRecentProducts(8);
+    PENDING_PRODUCT = recent.length > 0
+      ? {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'}
+      : null;
     renderSuggestions(recent);
     return;
   }
+
   var parsed = parseSegment(SEARCH_QUERY);
   var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = search(searchPhrase, 8);
+  var results = search(searchPhrase, 100);
+
   if(results && results.length > 0){
     PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
-    PENDING_PRODUCT = null;
+    // Fallback: recent products
+    results = getRecentProducts(8);
+    PENDING_PRODUCT = results.length > 0
+      ? {product: results[0].product, qty: 1, unit: results[0].product.unit || 'đv'}
+      : null;
   }
   renderSuggestions(results);
 }
