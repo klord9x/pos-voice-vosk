@@ -1246,29 +1246,16 @@ function liveSearch(){
     renderSuggestions(recent);
     return;
   }
-  if(SEARCH_INPUT_MODE === 'voice'){
-    var parsed = parseSegment(SEARCH_QUERY);
-    var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
-    var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-    var results = matchProductTop3(searchPhrase, parsed ? parsed.unit : null, 'voice');
-    if(results && results.length > 0){
-      PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
-    } else {
-      PENDING_PRODUCT = null;
-    }
-    renderSuggestions(results);
+  var parsed = parseSegment(SEARCH_QUERY);
+  var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
+  var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
+  var results = simpleSearch(searchPhrase, 8);
+  if(results && results.length > 0){
+    PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
-    var parsed = parseSegment(SEARCH_QUERY);
-    var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
-    var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-    var results = simpleSearch(searchPhrase, 8);
-    if(results && results.length > 0){
-      PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
-    } else {
-      PENDING_PRODUCT = null;
-    }
-    renderSuggestions(results);
+    PENDING_PRODUCT = null;
   }
+  renderSuggestions(results);
 }
 
 function onSearchKey(c){
