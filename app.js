@@ -65,6 +65,7 @@ var SEARCH_QUERY = '';
 var BACKSPACE_INTERVAL = null;
 var SUGGESTIONS = [];
 var SUGGEST_ACTIVE_IDX = 0;
+var SUGGEST_MAX = 20; // tối đa hiển thị; >8 thì scroll trong panel (đã có overflow-y:auto sẵn)
 var PENDING_PRODUCT = null;
 var EDIT_IDX = -1;
 var NUMPAD_QTY = '0';
@@ -532,7 +533,7 @@ function _finishSearch(results,unitHint,cacheKey){
     if(r.product._idx.unit===unitHint)r.score=Math.min(1,r.score+0.12);
   });
   results.sort(function(a,b){return a.tier!==b.tier?a.tier-b.tier:b.score-a.score;});
-  var out=results.slice(0,8);
+  var out=results.slice(0,SUGGEST_MAX);
   if(cacheKey)SEARCH_CACHE[cacheKey]=out;
   return out;
 }
@@ -1290,57 +1291,59 @@ function renderCommand(){
 function renderSuggestions(results){
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
-  var max = 8;
-  for(var i = 0; i < max; i++){
-    var el = document.getElementById('suggest'+i);
-    if(!el) continue;
-    var nameEl = document.getElementById('s'+i+'name');
-    var priceEl = document.getElementById('s'+i+'price');
-    var unitEl = document.getElementById('s'+i+'unit');
-    if(SUGGESTIONS && SUGGESTIONS[i]){
-      nameEl.textContent = SUGGESTIONS[i].product.name;
-      priceEl.textContent = fmtShort(SUGGESTIONS[i].product.price);
-      if(unitEl) unitEl.textContent = SUGGESTIONS[i].product.unit || '';
-    }
+  var area = document.getElementById('suggestArea');
+  if(!area) return;
+
+  var html = '';
+  for(var i = 0; i < SUGGESTIONS.length; i++){
+    var p = SUGGESTIONS[i].product;
+    html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
+    html += '<span class="indicator"></span>';
+    html += '<span class="name">'+escapeHtml(p.name)+'</span>';
+    html += '<span class="unit'+(p.unit?' show':'')+'">'+escapeHtml(p.unit||'')+'</span>';
+    html += '<span class="price">'+fmtShort(p.price)+'</span>';
+    html += '</div>';
   }
+  area.innerHTML = html;
   updateActiveSuggestion();
-  var suggestArea = document.getElementById('suggestArea');
-  if(suggestArea) suggestArea.scrollTop = 0;
+  area.scrollTop = 0;
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function updateActiveSuggestion(){
-  var max = 8;
   var focusIdx = SUGGEST_ACTIVE_IDX;
   var isQty = document.body.getAttribute('data-parser') === 'qty';
-  for(var i = 0; i < max; i++){
+  for(var i = 0; i < SUGGESTIONS.length; i++){
     var el = document.getElementById('suggest'+i);
     if(!el) continue;
-    if(SUGGESTIONS && SUGGESTIONS[i]){
-      if(isQty){
-        if(i === focusIdx && focusIdx >= 0){
-          el.style.display = 'grid';
-          el.classList.add('active');
-          var ind = el.querySelector('.indicator');
-          if(ind) ind.textContent = '▶';
-        } else {
-          el.style.display = 'none';
-          var ind = el.querySelector('.indicator');
-          if(ind) ind.textContent = '';
-        }
-      } else {
+    if(isQty){
+      if(i === focusIdx && focusIdx >= 0){
         el.style.display = 'grid';
-        el.classList.toggle('active', i === focusIdx && focusIdx >= 0);
+        el.classList.add('active');
         var ind = el.querySelector('.indicator');
-        if(ind) ind.textContent = i === focusIdx && focusIdx >= 0 ? '▶' : '';
+        if(ind) ind.textContent = '▶';
+      } else {
+        el.style.display = 'none';
       }
     } else {
-      el.style.display = 'none';
+      el.style.display = 'grid';
+      el.classList.toggle('active', i === focusIdx && focusIdx >= 0);
+      var ind2 = el.querySelector('.indicator');
+      if(ind2) ind2.textContent = (i === focusIdx && focusIdx >= 0) ? '▶' : '';
     }
+  }
+  // Tự cuộn để item active luôn nằm trong vùng nhìn thấy (quan trọng khi list dài hơn 8)
+  var activeEl = document.getElementById('suggest'+focusIdx);
+  if(activeEl && activeEl.scrollIntoView){
+    activeEl.scrollIntoView({block:'nearest'});
   }
 }
 
 function getRecentProducts(limit){
-  limit = limit || 8;
+  limit = limit || SUGGEST_MAX;
   var seen = {};
   var result = [];
   for(var i = 0; i < SALES_HISTORY.length && result.length < limit; i++){
@@ -1369,7 +1372,7 @@ function liveSearch(){
     return;
   }
   if(!SEARCH_QUERY.trim()){
-    var recent = getRecentProducts(8);
+    var recent = getRecentProducts(SUGGEST_MAX);
     if(recent.length > 0){
       PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'};
     } else {
@@ -1383,6 +1386,11 @@ function liveSearch(){
   var parsed = parseSegment(SEARCH_QUERY);
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
   var results = matchProductTop3(SEARCH_QUERY, null, SEARCH_INPUT_MODE);
+  // Fallback: cascade không ra kết quả nào -> không để list trống,
+  // hiện SP bán chạy/gần đây để người bán còn cuộn tay chọn
+  if(!results || results.length === 0){
+    results = getRecentProducts(SUGGEST_MAX);
+  }
   if(results && results.length > 0){
     PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
