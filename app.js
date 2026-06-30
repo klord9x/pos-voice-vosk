@@ -1296,9 +1296,11 @@ function renderSuggestions(results){
     if(!el) continue;
     var nameEl = document.getElementById('s'+i+'name');
     var priceEl = document.getElementById('s'+i+'price');
+    var unitEl = document.getElementById('s'+i+'unit');
     if(SUGGESTIONS && SUGGESTIONS[i]){
       nameEl.textContent = SUGGESTIONS[i].product.name;
       priceEl.textContent = fmtShort(SUGGESTIONS[i].product.price);
+      if(unitEl) unitEl.textContent = SUGGESTIONS[i].product.unit || '';
     }
   }
   updateActiveSuggestion();
