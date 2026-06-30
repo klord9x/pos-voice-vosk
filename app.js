@@ -58,197 +58,6 @@ var MATCH_OK = 0.55;
 var MATCH_LOW = 0.32;
 var QTY_CONFIG = [];
 var SALES_HISTORY = [];
-var SEARCH_INDEX = [];
-var SEARCH_CACHE = {};
-var SEARCH_TIMER = null;
-
-var NUM_WORDS = {mot:'1',một:'1',mốt:'1',hai:'2',ba:'3',
-  bon:'4',bốn:'4',nam:'5',năm:'5',sau:'6',sáu:'6',bay:'7',bảy:'7',
-  tam:'8',tám:'8',chin:'9',chín:'9',muoi:'10',mười:'10',tram:'100',trăm:'100',
-  nghin:'1000',nghìn:'1000'};
-
-var FILLER_WORDS = ['oi','ơi','nha','nhe','nhé','lay','lấy','ban','bán','mua','gium','giùm',
-  'cho em','cho anh','cho chi','cho chị'];
-
-function n2w(s){
-  var m = {'3':'ba','2':'hai','1':'mot','4':'bon','5':'nam','6':'sau','7':'bay','8':'tam','9':'chin','10':'muoi','100':'tram','1000':'nghin'};
-  var r = s; Object.keys(m).forEach(function(k){ r = r.replace(new RegExp('\\b'+k+'\\b','g'), m[k]); }); return r;
-}
-
-function w2n(s){
-  var r = s; Object.keys(NUM_WORDS).forEach(function(k){ r = r.replace(new RegExp('\\b'+k+'\\b','g'), NUM_WORDS[k]); }); return r;
-}
-
-function normalizeText(s){
-  return String(s||'').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d')
-    .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
-}
-
-function normalizeQuery(s){
-  // Standard normalize
-  var q = normalizeText(s);
-  // Spoken numbers → digits
-  Object.keys(NUM_WORDS).forEach(function(k){ q = q.replace(new RegExp('\\b'+normalizeText(k)+'\\b','g'), NUM_WORDS[k]); });
-  // Filler removal
-  FILLER_WORDS.forEach(function(f){ q = q.replace(new RegExp('\\b'+normalizeText(f)+'\\b','g'), ''); });
-  q = q.replace(/\s+/g,' ').trim();
-  return q;
-}
-
-function genVariants(name, code, unit, keywords){
-  var std = normalizeText(name + ' ' + code);
-  var parts = [std];
-
-  // Number-to-word variant
-  var nw = n2w(std);
-  if(nw !== std) parts.push(nw);
-
-  // Word-to-number variant
-  var wn = w2n(std);
-  if(wn !== std) parts.push(wn);
-
-  // Auto abbreviation from name words
-  var nameWords = normalizeText(name).split(/\s+/).filter(Boolean);
-  if(nameWords.length >= 2){
-    for(var ai = 2; ai <= Math.min(nameWords.length, 6); ai++){
-      var abbr = '';
-      for(var aj = 0; aj < ai; aj++) abbr += nameWords[aj][0] || '';
-      if(abbr.length >= 2) parts.push(abbr);
-    }
-  }
-
-  // Unit
-  if(unit) parts.push(normalizeText(unit));
-
-  // Keywords
-  if(keywords && keywords.length)
-    parts.push(keywords.map(function(k){ return normalizeText(k); }).join(' '));
-
-  return parts.join(' ').replace(/\s+/g,' ').trim();
-}
-
-function rankSearch(item, q, qWords){
-  var st = item.searchText;
-  var nm = item.normalizedName;
-  var cd = item.codeNorm;
-
-  // 1. Exact code match
-  if(q === cd) return 100000;
-  // 2. Exact name match
-  if(q === nm) return 50000;
-  // 3. Name starts with query
-  if(nm.indexOf(q) === 0) return 20000;
-  // 4. Name contains query (as contiguous substring)
-  if(nm.indexOf(q) !== -1) {
-    var pos = nm.indexOf(q);
-    var earlyRatio = 1 - (pos / nm.length);
-    return 16000 + Math.round(earlyRatio * 999);
-  }
-
-  // 5. Ordered word match in name
-  var sw = nm.split(' ');
-  var o = 0, wi = 0;
-  for(var i = 0; i < sw.length && wi < qWords.length; i++)
-    if(sw[i] === qWords[wi]){ o++; wi++; }
-  var orderRatio = qWords.length > 0 ? o / qWords.length : 0;
-  if(orderRatio >= 0.5) {
-    var base = 10000 + orderRatio * 5000;
-    var firstPos = nm.indexOf(qWords[0]);
-    var er = firstPos >= 0 ? 1 - (firstPos / nm.length) : 0;
-    return base + Math.round(er * 499);
-  }
-
-  // 6. ALL qWords in searchText (word-level match)
-  var allInSt = true;
-  for(var j = 0; j < qWords.length; j++)
-    if(st.indexOf(qWords[j]) === -1){ allInSt = false; break; }
-  if(allInSt) return 8000;
-
-  // 7. Partial word match in searchText
-  if(qWords.length >= 1){
-    var matchedWords = 0;
-    for(var j = 0; j < qWords.length; j++)
-      if(st.indexOf(qWords[j]) !== -1) matchedWords++;
-    if(matchedWords > 0){
-      var wordRatio = matchedWords / qWords.length;
-      return 5000 + Math.round(wordRatio * 3000);
-    }
-  }
-
-  return 1000;
-}
-
-function levenshtein(a,b){
-  var m=a.length,n=b.length;
-  if(m===0)return n;if(n===0)return m;
-  var dp=[]; for(var i=0;i<=m;i++){dp.push([i]);}
-  for(var j=0;j<=n;j++){dp[0][j]=j;}
-  for(i=1;i<=m;i++) for(j=1;j<=n;j++)
-    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
-  return dp[m][n];
-}
-
-function buildSearchIndex(){
-  var len = PRODUCTS.length;
-  SEARCH_INDEX = new Array(len);
-  for(var i = 0; i < len; i++){
-    var p = PRODUCTS[i];
-    SEARCH_INDEX[i] = {
-      product: p,
-      codeNorm: normalizeText(p.code),
-      normalizedName: normalizeText(p.name),
-      searchText: genVariants(p.name, p.code, p.unit, p.keywords)
-    };
-  }
-}
-
-function search(query, limit){
-  limit = limit || 100;
-  if(!query) return [];
-
-  var q = normalizeQuery(query);
-  var qWords = q.split(/\s+/).filter(Boolean);
-  if(qWords.length === 0) return [];
-
-  // Check prefix cache
-  if(SEARCH_CACHE[q]) return SEARCH_CACHE[q].slice(0, limit);
-
-  // Score ALL products by rankSearch
-  var scored = new Array(SEARCH_INDEX.length);
-  for(var i = 0; i < SEARCH_INDEX.length; i++){
-    scored[i] = {idx:i, score: rankSearch(SEARCH_INDEX[i], q, qWords)};
-  }
-  scored.sort(function(a,b){ return b.score - a.score; });
-
-  // Threshold filter: score >= 8000 (word-level match trở lên)
-  var results = [];
-  for(var i = 0; i < scored.length && results.length < limit; i++){
-    if(scored[i].score >= 8000){
-      results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
-    }
-  }
-
-  // Nếu < 8 kết quả, thêm top level 7 (partial word match)
-  if(results.length < 8){
-    for(var i = 0; i < scored.length && results.length < Math.min(limit, 20); i++){
-      if(scored[i].score >= 5000 && scored[i].score < 8000){
-        results.push({product: SEARCH_INDEX[scored[i].idx].product, score: scored[i].score, matchType: 'search'});
-      }
-    }
-  }
-
-  // Cache prefix — chỉ cache khi limit > 1 (tránh voice scoring pollute)
-  if(limit > 1){
-    SEARCH_CACHE[q] = results.slice();
-    var keys = Object.keys(SEARCH_CACHE);
-    if(keys.length > 50){
-      delete SEARCH_CACHE[keys[0]];
-    }
-  }
-
-  return results;
-}
 
 var STATE = 'search';
 var PREV_STATE = 'search';
@@ -319,11 +128,17 @@ try{
   QTY_CONFIG=saved?JSON.parse(saved):JSON.parse(JSON.stringify(QTY_CONFIG_DEFAULT));
 }catch(e){QTY_CONFIG=JSON.parse(JSON.stringify(QTY_CONFIG_DEFAULT));}
 
+// ═══════════════════════════════════════════════════════════════
+// SEARCH ENGINE v2 — Cascade: SKU→Barcode→Exact→StartsWith→
+//   Contains→Keyword→Fuzzy(top30)→Voice Phonetic
+// Spec: <20ms/1000 SP, offline, Vietnamese text+voice
+// ═══════════════════════════════════════════════════════════════
+
 var PHONETIC_INITIAL = {
   'tr':'CH','ch':'CH','s':'X','x':'X','gi':'Z','d':'Z','r':'Z','z':'Z',
   'đ':'D','v':'V','b':'V','l':'L','n':'N','ph':'F','f':'F','kh':'K','k':'K',
   'th':'T','t':'T','gh':'G','g':'G','ngh':'NG','ng':'NG','nh':'NH','qu':'Q',
-  'c':'K' // c/k/qu cùng là âm /k/ trong tiếng Việt -> gập chung 1 nhóm
+  'c':'K'
 };
 var PHONETIC_RHYME = {
   'ă':'A','â':'A','a':'A','ê':'E','e':'E','ô':'O','o':'O','ơ':'O',
@@ -412,31 +227,144 @@ function firstCharRatio(a,b){
   return match/Math.max(wa.length,wb.length,1);
 }
 
-// Rớt cụm phụ âm đầu (1-2 ký tự) của mỗi từ -> bắt lỗi gõ thiếu / nói lướt âm đầu
-// (vd "huc"->"uc", "hao"->"ao"); chỉ áp dụng khi từ còn đủ dài để không biến dạng quá mức
+// ── Brand alias: voice nhận nhầm / tên phổ biến → chuẩn ──────
+var BRAND_ALIAS = {
+  'kho':'coca','co ca':'coca','coca co':'coca cola',
+  'pep si':'pepsi','pep xi':'pepsi',
+  'sting do':'sting do','sting vang':'sting vang',
+  'red bull':'bo huc','redbull':'bo huc',
+  '7 up':'7up','seven up':'7up',
+  'spayti':'sprite','sbrite':'sprite','sbay ti':'sprite',
+  'omaci':'omachi','omati':'omachi',
+  'ba mien':'3 mien','ba mien':'3 mien','3mien':'3 mien',
+  'ncsuoi':'nuoc suoi','nc suoi':'nuoc suoi',
+  'nc':'nuoc','cf':'ca phe',
+  'sg':'sai gon','sg do':'bia sai gon do',
+  'gụi':'goi','gụt':'goi','goi':'goi'
+};
+
+// ── Filler words loại bỏ (voice) ─────────────────────────────
+var SEARCH_FILLERS = [
+  'cho em','cho anh','cho chi','cho toi','giup toi',
+  'tinh tong tien','tinh tien','tong hoa don','tinh hoa don',
+  'lap hoa don','tao hoa don','lam hoa don','thanh toan giup','thanh toan',
+  'lay gium','lay','gium','oi','nha','cho','ban','mua','giup','di nao','di','nao'
+];
+
+// ── Số chữ → số (voice + gõ chữ) ────────────────────────────
+var WORD_TO_NUM = {
+  'mot ngan':1000,'hai tram':200,'mot tram':100,
+  'hai muoi':20,'ba muoi':30,'bon muoi':40,'nam muoi':50,
+  'muoi':10,'chin':9,'tam':8,'bay':7,'sau':6,
+  'nam':5,'bon':4,'ba':3,'hai':2,'mot':1,
+  // có dấu (khi voice trả về đầy đủ dấu)
+  'mười':10,'chín':9,'tám':8,'bảy':7,'sáu':6,
+  'năm':5,'bốn':4,'một':1
+};
+
+// ── Normalize: bỏ dấu + lower + collapse space ───────────────
+function norm(s){
+  return String(s||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/đ/g,'d')
+    .replace(/[-_.]/g,'')
+    .replace(/[^a-z0-9\s]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+function applyAlias(s){
+  var t=s;
+  Object.keys(BRAND_ALIAS).sort(function(a,b){return b.length-a.length;}).forEach(function(k){
+    var re=new RegExp('(^|\\s)'+k.replace(/\s+/g,'\\s+')+'(\\s|$)','g');
+    t=t.replace(re,function(m,p,su){return p+BRAND_ALIAS[k]+su;});
+  });
+  return t.replace(/\s+/g,' ').trim();
+}
+
+function wordToNumber(s){
+  var t=s;
+  Object.keys(WORD_TO_NUM).sort(function(a,b){return b.length-a.length;}).forEach(function(k){
+    var re=new RegExp('(^|\\s)'+norm(k)+'(\\s|$)','g');
+    t=t.replace(re,function(m,p,su){return p+WORD_TO_NUM[k]+su;});
+  });
+  return t.replace(/\s+/g,' ').trim();
+}
+
+function stripFillers(s){
+  var t=s;
+  SEARCH_FILLERS.slice().sort(function(a,b){return b.length-a.length;}).forEach(function(f){
+    var fn=norm(f);
+    var re=new RegExp('(^|\\s)'+fn.replace(/\s+/g,'\\s+')+'(\\s|$)','g');
+    t=t.replace(re,' ');
+  });
+  return t.replace(/\s+/g,' ').trim();
+}
+
+// ── Phonetic ─────────────────────────────────────────────────
+var PHONETIC_RHYME = {
+  'ă':'A','â':'A','a':'A','ê':'E','e':'E','ô':'O','o':'O','ơ':'O',
+  'ư':'U','u':'U','i':'I','y':'I','ăn':'AN','ân':'AN','an':'AN',
+  'ên':'EN','en':'EN','ôn':'ON','ơn':'ON','on':'ON','ưn':'UN','un':'UN',
+  'in':'IN','yn':'IN','ăt':'AT','ât':'AT','at':'AT','êt':'ET','et':'ET',
+  'ôt':'OT','ơt':'OT','ot':'OT','ưt':'UT','ut':'UT','it':'IT','yt':'IT',
+  'ăng':'ANG','âng':'ANG','ang':'ANG','êng':'ENG','eng':'ENG',
+  'ông':'ONG','ơng':'ONG','ong':'ONG','ưng':'UNG','ung':'UNG',
+  'ing':'ING','yng':'ING','nh':'NH','n':'N','ch':'CH','c':'C','t':'T',
+  'p':'P','ng':'NG',
+  'ăc':'AT','âc':'AT','ac':'AT','êc':'ET','ec':'ET',
+  'ôc':'OT','ơc':'OT','oc':'OT','ưc':'UT','uc':'UT','ic':'IT','yc':'IT'
+};
+
+function toPhoneticKey(text){
+  var words=norm(text).split(' ').filter(Boolean);
+  return words.map(function(word){
+    var initial='',rest=word;
+    var three=word.substring(0,3),two=word.substring(0,2),one=word.substring(0,1);
+    if(PHONETIC_INITIAL[three]){initial=PHONETIC_INITIAL[three];rest=word.substring(3);}
+    else if(PHONETIC_INITIAL[two]){initial=PHONETIC_INITIAL[two];rest=word.substring(2);}
+    else if(PHONETIC_INITIAL[one]){initial=PHONETIC_INITIAL[one];rest=word.substring(1);}
+    else{initial=one?one.toUpperCase():'';rest=word.substring(1);}
+    var pr='';
+    for(var len=Math.min(rest.length,4);len>=1;len--){
+      var sub=rest.substring(0,len);
+      if(PHONETIC_RHYME[sub]){pr=PHONETIC_RHYME[sub]+rest.substring(len);break;}
+    }
+    if(!pr)pr=rest;
+    return (initial+pr).toUpperCase();
+  }).join(' ');
+}
+
+function initialClass(word){
+  if(!word)return '';
+  var two=word.substring(0,2),three=word.substring(0,3);
+  if(PHONETIC_INITIAL[three])return PHONETIC_INITIAL[three];
+  if(PHONETIC_INITIAL[two])return PHONETIC_INITIAL[two];
+  if(PHONETIC_INITIAL[word[0]])return PHONETIC_INITIAL[word[0]];
+  return word[0]?word[0].toUpperCase():'';
+}
+
+function relaxFinal(key){return key.replace(/(NG|NH)(?=\s|$)/g,'N');}
+
+function firstCharRatio(a,b){
+  var wa=a.split(' ').filter(Boolean),wb=b.split(' ').filter(Boolean);
+  var n=Math.min(wa.length,wb.length);if(n===0)return 0;
+  var match=0;
+  for(var i=0;i<n;i++){
+    if(initialClass(wa[i])===initialClass(wb[i]))match++;
+    else if(wa[i][0]===wb[i][0])match+=1;
+  }
+  return match/Math.max(wa.length,wb.length,1);
+}
+
 function dropLeadingConsonants(text){
-  var s=normalizeVN(text);
-  var words=s.split(' ').filter(Boolean);
+  var words=norm(text).split(' ').filter(Boolean);
   var changed=false;
   var out=words.map(function(w){
     var m=w.match(/^[bcdghklmnpqrstvx]{1,2}(?=[aeiouy])/);
-    if(m && w.length>m[0].length+1){changed=true;return w.slice(m[0].length);}
+    if(m&&w.length>m[0].length+1){changed=true;return w.slice(m[0].length);}
     return w;
   });
-  return changed?out.join(' '):s;
-}
-
-// Gập đuôi mũi -ng/-nh về -n (đặc trưng giọng Nam: "ăn"≈"ăng"≈"anh")
-// dùng như phương án phụ (không thay primary key) để không làm lệch các trường hợp cần phân biệt rõ
-function relaxFinal(key){
-  return key.replace(/(NG|NH)(?=\s|$)/g,'N');
-}
-
-// mode: 'voice' (giọng nói, lỗi thường là nhận lầm cả âm tiết) hoặc 'type' (gõ tay, lỗi thường là sai/thiếu ký tự)
-function combinedScore(a,b,mode){
-  var lr=levRatio(a,b),fr=firstCharRatio(a,b),pr=phoneticScore(a,b);
-  if(mode==='voice')return 0.30*lr+0.20*fr+0.50*pr;
-  return 0.45*lr+0.35*fr+0.20*pr;
+  return changed?out.join(' '):norm(text);
 }
 
 function phoneticScore(a,b){
@@ -446,53 +374,174 @@ function phoneticScore(a,b){
   var ra=relaxFinal(pa),rb=relaxFinal(pb);
   if(ra!==pa||rb!==pb){
     var relaxed=1-levenshtein(ra,rb)/Math.max(ra.length,rb.length,1);
-    return Math.max(strict,relaxed*0.92); // *0.92: khớp nới giọng vùng miền, tin thấp hơn khớp đúng
+    return Math.max(strict,relaxed*0.92);
   }
   return strict;
 }
 
-function abbreviationScore(query,productWords){
-  var qWords=normalizeVN(query).split(' ').filter(Boolean);
-  var pWords=productWords||[];
-  var pInitials=pWords.map(function(w){return w[0];}).join('');
-  var qJoined=qWords.join('');
-  if(pInitials===qJoined)return 0.9;
-  if(levRatio(pInitials,qJoined)>0.8)return 0.7;
-  return 0;
+function combinedScore(a,b,mode){
+  var lr=levRatio(a,b),fr=firstCharRatio(a,b),pr=phoneticScore(a,b);
+  if(mode==='voice')return 0.30*lr+0.20*fr+0.50*pr;
+  return 0.45*lr+0.35*fr+0.20*pr;
 }
 
-function matchProductTop3(phrase,unitHint,mode){
-  mode=mode||'type';
-  var pn=normalizeVN(phrase);
-  var pnAlt=dropLeadingConsonants(phrase); // bản suy đoán: rớt phụ âm đầu mỗi từ
-  var hasAlt=pnAlt!==pn;
-  var scored=[];
-  PRODUCTS.forEach(function(p){
-    var candidates=[normalizeVN(p.name)].concat((p.keywords||[]).map(normalizeVN));
-    var pWords=normalizeVN(p.name).split(' ').filter(Boolean);
-    var pScore=0,matchType='';
-    candidates.forEach(function(c){
-      var s=combinedScore(pn,c,mode);
-      if(pn===c||c.indexOf(pn)!==-1||pn.indexOf(c)!==-1){s=Math.max(s,0.95);}
-      if(s>pScore){pScore=s;matchType='lev';}
-      if(hasAlt){
-        var sAlt=combinedScore(pnAlt,c,mode)*0.95; // giảm nhẹ vì là bản suy đoán, không phải input thật
-        if(sAlt>pScore){pScore=sAlt;matchType='lev-alt';}
-      }
-    });
-    var abbrScore=abbreviationScore(pn,pWords);
-    if(abbrScore>pScore){pScore=abbrScore;matchType='abbr';}
-    var phoneticKeyScore=phoneticScore(pn,p.name);
-    if(phoneticKeyScore>pScore){pScore=phoneticKeyScore;matchType='phonetic';}
-    if(unitHint){
-      var uh=normalizeVN(unitHint),pu=normalizeVN(p.unit||'');
-      if(pu&&uh===pu){pScore=Math.min(1,pScore+0.15);matchType=matchType+'+unit';}
-    }
-    scored.push({product:p,score:pScore,matchType:matchType});
-  });
-  scored.sort(function(a,b){return b.score-a.score;});
-  return scored.slice(0,8);
+// ── Index builder: gọi 1 lần khi load ────────────────────────
+function buildProductIndex(p){
+  var n=norm(p.name||'');
+  var nNum=wordToNumber(n);
+  var nAlias=applyAlias(n);
+  var variants=[n,nNum,nAlias].filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+  var kws=(p.keywords||[]).map(function(k){var nk=norm(k);return applyAlias(wordToNumber(nk));});
+  variants.forEach(function(v){if(kws.indexOf(v)===-1)kws.unshift(v);});
+  return {
+    code    : norm(p.code||''),
+    barcode : norm(p.barcode||''),
+    name    : n,
+    variants: variants,
+    keywords: kws,
+    tokens  : n.split(' ').filter(Boolean),
+    phonetic: toPhoneticKey(n),
+    unit    : norm(p.unit||'')
+  };
 }
+
+// ── Prefix cache ──────────────────────────────────────────────
+var SEARCH_CACHE = {};
+
+// ── Parse input (qty + unit + phrase) ────────────────────────
+function parseQueryInput(raw, mode){
+  var s=norm(wordToNumber(raw));
+  s=stripFillers(s);
+  s=applyAlias(s);
+  var qty=1,unit='',phrase=s;
+  var unitGroup=UNIT_WORDS_NORM.join('|');
+  var m=s.match(new RegExp('^(\\d+(?:\\.\\d+)?)\\s*('+unitGroup+')?\\s+(.+)$'));
+  if(m){qty=parseFloat(m[1]);unit=m[2]||'';phrase=m[3].trim();}
+  else{
+    m=s.match(new RegExp('^(.+?)\\s+(\\d+(?:\\.\\d+)?)\\s*('+unitGroup+')?\\s*$'));
+    if(m){phrase=m[1].trim();qty=parseFloat(m[2]);unit=m[3]||'';}
+  }
+  return {qty:qty,unit:norm(unit),phrase:phrase};
+}
+
+// ── Main search: cascade 8 tiers ─────────────────────────────
+function matchProductTop3(rawQuery, unitHintLegacy, mode){
+  mode=mode||SEARCH_INPUT_MODE||'type';
+  if(!rawQuery||!rawQuery.trim())return[];
+
+  var cacheKey=mode+':'+rawQuery.trim().toLowerCase();
+  if(SEARCH_CACHE[cacheKey])return SEARCH_CACHE[cacheKey];
+
+  var parsed=parseQueryInput(rawQuery,mode);
+  var q=parsed.phrase;
+  var unitHint=parsed.unit||unitHintLegacy||'';
+
+  var results=[];
+
+  // Tier 1: SKU exact
+  PRODUCTS.forEach(function(p){
+    if(p._idx.code===q)results.push({product:p,tier:1,score:1.00,matchType:'sku'});
+  });
+  if(results.length)return _finishSearch(results,unitHint,cacheKey);
+
+  // Tier 2: Barcode exact
+  PRODUCTS.forEach(function(p){
+    if(p._idx.barcode&&p._idx.barcode===q)results.push({product:p,tier:2,score:1.00,matchType:'barcode'});
+  });
+  if(results.length)return _finishSearch(results,unitHint,cacheKey);
+
+  // Tier 3: Exact name/variant/keyword
+  PRODUCTS.forEach(function(p){
+    var idx=p._idx;
+    if(idx.variants.indexOf(q)!==-1||idx.keywords.indexOf(q)!==-1)
+      results.push({product:p,tier:3,score:1.00,matchType:'exact'});
+  });
+  if(results.length)return _finishSearch(results,unitHint,cacheKey);
+
+  // Tier 4: StartsWith
+  PRODUCTS.forEach(function(p){
+    var idx=p._idx;
+    if(idx.variants.some(function(v){return v.indexOf(q)===0;})||
+       idx.keywords.some(function(k){return k.indexOf(q)===0;}))
+      results.push({product:p,tier:4,score:0.95,matchType:'startswith'});
+  });
+
+  // Tier 5: Contains + multi-keyword
+  var qTokens=q.split(' ').filter(Boolean);
+  PRODUCTS.forEach(function(p){
+    if(results.some(function(r){return r.product===p;}))return;
+    var idx=p._idx;
+    if(idx.variants.some(function(v){return v.indexOf(q)!==-1;})||
+       idx.keywords.some(function(k){return k.indexOf(q)!==-1;})){
+      results.push({product:p,tier:5,score:0.88,matchType:'contains'});return;
+    }
+    if(qTokens.length>1&&qTokens.every(function(t){
+      return idx.tokens.some(function(pt){return pt.indexOf(t)===0;})||
+             idx.keywords.some(function(k){return k.indexOf(t)!==-1;});
+    })){results.push({product:p,tier:5,score:0.82,matchType:'multi-kw'});}
+  });
+
+  // Tier 6: Keyword partial
+  PRODUCTS.forEach(function(p){
+    if(results.some(function(r){return r.product===p;}))return;
+    var idx=p._idx;
+    if(idx.keywords.some(function(k){return k.indexOf(q)===0||q.indexOf(k)===0;}))
+      results.push({product:p,tier:6,score:0.75,matchType:'keyword'});
+  });
+
+  // Tier 7+8: Fuzzy + Phonetic — chỉ trên top30 candidates
+  var already={};
+  results.forEach(function(r){already[r.product._idx.code||r.product.name]=true;});
+  var q0=qTokens[0]||'';
+  var candidates=PRODUCTS.filter(function(p){
+    if(already[p._idx.code||p.name])return false;
+    return p._idx.tokens.some(function(t){
+      return t.indexOf(q0)===0||q0.indexOf(t)===0||Math.abs(t.length-q0.length)<=2;
+    })||p._idx.keywords.length>0;
+  }).map(function(p){
+    var quick=Math.max(
+      levRatio(q,p._idx.name),
+      p._idx.variants.reduce(function(mx,v){return Math.max(mx,levRatio(q,v));},0)
+    );
+    return {p:p,quick:quick};
+  }).filter(function(x){return x.quick>0.35;})
+    .sort(function(a,b){return b.quick-a.quick;})
+    .slice(0,30);
+
+  var qAlt=dropLeadingConsonants(q);
+  candidates.forEach(function(x){
+    var p=x.p;var idx=p._idx;
+    var fuzzy=Math.max(
+      combinedScore(q,idx.name,mode),
+      idx.variants.reduce(function(mx,v){return Math.max(mx,combinedScore(q,v,mode));},0),
+      qAlt!==q?combinedScore(qAlt,idx.name,mode)*0.93:0
+    );
+    var voice=Math.max(
+      phoneticScore(q,idx.name),
+      idx.variants.reduce(function(mx,v){return Math.max(mx,phoneticScore(q,v));},0)
+    );
+    var best=Math.max(fuzzy,voice*0.90);
+    if(best>0.50)results.push({product:p,tier:best>=0.80?7:8,score:best,matchType:'fuzzy'});
+  });
+
+  return _finishSearch(results,unitHint,cacheKey);
+}
+
+function _finishSearch(results,unitHint,cacheKey){
+  if(unitHint)results.forEach(function(r){
+    if(r.product._idx.unit===unitHint)r.score=Math.min(1,r.score+0.12);
+  });
+  results.sort(function(a,b){return a.tier!==b.tier?a.tier-b.tier:b.score-a.score;});
+  var out=results.slice(0,8);
+  if(cacheKey)SEARCH_CACHE[cacheKey]=out;
+  return out;
+}
+
+// norm các unit word (dùng trong parseQueryInput)
+var UNIT_WORDS_NORM=['kg','ki','ky','can','g','gam','gr','lon','chai','goi','hop',
+  'tui','bich','ly','coc','o','mieng','cai','bao','cay','thung','lit','chiec',
+  'con','cap','doi','chuc','ta','ro','bo','nam','mo','it','loc','vi','xap','tam',
+  'cuon','qua','trai'];
 
 var UNIT_WORDS=['kg','kí','ký','ki','cân','can','g','gam','gr','lon','chai','gói','goi','hộp','hop','túi','tui',
   'quả','qua','trái','trai','ly','cốc','coc','ổ','o','miếng','mieng','cái','cai',
@@ -678,8 +727,6 @@ function renderCart(){
   }
   cartItems.innerHTML = html;
   updateTotal();
-  var activeRow = document.querySelector('#cartItems .cart-row.active .name');
-  if(activeRow) startMarquee(activeRow);
 }
 
 function renderHoldOrders(){
@@ -1175,7 +1222,6 @@ function initSpeechRecognition(){
   recognition.lang = 'vi-VN';
   recognition.continuous = false;
   recognition.interimResults = true;
-  recognition.maxAlternatives = 5;
 
   recognition.onstart = function(){
     VOICE_ACTIVE = true;
@@ -1184,24 +1230,15 @@ function initSpeechRecognition(){
   };
 
   recognition.onresult = function(event){
-    var interim = '';
-    var finalCandidates = [];
+    var interim = '', final = '';
     for(var i = event.resultIndex; i < event.results.length; i++){
-      if(event.results[i].isFinal){
-        var alts = event.results[i];
-        for(var j = 0; j < alts.length; j++){
-          var t = alts[j].transcript.trim();
-          if(t) finalCandidates.push(t);
-        }
-      } else {
-        interim += event.results[i][0].transcript;
-      }
+      if(event.results[i].isFinal) final += event.results[i][0].transcript;
+      else interim += event.results[i][0].transcript;
     }
-    if(finalCandidates.length > 0){
+    if(final.trim()){
       VOICE_DONE = true;
       SEARCH_INPUT_MODE = 'voice';
-      var best = pickBestVoiceResult(finalCandidates);
-      SEARCH_QUERY = best || finalCandidates[0];
+      SEARCH_QUERY = final.trim();
       renderCommand();
       liveSearch();
     }
@@ -1220,62 +1257,6 @@ function initSpeechRecognition(){
     renderCommand();
     if(SEARCH_QUERY) liveSearch();
   };
-}
-
-function pickBestVoiceResult(candidates){
-  var bestText = candidates[0] || '';
-  var bestScore = -1;
-  for(var t = 0; t < candidates.length; t++){
-    var text = candidates[t];
-    if(!text) continue;
-    var result = scoreVoiceMatch(text);
-    if(result.score > bestScore){
-      bestScore = result.score;
-      bestText = text;
-    }
-    if(result.score < 8000){
-      var variations = generateVoiceVariants(text);
-      for(var v = 0; v < variations.length; v++){
-        var vr = scoreVoiceMatch(variations[v]);
-        if(vr.score > bestScore){
-          bestScore = vr.score;
-          bestText = variations[v];
-        }
-      }
-    }
-  }
-  return bestText;
-}
-
-function scoreVoiceMatch(text){
-  var results = search(text, 1);
-  if(results.length === 0) return {score: -1, text: text};
-  return {score: results[0].score, text: text};
-}
-
-function generateVoiceVariants(text){
-  var variants = [];
-  var words = text.split(/\s+/).filter(Boolean);
-  // Gộp 2 từ ngắn: "cô ca" → "coca"
-  if(words.length >= 2){
-    for(var i = 0; i < words.length - 1; i++){
-      if(words[i].length <= 3 && words[i+1].length <= 3){
-        var merged = words.slice(0,i).concat([words[i]+words[i+1]]).concat(words.slice(i+2)).join(' ');
-        if(merged !== text) variants.push(merged);
-      }
-    }
-  }
-  // Tách từ dài không space: "cocacola" → "coca cola"
-  if(words.length === 1 && text.length > 6){
-    var commonSplits = {'cocacola':'coca cola','stingvang':'sting vang','stingdo':'sting do','pepsi':'pepsi'};
-    if(commonSplits[text]) variants.push(commonSplits[text]);
-  }
-  // Thử bỏ từ cuối (thường là từ thừa API tự thêm)
-  if(words.length >= 3){
-    variants.push(words.slice(0, -1).join(' '));
-    if(words.length >= 4) variants.push(words.slice(0, -2).join(' '));
-  }
-  return variants;
 }
 
 function startVoiceInput(){
@@ -1307,158 +1288,48 @@ function renderCommand(){
 }
 
 function renderSuggestions(results){
-  var oldActive = document.querySelector('#suggestArea .item.active .name');
-  if(oldActive) stopMarquee(oldActive);
-
-  // Remove previously created dynamic items
-  var container = document.getElementById('suggestArea');
-  if(container){
-    var dynamics = container.querySelectorAll('.item[data-dynamic]');
-    for(var d = 0; d < dynamics.length; d++) dynamics[d].remove();
-  }
-
   SUGGESTIONS = results || [];
   SUGGEST_ACTIVE_IDX = 0;
-
-  var PREDEFINED = 8;
-  for(var i = 0; i < SUGGESTIONS.length; i++){
-    var p = SUGGESTIONS[i].product;
-    var el;
-
-    if(i < PREDEFINED){
-      el = document.getElementById('suggest'+i);
-      if(!el) continue;
-      el.style.display = '';
-      el.dataset.index = i;
-      document.getElementById('s'+i+'name').textContent = p.name;
-      var ue = document.getElementById('s'+i+'unit');
-      if(ue) ue.textContent = p.unit || '';
-      document.getElementById('s'+i+'price').textContent = fmtShort(p.price);
-    } else {
-      if(!container) continue;
-      el = document.createElement('div');
-      el.className = 'item';
-      el.setAttribute('data-dynamic', '1');
-      el.dataset.index = i;
-      (function(idx){ el.onclick = function(){ onSuggestionTap(idx); }; })(i);
-
-      var ind = document.createElement('span');
-      ind.className = 'indicator';
-      el.appendChild(ind);
-
-      var nameEl = document.createElement('span');
-      nameEl.className = 'name';
-      nameEl.textContent = p.name;
-      el.appendChild(nameEl);
-
-      var unitEl = document.createElement('span');
-      unitEl.className = 'unit';
-      unitEl.textContent = p.unit || '';
-      el.appendChild(unitEl);
-
-      var priceEl = document.createElement('span');
-      priceEl.className = 'price';
-      priceEl.textContent = fmtShort(p.price);
-      el.appendChild(priceEl);
-
-      container.appendChild(el);
+  var max = 8;
+  for(var i = 0; i < max; i++){
+    var el = document.getElementById('suggest'+i);
+    if(!el) continue;
+    var nameEl = document.getElementById('s'+i+'name');
+    var priceEl = document.getElementById('s'+i+'price');
+    if(SUGGESTIONS && SUGGESTIONS[i]){
+      nameEl.textContent = SUGGESTIONS[i].product.name;
+      priceEl.textContent = fmtShort(SUGGESTIONS[i].product.price);
     }
   }
-
-  // Hide unused predefined slots
-  for(var j = SUGGESTIONS.length; j < PREDEFINED; j++){
-    var hideEl = document.getElementById('suggest'+j);
-    if(hideEl){ hideEl.style.display = 'none'; hideEl.dataset.index = -1; }
-  }
-
   updateActiveSuggestion();
-  if(container) container.scrollTop = 0;
-}
-
-function stopMarquee(el){
-  if(!el) return;
-  var t = el.dataset.marqueeTimer;
-  if(t) clearTimeout(t);
-  var raf = el.dataset.marqueeRAF;
-  if(raf) cancelAnimationFrame(raf);
-  el.dataset.marquee = '';
-  el.dataset.marqueeTimer = '';
-  el.dataset.marqueeRAF = '';
-  el.scrollLeft = 0;
-  el.style.textOverflow = 'ellipsis';
-}
-
-function startMarquee(el){
-  stopMarquee(el);
-  if(!el) return;
-  el.dataset.marqueeTimer = setTimeout(function(){
-    el.style.textOverflow = 'clip';
-    el.scrollLeft = 0;
-    var cw = el.offsetWidth;
-    var sw = el.scrollWidth;
-    if(sw <= cw){ el.style.textOverflow = 'ellipsis'; return; }
-    el.dataset.marquee = '1';
-    var target = sw - cw + 20;
-    var duration = 3500;
-    var startTime = null;
-    function slide(t){
-      if(!startTime) startTime = t;
-      var p = Math.min((t - startTime) / duration, 1);
-      el.scrollLeft = target * p;
-      if(p < 1) el.dataset.marqueeRAF = requestAnimationFrame(slide);
-      else {
-        el.dataset.marqueeTimer = setTimeout(function(){
-          var rt = 600, rs = null;
-          function back(t2){
-            if(!rs) rs = t2;
-            var p2 = Math.min((t2 - rs) / rt, 1);
-            el.scrollLeft = target * (1 - p2);
-            if(p2 < 1) el.dataset.marqueeRAF = requestAnimationFrame(back);
-            else {
-              el.dataset.marquee = '';
-              el.dataset.marqueeTimer = '';
-              el.dataset.marqueeRAF = '';
-              el.style.textOverflow = 'ellipsis';
-            }
-          }
-          el.dataset.marqueeRAF = requestAnimationFrame(back);
-        }, 500);
-      }
-    }
-    el.dataset.marqueeRAF = requestAnimationFrame(slide);
-  }, 400);
+  var suggestArea = document.getElementById('suggestArea');
+  if(suggestArea) suggestArea.scrollTop = 0;
 }
 
 function updateActiveSuggestion(){
-  var items = document.querySelectorAll('#suggestArea .item');
+  var max = 8;
   var focusIdx = SUGGEST_ACTIVE_IDX;
   var isQty = document.body.getAttribute('data-parser') === 'qty';
-  for(var i = 0; i < items.length; i++){
-    var el = items[i];
-    var idx = parseInt(el.dataset.index);
-    if(isNaN(idx) || idx < 0) continue;
-    if(SUGGESTIONS && SUGGESTIONS[idx]){
+  for(var i = 0; i < max; i++){
+    var el = document.getElementById('suggest'+i);
+    if(!el) continue;
+    if(SUGGESTIONS && SUGGESTIONS[i]){
       if(isQty){
-        if(idx === focusIdx && focusIdx >= 0){
+        if(i === focusIdx && focusIdx >= 0){
           el.style.display = 'grid';
           el.classList.add('active');
           var ind = el.querySelector('.indicator');
           if(ind) ind.textContent = '▶';
-          startMarquee(el.querySelector('.name'));
         } else {
           el.style.display = 'none';
           var ind = el.querySelector('.indicator');
           if(ind) ind.textContent = '';
         }
       } else {
-        var isActive = idx === focusIdx && focusIdx >= 0;
         el.style.display = 'grid';
-        el.classList.toggle('active', isActive);
+        el.classList.toggle('active', i === focusIdx && focusIdx >= 0);
         var ind = el.querySelector('.indicator');
-        if(ind) ind.textContent = isActive ? '▶' : '';
-        if(isActive){
-          startMarquee(el.querySelector('.name'));
-        }
+        if(ind) ind.textContent = i === focusIdx && focusIdx >= 0 ? '▶' : '';
       }
     } else {
       el.style.display = 'none';
@@ -1495,32 +1366,25 @@ function liveSearch(){
     renderSuggestions([]);
     return;
   }
-  var qText = SEARCH_QUERY.trim();
-  var recent;
-
-  // Query rỗng hoặc < 2 ký tự → recent products
-  if(!qText || qText.length < 2){
-    recent = getRecentProducts(8);
-    PENDING_PRODUCT = recent.length > 0
-      ? {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'}
-      : null;
+  if(!SEARCH_QUERY.trim()){
+    var recent = getRecentProducts(8);
+    if(recent.length > 0){
+      PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'};
+    } else {
+      PENDING_PRODUCT = null;
+    }
     renderSuggestions(recent);
     return;
   }
-
+  // Engine mới tự parse qty/unit/fillers từ raw query
+  // Giữ parseSegment cho backward-compat qty (special fractions, ký rưỡi, etc.)
   var parsed = parseSegment(SEARCH_QUERY);
-  var searchPhrase = parsed ? parsed.phrase : SEARCH_QUERY;
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = search(searchPhrase, 100);
-
+  var results = matchProductTop3(SEARCH_QUERY, null, SEARCH_INPUT_MODE);
   if(results && results.length > 0){
     PENDING_PRODUCT = {product: results[0].product, qty: qty, unit: results[0].product.unit || 'đv'};
   } else {
-    // Fallback: recent products
-    results = getRecentProducts(8);
-    PENDING_PRODUCT = results.length > 0
-      ? {product: results[0].product, qty: 1, unit: results[0].product.unit || 'đv'}
-      : null;
+    PENDING_PRODUCT = null;
   }
   renderSuggestions(results);
 }
@@ -1536,8 +1400,7 @@ function onSearchKey(c){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += c;
   renderCommand();
-  clearTimeout(SEARCH_TIMER);
-  SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
+  liveSearch();
 }
 
 function onSpaceKey(){
@@ -1552,8 +1415,7 @@ function onSpaceKey(){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += ' ';
   renderCommand();
-  clearTimeout(SEARCH_TIMER);
-  SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
+  liveSearch();
 }
 
 function onBackspace(){
@@ -1575,9 +1437,9 @@ function onBackspace(){
   if(SEARCH_QUERY.length > 0){
     SEARCH_INPUT_MODE = 'type';
     SEARCH_QUERY = SEARCH_QUERY.slice(0, -1);
+    if(!SEARCH_QUERY) SEARCH_CACHE = {};
     renderCommand();
-    clearTimeout(SEARCH_TIMER);
-    SEARCH_TIMER = setTimeout(function(){ liveSearch(); }, 30);
+    liveSearch();
   }
 }
 
@@ -1781,7 +1643,9 @@ function saveInvoiceBtn(){
 
 apiCall('getProducts').then(function(products){
   PRODUCTS = products || [];
-  buildSearchIndex();
+  // Build search index 1 lần duy nhất khi load
+  PRODUCTS.forEach(function(p){ p._idx = buildProductIndex(p); });
+  SEARCH_CACHE = {};
   document.getElementById('loadingScreen').classList.add('hidden');
   if(ORDERS.length === 0){
     var firstOrder = createOrder(NEXT_ORDER_ID++);
