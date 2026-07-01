@@ -1171,6 +1171,8 @@ function saveInvoiceBtn(){
   renderCart();
   updateTotal();
   renderCommand();
+  _searchLastText = null;
+  SUGGESTIONS = [];
   liveSearch();
   updateHoldHeader();
 }
