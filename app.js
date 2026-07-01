@@ -71,7 +71,9 @@ var EDIT_IDX = -1;
 var NUMPAD_QTY = '0';
 var NUMPAD_DRAFT = '';
 var SKIP_CLICK = false;
-var _searchDebounceTimer = null;
+var _searchBusy = false;
+var _searchDirty = false;
+var _searchLastText = '';
 
 var ORDERS = [];
 var ACTIVE_ORDER_INDEX = 0;
@@ -171,7 +173,7 @@ function renderCart(){
     var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
-    var split = splitProductName(prod.name);
+    var split = prod._displayName || (prod._displayName = splitProductName(prod.name));
     html += '<span class="name'+(item._deleted?' strikethrough':'')+'">';
     html += '<span class="name-line1">'+escapeHtml(split.line1)+'</span>';
     if(split.line2) html += '<span class="name-line2">'+escapeHtml(split.line2)+'</span>';
@@ -710,7 +712,7 @@ function initSpeechRecognition(){
     VOICE_ACTIVE = false;
     VOICE_DONE = false;
     renderCommand();
-    if(SEARCH_QUERY) liveSearch();
+    if(SEARCH_QUERY) scheduleSearch();
   };
 }
 
@@ -742,21 +744,35 @@ function renderCommand(){
   }
 }
 
+function sameResults(a, b) {
+  if (a.length !== b.length) return false;
+  for (var i = 0; i < a.length; i++) {
+    if (a[i].product.code !== b[i].product.code) return false;
+  }
+  return true;
+}
+
 function renderSuggestions(results){
-  SUGGESTIONS = results || [];
-  SUGGEST_ACTIVE_IDX = 0;
+  var next = results || [];
   var area = document.getElementById('suggestArea');
-  if(!area) return;
+  if (area && SUGGESTIONS && sameResults(SUGGESTIONS, next)) {
+    SUGGEST_ACTIVE_IDX = 0;
+    updateActiveSuggestion();
+    return;
+  }
+  SUGGESTIONS = next;
+  SUGGEST_ACTIVE_IDX = 0;
+  if (!area) return;
 
   var html = '';
-  for(var i = 0; i < SUGGESTIONS.length; i++){
+  for (var i = 0; i < SUGGESTIONS.length; i++) {
     var p = SUGGESTIONS[i].product;
-    var split = splitProductName(p.name);
+    var split = p._displayName || (p._displayName = splitProductName(p.name));
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
     html += '<span class="name">';
     html += '<span class="name-line1">'+escapeHtml(split.line1)+'</span>';
-    if(split.line2) html += '<span class="name-line2">'+escapeHtml(split.line2)+'</span>';
+    if (split.line2) html += '<span class="name-line2">'+escapeHtml(split.line2)+'</span>';
     html += '</span>';
     html += '<span class="unit'+(p.unit?' show':'')+'">'+escapeHtml(p.unit||'')+'</span>';
     html += '<span class="price">'+fmtShort(p.price)+'</span>';
@@ -825,6 +841,9 @@ function getRecentProducts(limit){
 }
 
 function liveSearch(){
+  var q = SEARCH_QUERY;
+  if (q === _searchLastText) return;
+  _searchLastText = q;
   if(VOICE_ACTIVE && !VOICE_DONE){
     renderSuggestions([]);
     return;
@@ -857,12 +876,16 @@ function liveSearch(){
   renderSuggestions(results);
 }
 
-function debouncedLiveSearch() {
-  if (_searchDebounceTimer) clearTimeout(_searchDebounceTimer);
-  _searchDebounceTimer = setTimeout(function() {
-    _searchDebounceTimer = null;
-    liveSearch();
-  }, 120);
+function scheduleSearch() {
+  _searchDirty = true;
+  if (_searchBusy) return;
+  _searchBusy = true;
+  requestAnimationFrame(function run() {
+    if (!_searchDirty) { _searchBusy = false; return; }
+    _searchDirty = false;
+    try { liveSearch(); }
+    finally { requestAnimationFrame(run); }
+  });
 }
 
 function onSearchKey(c){
@@ -876,7 +899,7 @@ function onSearchKey(c){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += c;
   renderCommand();
-  debouncedLiveSearch();
+  scheduleSearch();
 }
 
 function onSpaceKey(){
@@ -891,7 +914,7 @@ function onSpaceKey(){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += ' ';
   renderCommand();
-  debouncedLiveSearch();
+  scheduleSearch();
 }
 
 function onBackspace(){
@@ -915,7 +938,7 @@ function onBackspace(){
     SEARCH_QUERY = SEARCH_QUERY.slice(0, -1);
     if(!SEARCH_QUERY) SEARCH_CACHE = {};
     renderCommand();
-    liveSearch();
+    scheduleSearch();
   }
 }
 
@@ -924,7 +947,7 @@ function onClearSearch(){
   SEARCH_QUERY = '';
   PENDING_PRODUCT = null;
   renderCommand();
-  liveSearch();
+  scheduleSearch();
 }
 
 function onBackspaceHoldStart(e){
