@@ -85,6 +85,58 @@ function lookupEntities(text) {
   return matches;
 }
 
+function splitProductName(name) {
+  if (!name) return { line1: '', line2: '' };
+  if (!KNOWLEDGE) return { line1: name, line2: '' };
+
+  var entities = lookupEntities(name);
+  var specTypes = { 'package': true, 'capacity': true, 'quantity': true, 'unit': true };
+  var specEntities = [];
+
+  entities.forEach(function(e) {
+    if (specTypes[e.type]) specEntities.push(e);
+  });
+
+  if (specEntities.length === 0) return { line1: name, line2: '' };
+
+  var normName = _normStr(name);
+  var specIndices = {};
+
+  specEntities.forEach(function(e) {
+    var idx = normName.indexOf(e.normalized);
+    if (idx !== -1) {
+      for (var i = idx; i < idx + e.normalized.length; i++) {
+        specIndices[i] = true;
+      }
+    }
+  });
+
+  var origWords = name.split(/\s+/);
+  var normWords = normName.split(/\s+/);
+  var line1Words = [];
+  var line2Words = [];
+  var charPos = 0;
+
+  normWords.forEach(function(w, wi) {
+    var isSpec = false;
+    for (var si = charPos; si < charPos + w.length && !isSpec; si++) {
+      if (specIndices[si]) isSpec = true;
+    }
+    if (isSpec) {
+      line2Words.push(origWords[wi]);
+    } else {
+      line1Words.push(origWords[wi]);
+    }
+    charPos += w.length + 1;
+  });
+
+  var line1 = line1Words.join(' ').trim();
+  var line2 = line2Words.join(' ').trim();
+
+  if (!line2 || !line1) return { line1: name, line2: '' };
+  return { line1: line1, line2: line2 };
+}
+
 function expandEntities(entities) {
   var tokens = [];
   entities.forEach(function(e) {

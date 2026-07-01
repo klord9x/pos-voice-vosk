@@ -170,7 +170,11 @@ function renderCart(){
     var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
-    html += '<span class="name'+(item._deleted?' strikethrough':'')+'">'+prod.name+'</span>';
+    var split = splitProductName(prod.name);
+    html += '<span class="name'+(item._deleted?' strikethrough':'')+'">';
+    html += '<span class="name-line1">'+escapeHtml(split.line1)+'</span>';
+    if(split.line2) html += '<span class="name-line2">'+escapeHtml(split.line2)+'</span>';
+    html += '</span>';
     html += '<span class="qty">'+qtyStr+'</span>';
     html += '<span class="price">'+fmtCompact(item.total)+'</span>';
     html += '</div>';
@@ -746,9 +750,13 @@ function renderSuggestions(results){
   var html = '';
   for(var i = 0; i < SUGGESTIONS.length; i++){
     var p = SUGGESTIONS[i].product;
+    var split = splitProductName(p.name);
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
-    html += '<span class="name">'+escapeHtml(p.name)+'</span>';
+    html += '<span class="name">';
+    html += '<span class="name-line1">'+escapeHtml(split.line1)+'</span>';
+    if(split.line2) html += '<span class="name-line2">'+escapeHtml(split.line2)+'</span>';
+    html += '</span>';
     html += '<span class="unit'+(p.unit?' show':'')+'">'+escapeHtml(p.unit||'')+'</span>';
     html += '<span class="price">'+fmtShort(p.price)+'</span>';
     html += '</div>';
