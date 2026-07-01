@@ -990,6 +990,7 @@ function onSuggestionTap(idx){
   renderCart();
   var now = Date.now();
   if(now - SUGGEST_LAST_TAP < 300 && SUGGEST_ACTIVE_IDX === idx){
+    _searchDirty = false;
     SUGGEST_LAST_TAP = 0;
     var sug = SUGGESTIONS[idx];
     PENDING_PRODUCT = {product: sug.product, qty: 1, unit: sug.product.unit || 'đv'};
@@ -1001,6 +1002,7 @@ function onSuggestionTap(idx){
     updateActiveSuggestion();
     return;
   }
+  _searchDirty = false;
   SUGGEST_LAST_TAP = now;
   SUGGEST_ACTIVE_IDX = idx;
   updateActiveSuggestion();
@@ -1119,6 +1121,7 @@ function goToPrevState(){
   if(target === 'qty') target = 'search';
   setParser(target);
   if(target === 'search'){
+    _searchLastText = null;
     renderCommand();
     liveSearch();
   } else if(target === 'pay'){
