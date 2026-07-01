@@ -5,6 +5,7 @@ var _knowledgeReady = null;
 var ENTITY_GROUPS = {
   spec: new Set(['package','capacity','quantity','unit'])
 };
+var MAX_ENTITY_WORDS = 0;
 function isSpecEntity(entity) {
   return ENTITY_GROUPS.spec.has(entity.type);
 }
@@ -23,6 +24,7 @@ function loadKnowledge() {
 
 function _buildEntityLookup(knowledge) {
   ENTITY_LOOKUP = {};
+  MAX_ENTITY_WORDS = 0;
   var dictTypes = ['brand','product_type','attribute','descriptor','processing',
     'origin','variety','grade','capacity','package','unit','quantity'];
   dictTypes.forEach(function(type) {
@@ -31,6 +33,8 @@ function _buildEntityLookup(knowledge) {
     Object.keys(dict).forEach(function(key) {
       var entry = dict[key];
       var norm = _normStr(entry.normalized || key);
+      var wordCount = norm.split(/\s+/).filter(Boolean).length;
+      if (wordCount > MAX_ENTITY_WORDS) MAX_ENTITY_WORDS = wordCount;
       ENTITY_LOOKUP[norm] = { type: type, canonical: entry.canonical, normalized: norm };
     });
   });
@@ -41,6 +45,8 @@ function _buildEntityLookup(knowledge) {
       (entry.aliases || []).forEach(function(alias) {
         var norm = _normStr(alias);
         if (!ENTITY_LOOKUP[norm]) {
+          var wc = norm.split(/\s+/).filter(Boolean).length;
+          if (wc > MAX_ENTITY_WORDS) MAX_ENTITY_WORDS = wc;
           ENTITY_LOOKUP[norm] = { type: 'speech', canonical: canonical, normalized: norm, target: _normStr(canonical) };
         }
       });
@@ -85,14 +91,12 @@ function lookupEntities(text) {
   if (normInfo.length === 0) return [];
 
   var normWords = normInfo.map(function(e) { return e.norm; });
-  var seen = {};
   var matches = [];
+  var maxLen = Math.min(MAX_ENTITY_WORDS, normWords.length);
 
-  for (var len = normWords.length; len >= 1; len--) {
+  for (var len = maxLen; len >= 1; len--) {
     for (var i = 0; i <= normWords.length - len; i++) {
       var ng = normWords.slice(i, i + len).join(' ');
-      if (seen[ng]) continue;
-      seen[ng] = true;
       if (ENTITY_LOOKUP[ng]) {
         var entry = ENTITY_LOOKUP[ng];
         var firstOrig = normInfo[i].origIdx;

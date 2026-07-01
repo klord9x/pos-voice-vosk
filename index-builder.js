@@ -3,7 +3,7 @@
                 search.js (toPhoneticKey, generatePronunciationVariants, norm)
    Globals: PRODUCTS */
 
-var INDEX_VERSION = 2;
+var INDEX_VERSION = 3;
 var INDEXED_DB_NAME = 'pos-search';
 var INDEXED_DB_STORE = 'index';
 
@@ -13,55 +13,55 @@ function buildInitialism(words) {
               .join('');
 }
 
-function addSearchToken(token, tokens) {
+function addSearchToken(token, tokenSet) {
   var tn = norm(token);
-  if (!tn) return;
-  if (tokens.indexOf(tn) === -1) tokens.push(tn);
+  if (!tn || tokenSet.has(tn)) return;
+  tokenSet.add(tn);
   var words = tn.split(/\s+/).filter(Boolean);
   if (words.length >= 2) {
     var init = buildInitialism(words);
-    if (tokens.indexOf(init) === -1) tokens.push(init);
+    if (!tokenSet.has(init)) tokenSet.add(init);
   }
 }
 
 function compileSearchTokens(productName) {
   if (!productName) return [];
-  var tokens = [];
+  var tokenSet = new Set();
   var normText = norm(productName);
 
   // 1. Original name (normalized)
-  if (normText) addSearchToken(normText, tokens);
+  if (normText) addSearchToken(normText, tokenSet);
 
   // 2. Individual words (skip single chars)
   var words = normText.split(/\s+/).filter(Boolean);
   words.forEach(function(w) {
-    if (w.length > 1) addSearchToken(w, tokens);
+    if (w.length > 1) addSearchToken(w, tokenSet);
   });
 
   // 3. Bigrams + trigrams
   for (var i = 0; i < words.length - 1; i++) {
     var bg = words[i] + ' ' + words[i + 1];
-    addSearchToken(bg, tokens);
+    addSearchToken(bg, tokenSet);
   }
   for (var i = 0; i < words.length - 2; i++) {
     var tg = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
-    addSearchToken(tg, tokens);
+    addSearchToken(tg, tokenSet);
   }
 
   // 4. Entity lookup + expansion
+  var entities = null;
   if (KNOWLEDGE) {
-    var entities = lookupEntities(productName);
+    entities = lookupEntities(productName);
     var expanded = expandEntities(entities);
     expanded.forEach(function(t) {
-      addSearchToken(t, tokens);
+      addSearchToken(t, tokenSet);
     });
   }
 
   // 5. Brand + type combinations from knowledge_graph
-  if (KNOWLEDGE && KNOWLEDGE.knowledge && KNOWLEDGE.knowledge.knowledge_graph) {
+  if (KNOWLEDGE && KNOWLEDGE.knowledge) {
     var kg = KNOWLEDGE.knowledge.knowledge_graph;
-    if (kg.brand) {
-      var entities = lookupEntities(productName);
+    if (kg && kg.brand && entities) {
       var matchedBrands = entities.filter(function(e) { return e.type === 'brand'; });
       var matchedTypes = entities.filter(function(e) { return e.type === 'product_type'; });
       var seen = {};
@@ -71,7 +71,7 @@ function compileSearchTokens(productName) {
           var key = norm(combo);
           if (!seen[key]) {
             seen[key] = true;
-            addSearchToken(combo, tokens);
+            addSearchToken(combo, tokenSet);
           }
         });
       });
@@ -80,15 +80,15 @@ function compileSearchTokens(productName) {
 
   // 6. Phonetic key for voice
   var phonetic = toPhoneticKey(productName);
-  if (phonetic) addSearchToken(phonetic, tokens);
+  if (phonetic) addSearchToken(phonetic, tokenSet);
 
   // 7. Pronunciation variants
   var variants = generatePronunciationVariants(productName);
   variants.forEach(function(v) {
-    addSearchToken(v, tokens);
+    addSearchToken(v, tokenSet);
   });
 
-  return tokens;
+  return Array.from(tokenSet);
 }
 
 function buildProductIndex(product) {
