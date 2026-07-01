@@ -91,49 +91,32 @@ function splitProductName(name) {
 
   var entities = lookupEntities(name);
   var specTypes = { 'package': true, 'capacity': true, 'quantity': true, 'unit': true };
-  var specEntities = [];
+  var normName = _normStr(name);
+
+  // Find the FIRST spec entity by word position
+  var firstSpecWordIdx = -1;
+  var firstPos = Infinity;
 
   entities.forEach(function(e) {
-    if (specTypes[e.type]) specEntities.push(e);
-  });
-
-  if (specEntities.length === 0) return { line1: name, line2: '' };
-
-  var normName = _normStr(name);
-  var specIndices = {};
-
-  specEntities.forEach(function(e) {
+    if (!specTypes[e.type]) return;
     var idx = normName.indexOf(e.normalized);
-    if (idx !== -1) {
-      for (var i = idx; i < idx + e.normalized.length; i++) {
-        specIndices[i] = true;
-      }
+    if (idx === -1) return;
+    var precedingText = normName.substring(0, idx);
+    var wordIdx = precedingText ? precedingText.trim().split(/\s+/).length : 0;
+    if (wordIdx < firstPos) {
+      firstPos = wordIdx;
+      firstSpecWordIdx = wordIdx;
     }
   });
+
+  // Don't split if spec is the first word or no spec found
+  if (firstSpecWordIdx < 1) return { line1: name, line2: '' };
 
   var origWords = name.split(/\s+/);
-  var normWords = normName.split(/\s+/);
-  var line1Words = [];
-  var line2Words = [];
-  var charPos = 0;
+  var line1 = origWords.slice(0, firstSpecWordIdx).join(' ').trim();
+  var line2 = origWords.slice(firstSpecWordIdx).join(' ').trim();
 
-  normWords.forEach(function(w, wi) {
-    var isSpec = false;
-    for (var si = charPos; si < charPos + w.length && !isSpec; si++) {
-      if (specIndices[si]) isSpec = true;
-    }
-    if (isSpec) {
-      line2Words.push(origWords[wi]);
-    } else {
-      line1Words.push(origWords[wi]);
-    }
-    charPos += w.length + 1;
-  });
-
-  var line1 = line1Words.join(' ').trim();
-  var line2 = line2Words.join(' ').trim();
-
-  if (!line2 || !line1) return { line1: name, line2: '' };
+  if (!line1 || !line2) return { line1: name, line2: '' };
   return { line1: line1, line2: line2 };
 }
 

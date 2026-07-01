@@ -71,6 +71,7 @@ var EDIT_IDX = -1;
 var NUMPAD_QTY = '0';
 var NUMPAD_DRAFT = '';
 var SKIP_CLICK = false;
+var _searchDebounceTimer = null;
 
 var ORDERS = [];
 var ACTIVE_ORDER_INDEX = 0;
@@ -856,6 +857,14 @@ function liveSearch(){
   renderSuggestions(results);
 }
 
+function debouncedLiveSearch() {
+  if (_searchDebounceTimer) clearTimeout(_searchDebounceTimer);
+  _searchDebounceTimer = setTimeout(function() {
+    _searchDebounceTimer = null;
+    liveSearch();
+  }, 120);
+}
+
 function onSearchKey(c){
   vibrate();
   if(STATE !== 'search') return;
@@ -867,7 +876,7 @@ function onSearchKey(c){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += c;
   renderCommand();
-  liveSearch();
+  debouncedLiveSearch();
 }
 
 function onSpaceKey(){
@@ -882,7 +891,7 @@ function onSpaceKey(){
   SEARCH_INPUT_MODE = 'type';
   SEARCH_QUERY += ' ';
   renderCommand();
-  liveSearch();
+  debouncedLiveSearch();
 }
 
 function onBackspace(){
