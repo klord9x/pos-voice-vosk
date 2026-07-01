@@ -849,13 +849,30 @@ function liveSearch(){
     return;
   }
   if(!SEARCH_QUERY.trim()){
-    var recent = getRecentProducts(SUGGEST_MAX);
-    if(recent.length > 0){
-      PENDING_PRODUCT = {product: recent[0].product, qty: 1, unit: recent[0].product.unit || 'đv'};
+    var suggest = [];
+    var suggestSeen = {};
+    for (var i = 0; i < ITEMS.length && suggest.length < SUGGEST_MAX; i++) {
+      var it = ITEMS[i];
+      if (it._deleted) continue;
+      var top = it.top3[it.selectedIdx];
+      if (top && top.product && !suggestSeen[top.product.code]) {
+        suggestSeen[top.product.code] = true;
+        suggest.push({product: top.product, score: 1.0, matchType: 'cart'});
+      }
+    }
+    var extra = getRecentProducts(SUGGEST_MAX - suggest.length);
+    for (var i = 0; i < extra.length && suggest.length < SUGGEST_MAX; i++) {
+      if (!suggestSeen[extra[i].product.code]) {
+        suggestSeen[extra[i].product.code] = true;
+        suggest.push(extra[i]);
+      }
+    }
+    if(suggest.length > 0){
+      PENDING_PRODUCT = {product: suggest[0].product, qty: 1, unit: suggest[0].product.unit || 'đv'};
     } else {
       PENDING_PRODUCT = null;
     }
-    renderSuggestions(recent);
+    renderSuggestions(suggest);
     return;
   }
   // Engine mới tự parse qty/unit/fillers từ raw query
