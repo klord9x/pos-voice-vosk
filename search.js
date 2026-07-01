@@ -70,6 +70,12 @@ var WORD_TO_NUM = {
 };
 
 var SEARCH_CACHE = {};
+var PREFIX_SCORE = 0.85;
+var SCORE_CACHE = {};
+
+function resetScoreCache() {
+  SCORE_CACHE = {};
+}
 
 function norm(s) {
   return String(s || '').toLowerCase()
@@ -153,8 +159,9 @@ function relaxFinal(key) {
   return key.replace(/(NG|NH)(?=\s|$)/g,'N');
 }
 
-function phoneticScore(a, b) {
-  var pa = toPhoneticKey(a), pb = toPhoneticKey(b);
+function phoneticScore(a, b, pa, pb) {
+  if (!pa) pa = toPhoneticKey(a);
+  if (!pb) pb = toPhoneticKey(b);
   if (pa === pb) return 1.0;
   var strict = 1 - levenshtein(pa, pb) / Math.max(pa.length, pb.length, 1);
   var ra = relaxFinal(pa), rb = relaxFinal(pb);
@@ -165,10 +172,18 @@ function phoneticScore(a, b) {
   return strict;
 }
 
-function combinedScore(a, b, mode) {
-  var lr = levRatio(a, b), fr = firstCharRatio(a, b), pr = phoneticScore(a, b);
+function combinedScore(a, b, mode, pa, pb) {
+  var lr = levRatio(a, b), fr = firstCharRatio(a, b), pr = phoneticScore(a, b, pa, pb);
   if (mode === 'voice') return 0.30 * lr + 0.20 * fr + 0.50 * pr;
   return 0.45 * lr + 0.35 * fr + 0.20 * pr;
+}
+
+function combinedScoreCached(a, b, mode, pa, pb) {
+  var key = mode + '|' + a + '|' + b;
+  if (SCORE_CACHE[key] !== undefined) return SCORE_CACHE[key];
+  var s = combinedScore(a, b, mode, pa, pb);
+  SCORE_CACHE[key] = s;
+  return s;
 }
 
 function applyAlias(s) {
@@ -408,6 +423,29 @@ function processTranscript(text) {
   return added;
 }
 
+function bestTypingScore(q, qPhonetic, tokens, mode) {
+  var best = 0;
+  for (var i = 0; i < tokens.length; i++) {
+    var s = tokens[i];
+    if (s === q) return 1.0;
+    if (s.indexOf(q) === 0) { best = Math.max(best, PREFIX_SCORE); continue; }
+    if (Math.abs(s.length - q.length) > 3 && s.indexOf(q) === -1 && q.indexOf(s) === -1) continue;
+    if (s.length < 2) continue;
+    best = Math.max(best, combinedScoreCached(q, s, mode, qPhonetic, null));
+  }
+  return best;
+}
+
+function bestVoiceScore(q, qPhonetic, tokens) {
+  var best = 0;
+  for (var i = 0; i < tokens.length; i++) {
+    var s = tokens[i];
+    if (Math.abs(s.length - q.length) > 3 && s.indexOf(q) === -1 && q.indexOf(s) === -1) continue;
+    best = Math.max(best, phoneticScore(q, s, qPhonetic, null));
+  }
+  return best;
+}
+
 /* ── Search engine ────────────────────────── */
 function matchProductTop3(rawQuery, unitHintLegacy, mode) {
   mode = mode || SEARCH_INPUT_MODE || 'type';
@@ -451,10 +489,13 @@ function matchProductTop3(rawQuery, unitHintLegacy, mode) {
 
   // Tier 5: Contains + multi-keyword
   var qTokens = q.split(' ').filter(Boolean);
+  var already = {};
+  results.forEach(function(r) { already[r.product._idx.code || r.product.name] = true; });
   PRODUCTS.forEach(function(p) {
-    if (results.some(function(r) { return r.product === p; })) return;
+    if (already[p._idx.code || p.name]) return;
     var idx = p._idx;
     if (idx.searchable && (idx.searchable.some(function(s) { return s.indexOf(q) !== -1; }))) {
+      already[p._idx.code || p.name] = true;
       results.push({ product: p, tier: 5, score: 0.88, matchType: 'contains' });
       return;
     }
@@ -462,21 +503,24 @@ function matchProductTop3(rawQuery, unitHintLegacy, mode) {
       return idx.tokens.some(function(pt) { return pt.indexOf(t) === 0; }) ||
              (idx.searchable && idx.searchable.some(function(s) { return s.indexOf(t) !== -1; }));
     })) {
+      already[p._idx.code || p.name] = true;
       results.push({ product: p, tier: 5, score: 0.82, matchType: 'multi-kw' });
     }
   });
 
   // Tier 6: Searchable partial
   PRODUCTS.forEach(function(p) {
-    if (results.some(function(r) { return r.product === p; })) return;
+    if (already[p._idx.code || p.name]) return;
     var idx = p._idx;
-    if (idx.searchable && idx.searchable.some(function(s) { return s.indexOf(q) === 0 || q.indexOf(s) === 0; }))
+    if (idx.searchable && idx.searchable.some(function(s) { return s.indexOf(q) === 0 || q.indexOf(s) === 0; })) {
+      already[p._idx.code || p.name] = true;
       results.push({ product: p, tier: 6, score: 0.75, matchType: 'keyword' });
+    }
   });
 
   // Tier 7+8: Fuzzy + Phonetic — top30 candidates
-  var already = {};
-  results.forEach(function(r) { already[r.product._idx.code || r.product.name] = true; });
+  resetScoreCache();
+  var qPhonetic = toPhoneticKey(q);
   var q0 = qTokens[0] || '';
   var candidates = PRODUCTS.filter(function(p) {
     if (already[p._idx.code || p.name]) return false;
@@ -486,7 +530,7 @@ function matchProductTop3(rawQuery, unitHintLegacy, mode) {
   }).map(function(p) {
     var quick = Math.max(
       levRatio(q, p._idx.name),
-      p._idx.searchable ? p._idx.searchable.reduce(function(mx, s) { return Math.max(mx, levRatio(q, s)); }, 0) : 0
+      p._idx.searchable ? bestTypingScore(q, qPhonetic, p._idx.searchable, mode) : 0
     );
     return { p: p, quick: quick };
   }).filter(function(x) { return x.quick > 0.35; })
@@ -494,17 +538,18 @@ function matchProductTop3(rawQuery, unitHintLegacy, mode) {
     .slice(0, 30);
 
   var qAlt = dropLeadingConsonants(q);
+  var qAltPhonetic = qAlt !== q ? toPhoneticKey(qAlt) : '';
   candidates.forEach(function(x) {
     var p = x.p;
     var idx = p._idx;
     var fuzzy = Math.max(
-      combinedScore(q, idx.name, mode),
-      idx.searchable ? idx.searchable.reduce(function(mx, s) { return Math.max(mx, combinedScore(q, s, mode)); }, 0) : 0,
-      qAlt !== q ? combinedScore(qAlt, idx.name, mode) * 0.93 : 0
+      combinedScoreCached(q, idx.name, mode, qPhonetic, idx.phonetic),
+      bestTypingScore(q, qPhonetic, idx.searchable, mode),
+      qAlt !== q ? combinedScoreCached(qAlt, idx.name, mode, qAltPhonetic, idx.phonetic) * 0.93 : 0
     );
     var voice = Math.max(
-      phoneticScore(q, idx.name),
-      idx.searchable ? idx.searchable.reduce(function(mx, s) { return Math.max(mx, phoneticScore(q, s)); }, 0) : 0
+      phoneticScore(q, idx.name, qPhonetic, idx.phonetic),
+      bestVoiceScore(q, qPhonetic, idx.searchable)
     );
     var best = Math.max(fuzzy, voice * 0.90);
     if (best > 0.50) results.push({ product: p, tier: best >= 0.80 ? 7 : 8, score: best, matchType: 'fuzzy' });
