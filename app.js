@@ -73,7 +73,7 @@ var NUMPAD_DRAFT = '';
 var SKIP_CLICK = false;
 var _searchBusy = false;
 var _searchDirty = false;
-var _searchLastText = '';
+var _searchLastText = null;
 
 var ORDERS = [];
 var ACTIVE_ORDER_INDEX = 0;
