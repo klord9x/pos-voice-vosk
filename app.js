@@ -510,15 +510,21 @@ function onNumpadCommit(){
   SEARCH_QUERY = '';
   NUMPAD_DRAFT = '';
   NUMPAD_QTY = '0';
-  setParser('search');
-  renderCommand();
-  var area = document.getElementById('suggestArea');
-  if (area && SUGGESTIONS && SUGGESTIONS.length > 0) {
-    var fresh = SUGGESTIONS.slice();
-    SUGGESTIONS = [];
-    renderSuggestions(fresh);
-  } else {
+
+  var target = PREV_STATE || 'search';
+  if (target === 'qty') target = 'search';
+  setParser(target);
+
+  if (target === 'search') {
+    renderCommand();
     updateActiveSuggestion();
+  } else if (target === 'pay') {
+    renderCommand();
+    renderCart();
+    updateTotal();
+    updatePayDisplay();
+  } else {
+    renderCommand();
   }
 }
 
@@ -1121,7 +1127,7 @@ function goToPrevState(){
   if(target === STATE) target = 'search';
   if(target === 'qty') target = 'search';
   setParser(target);
-  if(target === 'search'){
+  if (target === 'search'){
     renderCommand();
     var area = document.getElementById('suggestArea');
     if (area && SUGGESTIONS && SUGGESTIONS.length > 0) {
@@ -1131,9 +1137,11 @@ function goToPrevState(){
     } else {
       updateActiveSuggestion();
     }
-  } else if(target === 'pay'){
+  } else if (target === 'pay'){
+    renderCommand();
     renderCart();
-    initPayMode();
+    updateTotal();
+    updatePayDisplay();
   }
 }
 
