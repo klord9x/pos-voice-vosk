@@ -510,10 +510,9 @@ function onNumpadCommit(){
   SEARCH_QUERY = '';
   NUMPAD_DRAFT = '';
   NUMPAD_QTY = '0';
-  SUGGEST_ACTIVE_IDX = 0;
   setParser('search');
   renderCommand();
-  liveSearch();
+  updateActiveSuggestion();
 }
 
 /* ===== JsPayment ===== */
@@ -1116,20 +1115,8 @@ function goToPrevState(){
   if(target === 'qty') target = 'search';
   setParser(target);
   if(target === 'search'){
-    _searchLastText = null;
-    var prev = SUGGESTIONS;
-    SUGGESTIONS = [];
     renderCommand();
-    if(prev && prev.length > 0){
-      SUGGEST_ACTIVE_IDX = 0;
-      var area = document.getElementById('suggestArea');
-      if(area){
-        SUGGESTIONS = [];
-        renderSuggestions(prev);
-      }
-    } else {
-      liveSearch();
-    }
+    updateActiveSuggestion();
   } else if(target === 'pay'){
     renderCart();
     initPayMode();
