@@ -512,7 +512,14 @@ function onNumpadCommit(){
   NUMPAD_QTY = '0';
   setParser('search');
   renderCommand();
-  updateActiveSuggestion();
+  var area = document.getElementById('suggestArea');
+  if (area && SUGGESTIONS && SUGGESTIONS.length > 0) {
+    var fresh = SUGGESTIONS.slice();
+    SUGGESTIONS = [];
+    renderSuggestions(fresh);
+  } else {
+    updateActiveSuggestion();
+  }
 }
 
 /* ===== JsPayment ===== */
@@ -1116,7 +1123,14 @@ function goToPrevState(){
   setParser(target);
   if(target === 'search'){
     renderCommand();
-    updateActiveSuggestion();
+    var area = document.getElementById('suggestArea');
+    if (area && SUGGESTIONS && SUGGESTIONS.length > 0) {
+      var fresh = SUGGESTIONS.slice();
+      SUGGESTIONS = [];
+      renderSuggestions(fresh);
+    } else {
+      updateActiveSuggestion();
+    }
   } else if(target === 'pay'){
     renderCart();
     initPayMode();
