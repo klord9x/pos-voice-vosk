@@ -1120,15 +1120,15 @@ function goToPrevState(){
     var prev = SUGGESTIONS;
     SUGGESTIONS = [];
     renderCommand();
-    liveSearch();
     if(prev && prev.length > 0){
-      SUGGESTIONS = prev;
       SUGGEST_ACTIVE_IDX = 0;
       var area = document.getElementById('suggestArea');
       if(area){
         SUGGESTIONS = [];
         renderSuggestions(prev);
       }
+    } else {
+      liveSearch();
     }
   } else if(target === 'pay'){
     renderCart();
