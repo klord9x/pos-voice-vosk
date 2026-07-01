@@ -3,7 +3,7 @@
                 search.js (toPhoneticKey, generatePronunciationVariants, norm)
    Globals: PRODUCTS */
 
-var INDEX_VERSION = 1;
+var INDEX_VERSION = 2;
 var INDEXED_DB_NAME = 'pos-search';
 var INDEXED_DB_STORE = 'index';
 
@@ -20,6 +20,12 @@ function compileSearchTokens(productName) {
   words.forEach(function(w) {
     if (w.length > 1 && tokens.indexOf(w) === -1) tokens.push(w);
   });
+
+  // 2b. Initialism — first letter of each word for 2+ word prefixes
+  for (var prefixLen = 2; prefixLen <= words.length; prefixLen++) {
+    var init = words.slice(0, prefixLen).map(function(w) { return w[0]; }).join('');
+    if (init && tokens.indexOf(init) === -1) tokens.push(init);
+  }
 
   // 3. Bigrams + trigrams
   for (var i = 0; i < words.length - 1; i++) {

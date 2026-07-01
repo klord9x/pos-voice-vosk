@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pos-app-v61';
+const CACHE_NAME = 'pos-app-v62';
 const ASSETS = [
   '/',
   '/index.html',
