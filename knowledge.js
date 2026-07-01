@@ -2,6 +2,12 @@
 var KNOWLEDGE = null;
 var ENTITY_LOOKUP = {};
 var _knowledgeReady = null;
+var ENTITY_GROUPS = {
+  spec: new Set(['package','capacity','quantity','unit'])
+};
+function isSpecEntity(entity) {
+  return ENTITY_GROUPS.spec.has(entity.type);
+}
 
 function loadKnowledge() {
   if (_knowledgeReady) return _knowledgeReady;
@@ -67,18 +73,38 @@ function normalizeKnowledge(text) {
 }
 
 function lookupEntities(text) {
-  var norm = _normStr(text);
-  var words = norm.split(/\s+/).filter(Boolean);
-  if (words.length === 0) return [];
+  var origWords = text.split(/\s+/).filter(Boolean);
+  if (origWords.length === 0) return [];
+
+  var normInfo = [];
+  origWords.forEach(function(ow, idx) {
+    var nw = _normStr(ow).split(/\s+/).filter(Boolean);
+    if (nw.length === 0) return;
+    nw.forEach(function(n) { normInfo.push({ norm: n, origIdx: idx }); });
+  });
+  if (normInfo.length === 0) return [];
+
+  var normWords = normInfo.map(function(e) { return e.norm; });
   var seen = {};
   var matches = [];
-  for (var len = words.length; len >= 1; len--) {
-    for (var i = 0; i <= words.length - len; i++) {
-      var ng = words.slice(i, i + len).join(' ');
+
+  for (var len = normWords.length; len >= 1; len--) {
+    for (var i = 0; i <= normWords.length - len; i++) {
+      var ng = normWords.slice(i, i + len).join(' ');
       if (seen[ng]) continue;
       seen[ng] = true;
       if (ENTITY_LOOKUP[ng]) {
-        matches.push(ENTITY_LOOKUP[ng]);
+        var entry = ENTITY_LOOKUP[ng];
+        var firstOrig = normInfo[i].origIdx;
+        var lastOrig = normInfo[i + len - 1].origIdx;
+        matches.push({
+          type: entry.type,
+          canonical: entry.canonical,
+          normalized: entry.normalized,
+          text: origWords.slice(firstOrig, lastOrig + 1).join(' '),
+          wordStart: firstOrig,
+          wordEnd: lastOrig
+        });
       }
     }
   }
@@ -87,37 +113,25 @@ function lookupEntities(text) {
 
 function splitProductName(name) {
   if (!name) return { line1: '', line2: '' };
-  if (!KNOWLEDGE) return { line1: name, line2: '' };
-
   var entities = lookupEntities(name);
-  var specTypes = { 'package': true, 'capacity': true, 'quantity': true, 'unit': true };
-  var normName = _normStr(name);
 
-  // Find the FIRST spec entity by word position
-  var firstSpecWordIdx = -1;
-  var firstPos = Infinity;
-
+  var specWords = {};
   entities.forEach(function(e) {
-    if (!specTypes[e.type]) return;
-    var idx = normName.indexOf(e.normalized);
-    if (idx === -1) return;
-    var precedingText = normName.substring(0, idx);
-    var wordIdx = precedingText ? precedingText.trim().split(/\s+/).length : 0;
-    if (wordIdx < firstPos) {
-      firstPos = wordIdx;
-      firstSpecWordIdx = wordIdx;
-    }
+    if (!isSpecEntity(e)) return;
+    for (var w = e.wordStart; w <= e.wordEnd; w++) specWords[w] = true;
   });
 
-  // Don't split if spec is the first word or no spec found
-  if (firstSpecWordIdx < 1) return { line1: name, line2: '' };
+  var words = name.split(/\s+/).filter(Boolean);
+  var suffixStart = words.length;
+  while (suffixStart > 0 && specWords[suffixStart - 1]) suffixStart--;
 
-  var origWords = name.split(/\s+/);
-  var line1 = origWords.slice(0, firstSpecWordIdx).join(' ').trim();
-  var line2 = origWords.slice(firstSpecWordIdx).join(' ').trim();
+  if (suffixStart >= words.length || suffixStart === 0)
+    return { line1: name, line2: '' };
 
-  if (!line1 || !line2) return { line1: name, line2: '' };
-  return { line1: line1, line2: line2 };
+  return {
+    line1: words.slice(0, suffixStart).join(' '),
+    line2: words.slice(suffixStart).join(' ')
+  };
 }
 
 function expandEntities(entities) {
