@@ -7,34 +7,45 @@ var INDEX_VERSION = 2;
 var INDEXED_DB_NAME = 'pos-search';
 var INDEXED_DB_STORE = 'index';
 
+function buildInitialism(words) {
+  return words.filter(function(w) { return w.length > 0; })
+              .map(function(w) { return w[0]; })
+              .join('');
+}
+
+function addSearchToken(token, tokens) {
+  var tn = norm(token);
+  if (!tn) return;
+  if (tokens.indexOf(tn) === -1) tokens.push(tn);
+  var words = tn.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    var init = buildInitialism(words);
+    if (tokens.indexOf(init) === -1) tokens.push(init);
+  }
+}
+
 function compileSearchTokens(productName) {
   if (!productName) return [];
   var tokens = [];
   var normText = norm(productName);
 
   // 1. Original name (normalized)
-  if (normText && tokens.indexOf(normText) === -1) tokens.push(normText);
+  if (normText) addSearchToken(normText, tokens);
 
   // 2. Individual words (skip single chars)
   var words = normText.split(/\s+/).filter(Boolean);
   words.forEach(function(w) {
-    if (w.length > 1 && tokens.indexOf(w) === -1) tokens.push(w);
+    if (w.length > 1) addSearchToken(w, tokens);
   });
-
-  // 2b. Initialism — first letter of each word for 2+ word prefixes
-  for (var prefixLen = 2; prefixLen <= words.length; prefixLen++) {
-    var init = words.slice(0, prefixLen).map(function(w) { return w[0]; }).join('');
-    if (init && tokens.indexOf(init) === -1) tokens.push(init);
-  }
 
   // 3. Bigrams + trigrams
   for (var i = 0; i < words.length - 1; i++) {
     var bg = words[i] + ' ' + words[i + 1];
-    if (tokens.indexOf(bg) === -1) tokens.push(bg);
+    addSearchToken(bg, tokens);
   }
   for (var i = 0; i < words.length - 2; i++) {
     var tg = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
-    if (tokens.indexOf(tg) === -1) tokens.push(tg);
+    addSearchToken(tg, tokens);
   }
 
   // 4. Entity lookup + expansion
@@ -42,8 +53,7 @@ function compileSearchTokens(productName) {
     var entities = lookupEntities(productName);
     var expanded = expandEntities(entities);
     expanded.forEach(function(t) {
-      var tn = norm(t);
-      if (tn && tokens.indexOf(tn) === -1) tokens.push(tn);
+      addSearchToken(t, tokens);
     });
   }
 
@@ -57,10 +67,11 @@ function compileSearchTokens(productName) {
       var seen = {};
       matchedBrands.forEach(function(b) {
         matchedTypes.forEach(function(t) {
-          var combo = norm(b.canonical + ' ' + t.canonical);
-          if (!seen[combo]) {
-            seen[combo] = true;
-            tokens.push(combo);
+          var combo = b.canonical + ' ' + t.canonical;
+          var key = norm(combo);
+          if (!seen[key]) {
+            seen[key] = true;
+            addSearchToken(combo, tokens);
           }
         });
       });
@@ -69,13 +80,12 @@ function compileSearchTokens(productName) {
 
   // 6. Phonetic key for voice
   var phonetic = toPhoneticKey(productName);
-  if (phonetic && tokens.indexOf(phonetic) === -1) tokens.push(phonetic);
+  if (phonetic) addSearchToken(phonetic, tokens);
 
   // 7. Pronunciation variants
   var variants = generatePronunciationVariants(productName);
   variants.forEach(function(v) {
-    var vn = norm(v);
-    if (vn && tokens.indexOf(vn) === -1) tokens.push(vn);
+    addSearchToken(v, tokens);
   });
 
   return tokens;
