@@ -1117,6 +1117,7 @@ function goToPrevState(){
   setParser(target);
   if(target === 'search'){
     _searchLastText = null;
+    SUGGESTIONS = [];
     renderCommand();
     liveSearch();
   } else if(target === 'pay'){
