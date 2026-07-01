@@ -1,0 +1,77 @@
+{
+  "Chiên": {
+    "canonical": "Chiên",
+    "type": "processing",
+    "normalized": "chiên"
+  },
+  "Cắt khoanh": {
+    "canonical": "Cắt khoanh",
+    "type": "processing",
+    "normalized": "cắt khoanh"
+  },
+  "Cắt lát": {
+    "canonical": "Cắt lát",
+    "type": "processing",
+    "normalized": "cắt lát"
+  },
+  "Hấp sẵn": {
+    "canonical": "Hấp sẵn",
+    "type": "processing",
+    "normalized": "hấp sẵn"
+  },
+  "Làm sẵn": {
+    "canonical": "Làm sẵn",
+    "type": "processing",
+    "normalized": "làm sẵn"
+  },
+  "Lộn": {
+    "canonical": "Lộn",
+    "type": "processing",
+    "normalized": "lộn"
+  },
+  "Muối": {
+    "canonical": "Muối",
+    "type": "processing",
+    "normalized": "muối"
+  },
+  "Mềm": {
+    "canonical": "Mềm",
+    "type": "processing",
+    "normalized": "mềm"
+  },
+  "Nạc": {
+    "canonical": "Nạc",
+    "type": "processing",
+    "normalized": "nạc"
+  },
+  "Sạch": {
+    "canonical": "Sạch",
+    "type": "processing",
+    "normalized": "sạch"
+  },
+  "Sẵn": {
+    "canonical": "Sẵn",
+    "type": "processing",
+    "normalized": "sẵn"
+  },
+  "Sống": {
+    "canonical": "Sống",
+    "type": "processing",
+    "normalized": "sống"
+  },
+  "Tươi": {
+    "canonical": "Tươi",
+    "type": "processing",
+    "normalized": "tươi"
+  },
+  "Tươi rói": {
+    "canonical": "Tươi rói",
+    "type": "processing",
+    "normalized": "tươi rói"
+  },
+  "Tươi tỏi": {
+    "canonical": "Tươi tỏi",
+    "type": "processing",
+    "normalized": "tươi tỏi"
+  }
+}

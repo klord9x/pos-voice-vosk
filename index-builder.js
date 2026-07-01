@@ -1,0 +1,163 @@
+/* ===== Index Builder — compile tokens, build search index ===== */
+/* Depends on: knowledge.js (KNOWLEDGE, lookupEntities, expandEntities, normalizeKnowledge)
+                search.js (toPhoneticKey, generatePronunciationVariants, norm)
+   Globals: PRODUCTS */
+
+var INDEX_VERSION = 1;
+var INDEXED_DB_NAME = 'pos-search';
+var INDEXED_DB_STORE = 'index';
+
+function compileSearchTokens(productName) {
+  if (!productName) return [];
+  var tokens = [];
+  var normText = norm(productName);
+
+  // 1. Original name (normalized)
+  if (normText && tokens.indexOf(normText) === -1) tokens.push(normText);
+
+  // 2. Individual words (skip single chars)
+  var words = normText.split(/\s+/).filter(Boolean);
+  words.forEach(function(w) {
+    if (w.length > 1 && tokens.indexOf(w) === -1) tokens.push(w);
+  });
+
+  // 3. Bigrams + trigrams
+  for (var i = 0; i < words.length - 1; i++) {
+    var bg = words[i] + ' ' + words[i + 1];
+    if (tokens.indexOf(bg) === -1) tokens.push(bg);
+  }
+  for (var i = 0; i < words.length - 2; i++) {
+    var tg = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
+    if (tokens.indexOf(tg) === -1) tokens.push(tg);
+  }
+
+  // 4. Entity lookup + expansion
+  if (KNOWLEDGE) {
+    var entities = lookupEntities(productName);
+    var expanded = expandEntities(entities);
+    expanded.forEach(function(t) {
+      var tn = norm(t);
+      if (tn && tokens.indexOf(tn) === -1) tokens.push(tn);
+    });
+  }
+
+  // 5. Brand + type combinations from knowledge_graph
+  if (KNOWLEDGE && KNOWLEDGE.knowledge && KNOWLEDGE.knowledge.knowledge_graph) {
+    var kg = KNOWLEDGE.knowledge.knowledge_graph;
+    if (kg.brand) {
+      var entities = lookupEntities(productName);
+      var matchedBrands = entities.filter(function(e) { return e.type === 'brand'; });
+      var matchedTypes = entities.filter(function(e) { return e.type === 'product_type'; });
+      var seen = {};
+      matchedBrands.forEach(function(b) {
+        matchedTypes.forEach(function(t) {
+          var combo = norm(b.canonical + ' ' + t.canonical);
+          if (!seen[combo]) {
+            seen[combo] = true;
+            tokens.push(combo);
+          }
+        });
+      });
+    }
+  }
+
+  // 6. Phonetic key for voice
+  var phonetic = toPhoneticKey(productName);
+  if (phonetic && tokens.indexOf(phonetic) === -1) tokens.push(phonetic);
+
+  // 7. Pronunciation variants
+  var variants = generatePronunciationVariants(productName);
+  variants.forEach(function(v) {
+    var vn = norm(v);
+    if (vn && tokens.indexOf(vn) === -1) tokens.push(vn);
+  });
+
+  return tokens;
+}
+
+function buildProductIndex(product) {
+  var n = norm(product.name || '');
+  var searchable = compileSearchTokens(product.name);
+  return {
+    code: norm(product.code || ''),
+    name: n,
+    tokens: n.split(' ').filter(Boolean),
+    searchable: searchable,
+    phonetic: toPhoneticKey(product.name),
+    unit: norm(product.unit || '')
+  };
+}
+
+function buildAllIndexes() {
+  PRODUCTS.forEach(function(p) {
+    p._idx = buildProductIndex(p);
+  });
+  SEARCH_CACHE = {};
+}
+
+/* ── IndexedDB cache ─────────────────────── */
+var _db = null;
+
+function _openDB() {
+  return new Promise(function(resolve, reject) {
+    if (_db) return resolve(_db);
+    if (!window.indexedDB) return reject(null);
+    var req = indexedDB.open(INDEXED_DB_NAME, INDEX_VERSION);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(INDEXED_DB_STORE)) {
+        db.createObjectStore(INDEXED_DB_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = function(e) {
+      _db = e.target.result;
+      resolve(_db);
+    };
+    req.onerror = function() { reject(null); };
+  });
+}
+
+function saveIndexToCache(products, knowledgeVersion) {
+  _openDB().then(function(db) {
+    var tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
+    var store = tx.objectStore(INDEXED_DB_STORE);
+    var data = {
+      id: 'search_index',
+      version: INDEX_VERSION,
+      knowledgeVersion: knowledgeVersion,
+      timestamp: Date.now(),
+      products: products.map(function(p) {
+        return { code: p.code, name: p.name, price: p.price, unit: p.unit, _idx: p._idx };
+      })
+    };
+    store.put(data);
+    return tx.complete;
+  }).catch(function() {});
+}
+
+function loadIndexFromCache() {
+  return _openDB().then(function(db) {
+    return new Promise(function(resolve) {
+      var tx = db.transaction(INDEXED_DB_STORE, 'readonly');
+      var store = tx.objectStore(INDEXED_DB_STORE);
+      var req = store.get('search_index');
+      req.onsuccess = function(e) {
+        var data = e.target.result;
+        if (data && data.products && data.products.length > 0) {
+          resolve(data);
+        } else {
+          resolve(null);
+        }
+      };
+      req.onerror = function() { resolve(null); };
+    });
+  }).catch(function() { return null; });
+}
+
+function clearIndexCache() {
+  _openDB().then(function(db) {
+    var tx = db.transaction(INDEXED_DB_STORE, 'readwrite');
+    var store = tx.objectStore(INDEXED_DB_STORE);
+    store.delete('search_index');
+  }).catch(function() {});
+}

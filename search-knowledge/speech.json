@@ -1,0 +1,130 @@
+{
+  "7Up": {
+    "canonical": "7Up",
+    "aliases": [
+      "bẩy ắp"
+    ],
+    "type": "speech"
+  },
+  "Clear": {
+    "canonical": "Clear",
+    "aliases": [
+      "cờ lia"
+    ],
+    "type": "speech"
+  },
+  "Coca Cola": {
+    "canonical": "Coca Cola",
+    "aliases": [
+      "cô ca cô la"
+    ],
+    "type": "speech"
+  },
+  "Cosy": {
+    "canonical": "Cosy",
+    "aliases": [
+      "cô si"
+    ],
+    "type": "speech"
+  },
+  "Danisa": {
+    "canonical": "Danisa",
+    "aliases": [
+      "đa ni sa"
+    ],
+    "type": "speech"
+  },
+  "Gery": {
+    "canonical": "Gery",
+    "aliases": [
+      "ge ri"
+    ],
+    "type": "speech"
+  },
+  "Knorr": {
+    "canonical": "Knorr",
+    "aliases": [
+      "nô"
+    ],
+    "type": "speech"
+  },
+  "Kokomi": {
+    "canonical": "Kokomi",
+    "aliases": [
+      "cô cô mi"
+    ],
+    "type": "speech"
+  },
+  "Maggi": {
+    "canonical": "Maggi",
+    "aliases": [
+      "mắc gi"
+    ],
+    "type": "speech"
+  },
+  "Mirinda": {
+    "canonical": "Mirinda",
+    "aliases": [
+      "mi rin đa"
+    ],
+    "type": "speech"
+  },
+  "Nutifood": {
+    "canonical": "Nutifood",
+    "aliases": [
+      "nu ti phút"
+    ],
+    "type": "speech",
+    "heuristic": true
+  },
+  "Oishi": {
+    "canonical": "Oishi",
+    "aliases": [
+      "ôi si"
+    ],
+    "type": "speech"
+  },
+  "Omachi": {
+    "canonical": "Omachi",
+    "aliases": [
+      "ô ma chi"
+    ],
+    "type": "speech"
+  },
+  "Oreo": {
+    "canonical": "Oreo",
+    "aliases": [
+      "ô rê ô"
+    ],
+    "type": "speech"
+  },
+  "Pantene": {
+    "canonical": "Pantene",
+    "aliases": [
+      "ban ten"
+    ],
+    "type": "speech",
+    "heuristic": true
+  },
+  "Pepsi": {
+    "canonical": "Pepsi",
+    "aliases": [
+      "bép si"
+    ],
+    "type": "speech"
+  },
+  "Tempo": {
+    "canonical": "Tempo",
+    "aliases": [
+      "tem pô"
+    ],
+    "type": "speech"
+  },
+  "X-Men": {
+    "canonical": "X-Men",
+    "aliases": [
+      "ích men"
+    ],
+    "type": "speech"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "Bến Tre": {
+    "canonical": "Bến Tre",
+    "type": "origin",
+    "normalized": "bến tre"
+  },
+  "Hàn Quốc": {
+    "canonical": "Hàn Quốc",
+    "type": "origin",
+    "normalized": "hàn quốc"
+  },
+  "Hải Phòng": {
+    "canonical": "Hải Phòng",
+    "type": "origin",
+    "normalized": "hải phòng"
+  },
+  "Miền Trung": {
+    "canonical": "Miền Trung",
+    "type": "origin",
+    "normalized": "miền trung"
+  },
+  "Sông hồng": {
+    "canonical": "Sông hồng",
+    "type": "origin",
+    "normalized": "sông hồng"
+  },
+  "Đà Lạt": {
+    "canonical": "Đà Lạt",
+    "type": "origin",
+    "normalized": "đà lạt"
+  },
+  "Đài Loan": {
+    "canonical": "Đài Loan",
+    "type": "origin",
+    "normalized": "đài loan"
+  }
+}

@@ -68,208 +68,7 @@ function showPosDialog() {
   SpreadsheetApp.getUi().showModalDialog(html, 'POS Giọng Nói');
 }
 
-/* ===== Vietnamese phonetic / keyword matching (giữ nguyên không đổi) ===== */
 
-var INITIAL_CONSONANT_MAP = {
-  'tr': 'CH', 'ch': 'CH',
-  's': 'X', 'x': 'X',
-  'gi': 'Z', 'd': 'Z', 'r': 'Z', 'z': 'Z',
-  'đ': 'D',
-  'v': 'V', 'b': 'V',
-  'l': 'L', 'n': 'N',
-  'ph': 'F', 'f': 'F',
-  'kh': 'K', 'k': 'K',
-  'th': 'T', 't': 'T',
-  'gh': 'G', 'g': 'G',
-  'ngh': 'NG', 'ng': 'NG',
-  'nh': 'NH', 'n': 'N',
-  'ng': 'NG'
-};
-
-var RHYME_MAP = {
-  'ă': 'A', 'â': 'A', 'a': 'A',
-  'ê': 'E', 'e': 'E',
-  'ô': 'O', 'o': 'O', 'ơ': 'O',
-  'ư': 'U', 'u': 'U',
-  'i': 'I', 'y': 'I',
-  'ăn': 'AN', 'ân': 'AN', 'an': 'AN',
-  'ên': 'EN', 'en': 'EN',
-  'ôn': 'ON', 'ơn': 'ON', 'on': 'ON',
-  'ưn': 'UN', 'un': 'UN',
-  'in': 'IN', 'yn': 'IN',
-  'ăt': 'AT', 'ât': 'AT', 'at': 'AT',
-  'êt': 'ET', 'et': 'ET',
-  'ôt': 'OT', 'ơt': 'OT', 'ot': 'OT',
-  'ưt': 'UT', 'ut': 'UT',
-  'it': 'IT', 'yt': 'IT',
-  'ăng': 'ANG', 'âng': 'ANG', 'ang': 'ANG',
-  'êng': 'ENG', 'eng': 'ENG',
-  'ông': 'ONG', 'ơng': 'ONG', 'ong': 'ONG',
-  'ưng': 'UNG', 'ung': 'UNG',
-  'ing': 'ING', 'yng': 'ING',
-  'nh': 'NH', 'n': 'N',
-  'ch': 'CH', 'c': 'C', 't': 'T',
-  'p': 'P', 't': 'T', 'c': 'C',
-  'ng': 'NG', 'n': 'N'
-};
-
-function toPhoneticKey(text) {
-  if (!text) return '';
-  var s = String(text).toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  var words = s.split(' ');
-  var result = [];
-
-  for (var i = 0; i < words.length; i++) {
-    var word = words[i];
-    if (!word) continue;
-
-    var initial = '';
-    var rhyme = word;
-
-    var twoChar = word.substring(0, 2);
-    var threeChar = word.substring(0, 3);
-
-    if (INITIAL_CONSONANT_MAP[threeChar]) {
-      initial = INITIAL_CONSONANT_MAP[threeChar];
-      rhyme = word.substring(3);
-    } else if (INITIAL_CONSONANT_MAP[twoChar]) {
-      initial = INITIAL_CONSONANT_MAP[twoChar];
-      rhyme = word.substring(2);
-    } else if (INITIAL_CONSONANT_MAP[word[0]]) {
-      initial = INITIAL_CONSONANT_MAP[word[0]];
-      rhyme = word.substring(1);
-    } else {
-      initial = word[0].toUpperCase();
-      rhyme = word.substring(1);
-    }
-
-    var phoneticRhyme = rhyme;
-    for (var len = Math.min(rhyme.length, 4); len >= 1; len--) {
-      var sub = rhyme.substring(0, len);
-      if (RHYME_MAP[sub]) {
-        phoneticRhyme = RHYME_MAP[sub] + rhyme.substring(len);
-        break;
-      }
-    }
-
-    result.push(initial + phoneticRhyme.toUpperCase());
-  }
-
-  return result.join(' ');
-}
-
-function generatePronunciationVariants(text) {
-  var variants = [text];
-  var s = String(text).toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd');
-
-  var rules = [
-    [/tr/g, 'ch'], [/ch/g, 'tr'],
-    [/s/g, 'x'], [/x/g, 's'],
-    [/gi/g, 'd'], [/d(?=\s|$|[^i])/g, 'gi'], [/r/g, 'd'], [/z/g, 'd'],
-    [/v/g, 'b'], [/b/g, 'v'],
-    [/l/g, 'n'], [/n/g, 'l'],
-    [/nh/g, 'n'], [/n(?=\s|$)/g, 'nh'],
-    [/ng(?=\s|$)/g, 'n'], [/n(?=\s|$)/g, 'ng'],
-    [/ch(?=\s|$)/g, 'c'], [/c(?=\s|$)/g, 'ch'],
-    [/t(?=\s|$)/g, 'c'], [/c(?=\s|$)/g, 't'],
-    [/ph/g, 'f'], [/f/g, 'ph'],
-    [/kh/g, 'k'], [/k(?=[aeiouy])/g, 'kh'],
-    [/th/g, 't'], [/t(?=[aeiouy])/g, 'th'],
-    [/gh/g, 'g'], [/g(?=[ie])/g, 'gh'],
-    [/ngh/g, 'ng'], [/ng(?=[ie])/g, 'ngh'],
-    [/qu/g, 'q'], [/q/g, 'qu'],
-    [/uy/g, 'i'], [/i(?=[^aeiouy]|$)/g, 'uy'],
-  ];
-
-  for (var i = 0; i < rules.length; i += 2) {
-    var rule = rules[i];
-    var variant = s.replace(rule[0], rule[1]);
-    if (variant !== s && variants.indexOf(variant) === -1) {
-      variants.push(variant);
-    }
-  }
-
-  var combo = s
-    .replace(/tr/g, 'ch').replace(/ch/g, 'tr')
-    .replace(/s/g, 'x').replace(/x/g, 's')
-    .replace(/gi/g, 'd').replace(/d(?=\s|$|[^i])/g, 'gi');
-  if (combo !== s && variants.indexOf(combo) === -1) {
-    variants.push(combo);
-  }
-
-  return variants;
-}
-
-function autoGenerateKeywords(productName) {
-  if (!productName) return [];
-
-  var keywords = [];
-  var normalized = String(productName).toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd');
-
-  keywords.push(productName);
-  keywords.push(normalized);
-
-  var words = normalized.split(/\s+/).filter(function(w) { return w.length > 1; });
-  words.forEach(function(w) {
-    if (keywords.indexOf(w) === -1) keywords.push(w);
-  });
-
-  for (var i = 0; i < words.length - 1; i++) {
-    var bigram = words[i] + ' ' + words[i + 1];
-    if (keywords.indexOf(bigram) === -1) keywords.push(bigram);
-  }
-  for (var i = 0; i < words.length - 2; i++) {
-    var trigram = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
-    if (keywords.indexOf(trigram) === -1) keywords.push(trigram);
-  }
-
-  var variants = generatePronunciationVariants(productName);
-  variants.forEach(function(v) {
-    if (keywords.indexOf(v) === -1) keywords.push(v);
-  });
-
-  var phonetic = toPhoneticKey(productName);
-  if (phonetic && keywords.indexOf(phonetic) === -1) {
-    keywords.push(phonetic);
-  }
-
-  var abbreviations = generateAbbreviations(words);
-  abbreviations.forEach(function(abbr) {
-    if (keywords.indexOf(abbr) === -1) keywords.push(abbr);
-  });
-
-  return keywords;
-}
-
-function generateAbbreviations(words) {
-  var abbrs = [];
-  if (words.length < 2) return abbrs;
-
-  var initials = words.map(function(w) { return w[0]; }).join('');
-  abbrs.push(initials);
-
-  if (words.length > 2) {
-    abbrs.push(words[0] + ' ' + words[words.length - 1]);
-  }
-
-  var skipWords = ['nuoc', 'bot', 'banh', 'mi', 'com', 'cha', 'thit', 'ca', 'rau', 'qua'];
-  if (skipWords.indexOf(words[0]) !== -1 && words.length > 1) {
-    var withoutFirst = words.slice(1).join(' ');
-    abbrs.push(withoutFirst);
-  }
-
-  return abbrs;
-}
 
 /* ===== Google Sheet I/O (giữ nguyên không đổi) ===== */
 
@@ -287,7 +86,7 @@ function getProducts() {
   if (lastRow < PRODUCT_DATA_START_ROW) return [];
 
   var numRows = lastRow - PRODUCT_DATA_START_ROW + 1;
-  var data = sh.getRange(PRODUCT_DATA_START_ROW, 1, numRows, 5).getValues();
+  var data = sh.getRange(PRODUCT_DATA_START_ROW, 1, numRows, 4).getValues();
 
   var products = [];
   for (var i = 0; i < data.length; i++) {
@@ -295,24 +94,11 @@ function getProducts() {
     var name = data[i][1];
     var price = data[i][2];
     var unit = data[i][3];
-    var keywordsRaw = data[i][4];
     if (!name) continue;
-
-    var sheetKeywords = keywordsRaw
-      ? String(keywordsRaw).split(',').map(function(s) { return s.trim(); }).filter(Boolean)
-      : [];
-
-    var autoKeywords = autoGenerateKeywords(name);
-
-    var allKeywords = sheetKeywords.slice();
-    autoKeywords.forEach(function(k) {
-      if (allKeywords.indexOf(k) === -1) allKeywords.push(k);
-    });
 
     products.push({
       code: String(code || ''),
       name: String(name),
-      keywords: allKeywords,
       price: Number(price) || 0,
       unit: String(unit || '').trim()
     });

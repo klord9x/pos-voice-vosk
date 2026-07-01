@@ -1,0 +1,162 @@
+{
+  "3 Miền": {
+    "canonical": "3 Miền",
+    "type": "brand",
+    "normalized": "3 miền"
+  },
+  "7Up": {
+    "canonical": "7Up",
+    "type": "brand",
+    "normalized": "7up"
+  },
+  "Ajinomoto": {
+    "canonical": "Ajinomoto",
+    "type": "brand",
+    "normalized": "ajinomoto"
+  },
+  "An An": {
+    "canonical": "An An",
+    "type": "brand",
+    "normalized": "an an"
+  },
+  "Bless You": {
+    "canonical": "Bless You",
+    "type": "brand",
+    "normalized": "bless you"
+  },
+  "Chinsu": {
+    "canonical": "Chinsu",
+    "type": "brand",
+    "normalized": "chinsu"
+  },
+  "Clear": {
+    "canonical": "Clear",
+    "type": "brand",
+    "normalized": "clear"
+  },
+  "Coca Cola": {
+    "canonical": "Coca Cola",
+    "type": "brand",
+    "normalized": "coca cola"
+  },
+  "Cosy": {
+    "canonical": "Cosy",
+    "type": "brand",
+    "normalized": "cosy"
+  },
+  "Cung Đình": {
+    "canonical": "Cung Đình",
+    "type": "brand",
+    "normalized": "cung đình"
+  },
+  "Danisa": {
+    "canonical": "Danisa",
+    "type": "brand",
+    "normalized": "danisa"
+  },
+  "Dutch Lady": {
+    "canonical": "Dutch Lady",
+    "type": "brand",
+    "normalized": "dutch lady"
+  },
+  "Gery": {
+    "canonical": "Gery",
+    "type": "brand",
+    "normalized": "gery"
+  },
+  "Hảo Hảo": {
+    "canonical": "Hảo Hảo",
+    "type": "brand",
+    "normalized": "hảo hảo"
+  },
+  "Knorr": {
+    "canonical": "Knorr",
+    "type": "brand",
+    "normalized": "knorr"
+  },
+  "Kokomi": {
+    "canonical": "Kokomi",
+    "type": "brand",
+    "normalized": "kokomi"
+  },
+  "Maggi": {
+    "canonical": "Maggi",
+    "type": "brand",
+    "normalized": "maggi"
+  },
+  "Mirinda": {
+    "canonical": "Mirinda",
+    "type": "brand",
+    "normalized": "mirinda"
+  },
+  "Nam Ngư": {
+    "canonical": "Nam Ngư",
+    "type": "brand",
+    "normalized": "nam ngư"
+  },
+  "Nutifood": {
+    "canonical": "Nutifood",
+    "type": "brand",
+    "normalized": "nutifood"
+  },
+  "Omachi": {
+    "canonical": "Omachi",
+    "type": "brand",
+    "normalized": "omachi"
+  },
+  "Oreo": {
+    "canonical": "Oreo",
+    "type": "brand",
+    "normalized": "oreo"
+  },
+  "Pantene": {
+    "canonical": "Pantene",
+    "type": "brand",
+    "normalized": "pantene"
+  },
+  "Pepsi": {
+    "canonical": "Pepsi",
+    "type": "brand",
+    "normalized": "pepsi"
+  },
+  "Pulppy": {
+    "canonical": "Pulppy",
+    "type": "brand",
+    "normalized": "pulppy"
+  },
+  "Rejoice": {
+    "canonical": "Rejoice",
+    "type": "brand",
+    "normalized": "rejoice"
+  },
+  "Sprite": {
+    "canonical": "Sprite",
+    "type": "brand",
+    "normalized": "sprite"
+  },
+  "Sunsilk": {
+    "canonical": "Sunsilk",
+    "type": "brand",
+    "normalized": "sunsilk"
+  },
+  "TH True Milk": {
+    "canonical": "TH True Milk",
+    "type": "brand",
+    "normalized": "th true milk"
+  },
+  "Tempo": {
+    "canonical": "Tempo",
+    "type": "brand",
+    "normalized": "tempo"
+  },
+  "Vinamilk": {
+    "canonical": "Vinamilk",
+    "type": "brand",
+    "normalized": "vinamilk"
+  },
+  "X-Men": {
+    "canonical": "X-Men",
+    "type": "brand",
+    "normalized": "x-men"
+  }
+}

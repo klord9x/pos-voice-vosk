@@ -1,0 +1,1891 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-01T09:39:11.322Z",
+  "knowledge": {
+    "brand": {
+      "3 Miền": {
+        "canonical": "3 Miền",
+        "type": "brand",
+        "normalized": "3 miền"
+      },
+      "7Up": {
+        "canonical": "7Up",
+        "type": "brand",
+        "normalized": "7up"
+      },
+      "Ajinomoto": {
+        "canonical": "Ajinomoto",
+        "type": "brand",
+        "normalized": "ajinomoto"
+      },
+      "An An": {
+        "canonical": "An An",
+        "type": "brand",
+        "normalized": "an an"
+      },
+      "Bless You": {
+        "canonical": "Bless You",
+        "type": "brand",
+        "normalized": "bless you"
+      },
+      "Chinsu": {
+        "canonical": "Chinsu",
+        "type": "brand",
+        "normalized": "chinsu"
+      },
+      "Clear": {
+        "canonical": "Clear",
+        "type": "brand",
+        "normalized": "clear"
+      },
+      "Coca Cola": {
+        "canonical": "Coca Cola",
+        "type": "brand",
+        "normalized": "coca cola"
+      },
+      "Cosy": {
+        "canonical": "Cosy",
+        "type": "brand",
+        "normalized": "cosy"
+      },
+      "Cung Đình": {
+        "canonical": "Cung Đình",
+        "type": "brand",
+        "normalized": "cung đình"
+      },
+      "Danisa": {
+        "canonical": "Danisa",
+        "type": "brand",
+        "normalized": "danisa"
+      },
+      "Dutch Lady": {
+        "canonical": "Dutch Lady",
+        "type": "brand",
+        "normalized": "dutch lady"
+      },
+      "Gery": {
+        "canonical": "Gery",
+        "type": "brand",
+        "normalized": "gery"
+      },
+      "Hảo Hảo": {
+        "canonical": "Hảo Hảo",
+        "type": "brand",
+        "normalized": "hảo hảo"
+      },
+      "Knorr": {
+        "canonical": "Knorr",
+        "type": "brand",
+        "normalized": "knorr"
+      },
+      "Kokomi": {
+        "canonical": "Kokomi",
+        "type": "brand",
+        "normalized": "kokomi"
+      },
+      "Maggi": {
+        "canonical": "Maggi",
+        "type": "brand",
+        "normalized": "maggi"
+      },
+      "Mirinda": {
+        "canonical": "Mirinda",
+        "type": "brand",
+        "normalized": "mirinda"
+      },
+      "Nam Ngư": {
+        "canonical": "Nam Ngư",
+        "type": "brand",
+        "normalized": "nam ngư"
+      },
+      "Nutifood": {
+        "canonical": "Nutifood",
+        "type": "brand",
+        "normalized": "nutifood"
+      },
+      "Omachi": {
+        "canonical": "Omachi",
+        "type": "brand",
+        "normalized": "omachi"
+      },
+      "Oreo": {
+        "canonical": "Oreo",
+        "type": "brand",
+        "normalized": "oreo"
+      },
+      "Pantene": {
+        "canonical": "Pantene",
+        "type": "brand",
+        "normalized": "pantene"
+      },
+      "Pepsi": {
+        "canonical": "Pepsi",
+        "type": "brand",
+        "normalized": "pepsi"
+      },
+      "Pulppy": {
+        "canonical": "Pulppy",
+        "type": "brand",
+        "normalized": "pulppy"
+      },
+      "Rejoice": {
+        "canonical": "Rejoice",
+        "type": "brand",
+        "normalized": "rejoice"
+      },
+      "Sprite": {
+        "canonical": "Sprite",
+        "type": "brand",
+        "normalized": "sprite"
+      },
+      "Sunsilk": {
+        "canonical": "Sunsilk",
+        "type": "brand",
+        "normalized": "sunsilk"
+      },
+      "TH True Milk": {
+        "canonical": "TH True Milk",
+        "type": "brand",
+        "normalized": "th true milk"
+      },
+      "Tempo": {
+        "canonical": "Tempo",
+        "type": "brand",
+        "normalized": "tempo"
+      },
+      "Vinamilk": {
+        "canonical": "Vinamilk",
+        "type": "brand",
+        "normalized": "vinamilk"
+      },
+      "X-Men": {
+        "canonical": "X-Men",
+        "type": "brand",
+        "normalized": "x-men"
+      }
+    },
+    "product_type": {
+      "Bánh quy": {
+        "canonical": "Bánh quy",
+        "type": "product_type",
+        "normalized": "bánh quy"
+      },
+      "Bánh đa": {
+        "canonical": "Bánh đa",
+        "type": "product_type",
+        "normalized": "bánh đa"
+      },
+      "Bí đỏ": {
+        "canonical": "Bí đỏ",
+        "type": "product_type",
+        "normalized": "bí đỏ"
+      },
+      "Bún tươi": {
+        "canonical": "Bún tươi",
+        "type": "product_type",
+        "normalized": "bún tươi"
+      },
+      "Bưởi": {
+        "canonical": "Bưởi",
+        "type": "product_type",
+        "normalized": "bưởi"
+      },
+      "Bầu": {
+        "canonical": "Bầu",
+        "type": "product_type",
+        "normalized": "bầu"
+      },
+      "Bắp cải": {
+        "canonical": "Bắp cải",
+        "type": "product_type",
+        "normalized": "bắp cải"
+      },
+      "Cam": {
+        "canonical": "Cam",
+        "type": "product_type",
+        "normalized": "cam"
+      },
+      "Chuối": {
+        "canonical": "Chuối",
+        "type": "product_type",
+        "normalized": "chuối"
+      },
+      "Chân giò": {
+        "canonical": "Chân giò",
+        "type": "product_type",
+        "normalized": "chân giò"
+      },
+      "Chôm chôm": {
+        "canonical": "Chôm chôm",
+        "type": "product_type",
+        "normalized": "chôm chôm"
+      },
+      "Cà chua": {
+        "canonical": "Cà chua",
+        "type": "product_type",
+        "normalized": "cà chua"
+      },
+      "Cà rốt": {
+        "canonical": "Cà rốt",
+        "type": "product_type",
+        "normalized": "cà rốt"
+      },
+      "Cá hú": {
+        "canonical": "Cá hú",
+        "type": "product_type",
+        "normalized": "cá hú"
+      },
+      "Cá lóc": {
+        "canonical": "Cá lóc",
+        "type": "product_type",
+        "normalized": "cá lóc"
+      },
+      "Cá nục": {
+        "canonical": "Cá nục",
+        "type": "product_type",
+        "normalized": "cá nục"
+      },
+      "Cá thu": {
+        "canonical": "Cá thu",
+        "type": "product_type",
+        "normalized": "cá thu"
+      },
+      "Cá điêu hồng": {
+        "canonical": "Cá điêu hồng",
+        "type": "product_type",
+        "normalized": "cá điêu hồng"
+      },
+      "Cánh gà": {
+        "canonical": "Cánh gà",
+        "type": "product_type",
+        "normalized": "cánh gà"
+      },
+      "Cải ngọt": {
+        "canonical": "Cải ngọt",
+        "type": "product_type",
+        "normalized": "cải ngọt"
+      },
+      "Dưa leo": {
+        "canonical": "Dưa leo",
+        "type": "product_type",
+        "normalized": "dưa leo"
+      },
+      "Dầu gội": {
+        "canonical": "Dầu gội",
+        "type": "product_type",
+        "normalized": "dầu gội"
+      },
+      "Gia vị": {
+        "canonical": "Gia vị",
+        "type": "product_type",
+        "normalized": "gia vị"
+      },
+      "Hành tây": {
+        "canonical": "Hành tây",
+        "type": "product_type",
+        "normalized": "hành tây"
+      },
+      "Khoai tây": {
+        "canonical": "Khoai tây",
+        "type": "product_type",
+        "normalized": "khoai tây"
+      },
+      "Khăn giấy": {
+        "canonical": "Khăn giấy",
+        "type": "product_type",
+        "normalized": "khăn giấy"
+      },
+      "Khổ qua": {
+        "canonical": "Khổ qua",
+        "type": "product_type",
+        "normalized": "khổ qua"
+      },
+      "Mì": {
+        "canonical": "Mì",
+        "type": "product_type",
+        "normalized": "mì"
+      },
+      "Mồng tơi": {
+        "canonical": "Mồng tơi",
+        "type": "product_type",
+        "normalized": "mồng tơi"
+      },
+      "Mực ống": {
+        "canonical": "Mực ống",
+        "type": "product_type",
+        "normalized": "mực ống"
+      },
+      "Nghêu": {
+        "canonical": "Nghêu",
+        "type": "product_type",
+        "normalized": "nghêu"
+      },
+      "Nước ngọt": {
+        "canonical": "Nước ngọt",
+        "type": "product_type",
+        "normalized": "nước ngọt"
+      },
+      "Nạc dăm": {
+        "canonical": "Nạc dăm",
+        "type": "product_type",
+        "normalized": "nạc dăm"
+      },
+      "Nấm kim châm": {
+        "canonical": "Nấm kim châm",
+        "type": "product_type",
+        "normalized": "nấm kim châm"
+      },
+      "Nấm đùi gà": {
+        "canonical": "Nấm đùi gà",
+        "type": "product_type",
+        "normalized": "nấm đùi gà"
+      },
+      "Quýt": {
+        "canonical": "Quýt",
+        "type": "product_type",
+        "normalized": "quýt"
+      },
+      "Rau muống": {
+        "canonical": "Rau muống",
+        "type": "product_type",
+        "normalized": "rau muống"
+      },
+      "Rau ngót": {
+        "canonical": "Rau ngót",
+        "type": "product_type",
+        "normalized": "rau ngót"
+      },
+      "Sườn non": {
+        "canonical": "Sườn non",
+        "type": "product_type",
+        "normalized": "sườn non"
+      },
+      "Sữa tươi": {
+        "canonical": "Sữa tươi",
+        "type": "product_type",
+        "normalized": "sữa tươi"
+      },
+      "Thanh long": {
+        "canonical": "Thanh long",
+        "type": "product_type",
+        "normalized": "thanh long"
+      },
+      "Thịt ba rọi": {
+        "canonical": "Thịt ba rọi",
+        "type": "product_type",
+        "normalized": "thịt ba rọi"
+      },
+      "Thịt bò": {
+        "canonical": "Thịt bò",
+        "type": "product_type",
+        "normalized": "thịt bò"
+      },
+      "Thịt heo xay": {
+        "canonical": "Thịt heo xay",
+        "type": "product_type",
+        "normalized": "thịt heo xay"
+      },
+      "Trứng cút": {
+        "canonical": "Trứng cút",
+        "type": "product_type",
+        "normalized": "trứng cút"
+      },
+      "Trứng gà": {
+        "canonical": "Trứng gà",
+        "type": "product_type",
+        "normalized": "trứng gà"
+      },
+      "Trứng vịt": {
+        "canonical": "Trứng vịt",
+        "type": "product_type",
+        "normalized": "trứng vịt"
+      },
+      "Táo": {
+        "canonical": "Táo",
+        "type": "product_type",
+        "normalized": "táo"
+      },
+      "Tôm thẻ": {
+        "canonical": "Tôm thẻ",
+        "type": "product_type",
+        "normalized": "tôm thẻ"
+      },
+      "Xoài": {
+        "canonical": "Xoài",
+        "type": "product_type",
+        "normalized": "xoài"
+      },
+      "Xà lách": {
+        "canonical": "Xà lách",
+        "type": "product_type",
+        "normalized": "xà lách"
+      },
+      "Đùi gà": {
+        "canonical": "Đùi gà",
+        "type": "product_type",
+        "normalized": "đùi gà"
+      },
+      "Đậu hũ": {
+        "canonical": "Đậu hũ",
+        "type": "product_type",
+        "normalized": "đậu hũ"
+      },
+      "Ổi": {
+        "canonical": "Ổi",
+        "type": "product_type",
+        "normalized": "ổi"
+      }
+    },
+    "attribute": {
+      "2 lớp": {
+        "canonical": "2 lớp",
+        "type": "attribute",
+        "normalized": "2 lớp"
+      },
+      "3 lớp": {
+        "canonical": "3 lớp",
+        "type": "attribute",
+        "normalized": "3 lớp"
+      },
+      "Bò hầm": {
+        "canonical": "Bò hầm",
+        "type": "attribute",
+        "normalized": "bò hầm"
+      },
+      "Bơ": {
+        "canonical": "Bơ",
+        "type": "attribute",
+        "normalized": "bơ"
+      },
+      "Bạc hà": {
+        "canonical": "Bạc hà",
+        "type": "attribute",
+        "normalized": "bạc hà"
+      },
+      "Bột ngọt": {
+        "canonical": "Bột ngọt",
+        "type": "attribute",
+        "normalized": "bột ngọt"
+      },
+      "Chanh": {
+        "canonical": "Chanh",
+        "type": "attribute",
+        "normalized": "chanh"
+      },
+      "Có đường": {
+        "canonical": "Có đường",
+        "type": "attribute",
+        "normalized": "có đường"
+      },
+      "Dâu": {
+        "canonical": "Dâu",
+        "type": "attribute",
+        "normalized": "dâu"
+      },
+      "Hương cam": {
+        "canonical": "Hương cam",
+        "type": "attribute",
+        "normalized": "hương cam"
+      },
+      "Hương dâu": {
+        "canonical": "Hương dâu",
+        "type": "attribute",
+        "normalized": "hương dâu"
+      },
+      "Hương lô hội": {
+        "canonical": "Hương lô hội",
+        "type": "attribute",
+        "normalized": "hương lô hội"
+      },
+      "Hương xá xị": {
+        "canonical": "Hương xá xị",
+        "type": "attribute",
+        "normalized": "hương xá xị"
+      },
+      "Hạt nêm": {
+        "canonical": "Hạt nêm",
+        "type": "attribute",
+        "normalized": "hạt nêm"
+      },
+      "Không mùi": {
+        "canonical": "Không mùi",
+        "type": "attribute",
+        "normalized": "không mùi"
+      },
+      "Không đường": {
+        "canonical": "Không đường",
+        "type": "attribute",
+        "normalized": "không đường"
+      },
+      "Lẩu thái": {
+        "canonical": "Lẩu thái",
+        "type": "attribute",
+        "normalized": "lẩu thái"
+      },
+      "Nguyên bản": {
+        "canonical": "Nguyên bản",
+        "type": "attribute",
+        "normalized": "nguyên bản"
+      },
+      "Nước mắm": {
+        "canonical": "Nước mắm",
+        "type": "attribute",
+        "normalized": "nước mắm"
+      },
+      "Nước tương": {
+        "canonical": "Nước tương",
+        "type": "attribute",
+        "normalized": "nước tương"
+      },
+      "Phô mai": {
+        "canonical": "Phô mai",
+        "type": "attribute",
+        "normalized": "phô mai"
+      },
+      "Socola": {
+        "canonical": "Socola",
+        "type": "attribute",
+        "normalized": "socola"
+      },
+      "Suôn mượt": {
+        "canonical": "Suôn mượt",
+        "type": "attribute",
+        "normalized": "suôn mượt"
+      },
+      "Sườn heo": {
+        "canonical": "Sườn heo",
+        "type": "attribute",
+        "normalized": "sườn heo"
+      },
+      "Sạch sâu": {
+        "canonical": "Sạch sâu",
+        "type": "attribute",
+        "normalized": "sạch sâu"
+      },
+      "Trị gàu": {
+        "canonical": "Trị gàu",
+        "type": "attribute",
+        "normalized": "trị gàu"
+      },
+      "Tôm chua cay": {
+        "canonical": "Tôm chua cay",
+        "type": "attribute",
+        "normalized": "tôm chua cay"
+      },
+      "Tương ớt": {
+        "canonical": "Tương ớt",
+        "type": "attribute",
+        "normalized": "tương ớt"
+      },
+      "Vanila": {
+        "canonical": "Vanila",
+        "type": "attribute",
+        "normalized": "vanila"
+      },
+      "Xốt spaghetti": {
+        "canonical": "Xốt spaghetti",
+        "type": "attribute",
+        "normalized": "xốt spaghetti"
+      },
+      "Ít đường": {
+        "canonical": "Ít đường",
+        "type": "attribute",
+        "normalized": "ít đường"
+      }
+    },
+    "descriptor": {
+      "Baby": {
+        "canonical": "Baby",
+        "type": "descriptor",
+        "normalized": "baby"
+      },
+      "Biển": {
+        "canonical": "Biển",
+        "type": "descriptor",
+        "normalized": "biển"
+      },
+      "Búp": {
+        "canonical": "Búp",
+        "type": "descriptor",
+        "normalized": "búp"
+      },
+      "Bắp hoa": {
+        "canonical": "Bắp hoa",
+        "type": "descriptor",
+        "normalized": "bắp hoa"
+      },
+      "Cau": {
+        "canonical": "Cau",
+        "type": "descriptor",
+        "normalized": "cau"
+      },
+      "Dài": {
+        "canonical": "Dài",
+        "type": "descriptor",
+        "normalized": "dài"
+      },
+      "Dưa hấu Không hạt": {
+        "canonical": "Dưa hấu Không hạt",
+        "type": "descriptor",
+        "normalized": "dưa hấu không hạt"
+      },
+      "Dưa hấu Long An": {
+        "canonical": "Dưa hấu Long An",
+        "type": "descriptor",
+        "normalized": "dưa hấu long an"
+      },
+      "Góc tư": {
+        "canonical": "Góc tư",
+        "type": "descriptor",
+        "normalized": "góc tư"
+      },
+      "Gầu": {
+        "canonical": "Gầu",
+        "type": "descriptor",
+        "normalized": "gầu"
+      },
+      "Heo": {
+        "canonical": "Heo",
+        "type": "descriptor",
+        "normalized": "heo"
+      },
+      "Heo sau": {
+        "canonical": "Heo sau",
+        "type": "descriptor",
+        "normalized": "heo sau"
+      },
+      "Heo trước": {
+        "canonical": "Heo trước",
+        "type": "descriptor",
+        "normalized": "heo trước"
+      },
+      "Mỡ": {
+        "canonical": "Mỡ",
+        "type": "descriptor",
+        "normalized": "mỡ"
+      },
+      "Nhập khẩu": {
+        "canonical": "Nhập khẩu",
+        "type": "descriptor",
+        "normalized": "nhập khẩu"
+      },
+      "Quả": {
+        "canonical": "Quả",
+        "type": "descriptor",
+        "normalized": "quả"
+      },
+      "Sao": {
+        "canonical": "Sao",
+        "type": "descriptor",
+        "normalized": "sao"
+      },
+      "Sợi quả": {
+        "canonical": "Sợi quả",
+        "type": "descriptor",
+        "normalized": "sợi quả"
+      },
+      "Sợi to": {
+        "canonical": "Sợi to",
+        "type": "descriptor",
+        "normalized": "sợi to"
+      },
+      "Sợi to quả": {
+        "canonical": "Sợi to quả",
+        "type": "descriptor",
+        "normalized": "sợi to quả"
+      },
+      "Sứ": {
+        "canonical": "Sứ",
+        "type": "descriptor",
+        "normalized": "sứ"
+      },
+      "Thăn nội": {
+        "canonical": "Thăn nội",
+        "type": "descriptor",
+        "normalized": "thăn nội"
+      },
+      "Thường": {
+        "canonical": "Thường",
+        "type": "descriptor",
+        "normalized": "thường"
+      },
+      "Tròn": {
+        "canonical": "Tròn",
+        "type": "descriptor",
+        "normalized": "tròn"
+      },
+      "Trắng": {
+        "canonical": "Trắng",
+        "type": "descriptor",
+        "normalized": "trắng"
+      },
+      "Trắng quả": {
+        "canonical": "Trắng quả",
+        "type": "descriptor",
+        "normalized": "trắng quả"
+      },
+      "Tím": {
+        "canonical": "Tím",
+        "type": "descriptor",
+        "normalized": "tím"
+      },
+      "Vườn nhà": {
+        "canonical": "Vườn nhà",
+        "type": "descriptor",
+        "normalized": "vườn nhà"
+      },
+      "Xoàn": {
+        "canonical": "Xoàn",
+        "type": "descriptor",
+        "normalized": "xoàn"
+      }
+    },
+    "processing": {
+      "Chiên": {
+        "canonical": "Chiên",
+        "type": "processing",
+        "normalized": "chiên"
+      },
+      "Cắt khoanh": {
+        "canonical": "Cắt khoanh",
+        "type": "processing",
+        "normalized": "cắt khoanh"
+      },
+      "Cắt lát": {
+        "canonical": "Cắt lát",
+        "type": "processing",
+        "normalized": "cắt lát"
+      },
+      "Hấp sẵn": {
+        "canonical": "Hấp sẵn",
+        "type": "processing",
+        "normalized": "hấp sẵn"
+      },
+      "Làm sẵn": {
+        "canonical": "Làm sẵn",
+        "type": "processing",
+        "normalized": "làm sẵn"
+      },
+      "Lộn": {
+        "canonical": "Lộn",
+        "type": "processing",
+        "normalized": "lộn"
+      },
+      "Muối": {
+        "canonical": "Muối",
+        "type": "processing",
+        "normalized": "muối"
+      },
+      "Mềm": {
+        "canonical": "Mềm",
+        "type": "processing",
+        "normalized": "mềm"
+      },
+      "Nạc": {
+        "canonical": "Nạc",
+        "type": "processing",
+        "normalized": "nạc"
+      },
+      "Sạch": {
+        "canonical": "Sạch",
+        "type": "processing",
+        "normalized": "sạch"
+      },
+      "Sẵn": {
+        "canonical": "Sẵn",
+        "type": "processing",
+        "normalized": "sẵn"
+      },
+      "Sống": {
+        "canonical": "Sống",
+        "type": "processing",
+        "normalized": "sống"
+      },
+      "Tươi": {
+        "canonical": "Tươi",
+        "type": "processing",
+        "normalized": "tươi"
+      },
+      "Tươi rói": {
+        "canonical": "Tươi rói",
+        "type": "processing",
+        "normalized": "tươi rói"
+      },
+      "Tươi tỏi": {
+        "canonical": "Tươi tỏi",
+        "type": "processing",
+        "normalized": "tươi tỏi"
+      }
+    },
+    "origin": {
+      "Bến Tre": {
+        "canonical": "Bến Tre",
+        "type": "origin",
+        "normalized": "bến tre"
+      },
+      "Hàn Quốc": {
+        "canonical": "Hàn Quốc",
+        "type": "origin",
+        "normalized": "hàn quốc"
+      },
+      "Hải Phòng": {
+        "canonical": "Hải Phòng",
+        "type": "origin",
+        "normalized": "hải phòng"
+      },
+      "Miền Trung": {
+        "canonical": "Miền Trung",
+        "type": "origin",
+        "normalized": "miền trung"
+      },
+      "Sông hồng": {
+        "canonical": "Sông hồng",
+        "type": "origin",
+        "normalized": "sông hồng"
+      },
+      "Đà Lạt": {
+        "canonical": "Đà Lạt",
+        "type": "origin",
+        "normalized": "đà lạt"
+      },
+      "Đài Loan": {
+        "canonical": "Đài Loan",
+        "type": "origin",
+        "normalized": "đài loan"
+      }
+    },
+    "variety": {
+      "Bi": {
+        "canonical": "Bi",
+        "type": "variety",
+        "normalized": "bi"
+      },
+      "CP": {
+        "canonical": "CP",
+        "type": "variety",
+        "normalized": "cp"
+      },
+      "Cát Hòa Lộc": {
+        "canonical": "Cát Hòa Lộc",
+        "type": "variety",
+        "normalized": "cát hòa lộc"
+      },
+      "Công nghiệp": {
+        "canonical": "Công nghiệp",
+        "type": "variety",
+        "normalized": "công nghiệp"
+      },
+      "Da xanh": {
+        "canonical": "Da xanh",
+        "type": "variety",
+        "normalized": "da xanh"
+      },
+      "Envy": {
+        "canonical": "Envy",
+        "type": "variety",
+        "normalized": "envy"
+      },
+      "Fuji": {
+        "canonical": "Fuji",
+        "type": "variety",
+        "normalized": "fuji"
+      },
+      "Gala": {
+        "canonical": "Gala",
+        "type": "variety",
+        "normalized": "gala"
+      },
+      "Già hương": {
+        "canonical": "Già hương",
+        "type": "variety",
+        "normalized": "già hương"
+      },
+      "Heo tộc": {
+        "canonical": "Heo tộc",
+        "type": "variety",
+        "normalized": "heo tộc"
+      },
+      "Hồ lô": {
+        "canonical": "Hồ lô",
+        "type": "variety",
+        "normalized": "hồ lô"
+      },
+      "Hữu cơ": {
+        "canonical": "Hữu cơ",
+        "type": "variety",
+        "normalized": "hữu cơ"
+      },
+      "Keo": {
+        "canonical": "Keo",
+        "type": "variety",
+        "normalized": "keo"
+      },
+      "Mè": {
+        "canonical": "Mè",
+        "type": "variety",
+        "normalized": "mè"
+      },
+      "Nhãn": {
+        "canonical": "Nhãn",
+        "type": "variety",
+        "normalized": "nhãn"
+      },
+      "Nuôi": {
+        "canonical": "Nuôi",
+        "type": "variety",
+        "normalized": "nuôi"
+      },
+      "Năm Roi": {
+        "canonical": "Năm Roi",
+        "type": "variety",
+        "normalized": "năm roi"
+      },
+      "Nữ hoàng": {
+        "canonical": "Nữ hoàng",
+        "type": "variety",
+        "normalized": "nữ hoàng"
+      },
+      "Ruột trắng": {
+        "canonical": "Ruột trắng",
+        "type": "variety",
+        "normalized": "ruột trắng"
+      },
+      "Ruột đỏ": {
+        "canonical": "Ruột đỏ",
+        "type": "variety",
+        "normalized": "ruột đỏ"
+      },
+      "Rừng": {
+        "canonical": "Rừng",
+        "type": "variety",
+        "normalized": "rừng"
+      },
+      "Sành miền Tây": {
+        "canonical": "Sành miền Tây",
+        "type": "variety",
+        "normalized": "sành miền tây"
+      },
+      "Ta": {
+        "canonical": "Ta",
+        "type": "variety",
+        "normalized": "ta"
+      },
+      "Thái": {
+        "canonical": "Thái",
+        "type": "variety",
+        "normalized": "thái"
+      },
+      "Vàng": {
+        "canonical": "Vàng",
+        "type": "variety",
+        "normalized": "vàng"
+      },
+      "Đồng": {
+        "canonical": "Đồng",
+        "type": "variety",
+        "normalized": "đồng"
+      },
+      "Đồng quê": {
+        "canonical": "Đồng quê",
+        "type": "variety",
+        "normalized": "đồng quê"
+      }
+    },
+    "grade": {
+      "Lớn": {
+        "canonical": "Lớn",
+        "type": "grade",
+        "normalized": "lớn"
+      },
+      "Nhỏ": {
+        "canonical": "Nhỏ",
+        "type": "grade",
+        "normalized": "nhỏ"
+      },
+      "Size lớn": {
+        "canonical": "Size lớn",
+        "type": "grade",
+        "normalized": "size lớn"
+      },
+      "Size vừa": {
+        "canonical": "Size vừa",
+        "type": "grade",
+        "normalized": "size vừa"
+      },
+      "Size vừa lớn": {
+        "canonical": "Size vừa lớn",
+        "type": "grade",
+        "normalized": "size vừa lớn"
+      },
+      "Tầm trung": {
+        "canonical": "Tầm trung",
+        "type": "grade",
+        "normalized": "tầm trung"
+      }
+    },
+    "capacity": {
+      "100g": {
+        "canonical": "100g",
+        "type": "capacity",
+        "normalized": "100g"
+      },
+      "100ml": {
+        "canonical": "100ml",
+        "type": "capacity",
+        "normalized": "100ml"
+      },
+      "1L": {
+        "canonical": "1L",
+        "type": "capacity",
+        "normalized": "1l"
+      },
+      "1kg": {
+        "canonical": "1kg",
+        "type": "capacity",
+        "normalized": "1kg"
+      },
+      "250g": {
+        "canonical": "250g",
+        "type": "capacity",
+        "normalized": "250g"
+      },
+      "250ml": {
+        "canonical": "250ml",
+        "type": "capacity",
+        "normalized": "250ml"
+      },
+      "300g": {
+        "canonical": "300g",
+        "type": "capacity",
+        "normalized": "300g"
+      },
+      "400g": {
+        "canonical": "400g",
+        "type": "capacity",
+        "normalized": "400g"
+      },
+      "400ml": {
+        "canonical": "400ml",
+        "type": "capacity",
+        "normalized": "400ml"
+      },
+      "500g": {
+        "canonical": "500g",
+        "type": "capacity",
+        "normalized": "500g"
+      },
+      "50g": {
+        "canonical": "50g",
+        "type": "capacity",
+        "normalized": "50g"
+      },
+      "50ml": {
+        "canonical": "50ml",
+        "type": "capacity",
+        "normalized": "50ml"
+      },
+      "65g": {
+        "canonical": "65g",
+        "type": "capacity",
+        "normalized": "65g"
+      },
+      "65ml": {
+        "canonical": "65ml",
+        "type": "capacity",
+        "normalized": "65ml"
+      },
+      "85g": {
+        "canonical": "85g",
+        "type": "capacity",
+        "normalized": "85g"
+      },
+      "85ml": {
+        "canonical": "85ml",
+        "type": "capacity",
+        "normalized": "85ml"
+      }
+    },
+    "package": {
+      "Bó": {
+        "canonical": "Bó",
+        "type": "package",
+        "normalized": "bó"
+      },
+      "Chai": {
+        "canonical": "Chai",
+        "type": "package",
+        "normalized": "chai"
+      },
+      "Cuộn": {
+        "canonical": "Cuộn",
+        "type": "package",
+        "normalized": "cuộn"
+      },
+      "Gói": {
+        "canonical": "Gói",
+        "type": "package",
+        "normalized": "gói"
+      },
+      "Hộp": {
+        "canonical": "Hộp",
+        "type": "package",
+        "normalized": "hộp"
+      },
+      "Khay": {
+        "canonical": "Khay",
+        "type": "package",
+        "normalized": "khay"
+      },
+      "Lon": {
+        "canonical": "Lon",
+        "type": "package",
+        "normalized": "lon"
+      },
+      "Lốc": {
+        "canonical": "Lốc",
+        "type": "package",
+        "normalized": "lốc"
+      },
+      "Thùng": {
+        "canonical": "Thùng",
+        "type": "package",
+        "normalized": "thùng"
+      }
+    },
+    "unit": {
+      "Chục": {
+        "canonical": "Chục",
+        "type": "unit",
+        "normalized": "chục"
+      },
+      "Con": {
+        "canonical": "Con",
+        "type": "unit",
+        "normalized": "con"
+      },
+      "Hũ": {
+        "canonical": "Hũ",
+        "type": "unit",
+        "normalized": "hũ"
+      },
+      "Kg": {
+        "canonical": "Kg",
+        "type": "unit",
+        "normalized": "kg"
+      },
+      "Phần": {
+        "canonical": "Phần",
+        "type": "unit",
+        "normalized": "phần"
+      },
+      "Trái": {
+        "canonical": "Trái",
+        "type": "unit",
+        "normalized": "trái"
+      },
+      "Vỉ": {
+        "canonical": "Vỉ",
+        "type": "unit",
+        "normalized": "vỉ"
+      }
+    },
+    "quantity": {
+      "4": {
+        "canonical": "4",
+        "type": "quantity",
+        "normalized": "4"
+      },
+      "6": {
+        "canonical": "6",
+        "type": "quantity",
+        "normalized": "6"
+      },
+      "10": {
+        "canonical": "10",
+        "type": "quantity",
+        "normalized": "10"
+      },
+      "12": {
+        "canonical": "12",
+        "type": "quantity",
+        "normalized": "12"
+      },
+      "24": {
+        "canonical": "24",
+        "type": "quantity",
+        "normalized": "24"
+      },
+      "30": {
+        "canonical": "30",
+        "type": "quantity",
+        "normalized": "30"
+      }
+    },
+    "speech": {
+      "7Up": {
+        "canonical": "7Up",
+        "aliases": [
+          "bẩy ắp"
+        ],
+        "type": "speech"
+      },
+      "Clear": {
+        "canonical": "Clear",
+        "aliases": [
+          "cờ lia"
+        ],
+        "type": "speech"
+      },
+      "Coca Cola": {
+        "canonical": "Coca Cola",
+        "aliases": [
+          "cô ca cô la"
+        ],
+        "type": "speech"
+      },
+      "Cosy": {
+        "canonical": "Cosy",
+        "aliases": [
+          "cô si"
+        ],
+        "type": "speech"
+      },
+      "Danisa": {
+        "canonical": "Danisa",
+        "aliases": [
+          "đa ni sa"
+        ],
+        "type": "speech"
+      },
+      "Gery": {
+        "canonical": "Gery",
+        "aliases": [
+          "ge ri"
+        ],
+        "type": "speech"
+      },
+      "Knorr": {
+        "canonical": "Knorr",
+        "aliases": [
+          "nô"
+        ],
+        "type": "speech"
+      },
+      "Kokomi": {
+        "canonical": "Kokomi",
+        "aliases": [
+          "cô cô mi"
+        ],
+        "type": "speech"
+      },
+      "Maggi": {
+        "canonical": "Maggi",
+        "aliases": [
+          "mắc gi"
+        ],
+        "type": "speech"
+      },
+      "Mirinda": {
+        "canonical": "Mirinda",
+        "aliases": [
+          "mi rin đa"
+        ],
+        "type": "speech"
+      },
+      "Nutifood": {
+        "canonical": "Nutifood",
+        "aliases": [
+          "nu ti phút"
+        ],
+        "type": "speech",
+        "heuristic": true
+      },
+      "Oishi": {
+        "canonical": "Oishi",
+        "aliases": [
+          "ôi si"
+        ],
+        "type": "speech"
+      },
+      "Omachi": {
+        "canonical": "Omachi",
+        "aliases": [
+          "ô ma chi"
+        ],
+        "type": "speech"
+      },
+      "Oreo": {
+        "canonical": "Oreo",
+        "aliases": [
+          "ô rê ô"
+        ],
+        "type": "speech"
+      },
+      "Pantene": {
+        "canonical": "Pantene",
+        "aliases": [
+          "ban ten"
+        ],
+        "type": "speech",
+        "heuristic": true
+      },
+      "Pepsi": {
+        "canonical": "Pepsi",
+        "aliases": [
+          "bép si"
+        ],
+        "type": "speech"
+      },
+      "Tempo": {
+        "canonical": "Tempo",
+        "aliases": [
+          "tem pô"
+        ],
+        "type": "speech"
+      },
+      "X-Men": {
+        "canonical": "X-Men",
+        "aliases": [
+          "ích men"
+        ],
+        "type": "speech"
+      }
+    },
+    "normalization": {
+      "Coca Cola": {
+        "canonical": "Coca Cola",
+        "aliases": [
+          "Coca-Cola",
+          "Coca   Cola",
+          "COCA COLA"
+        ],
+        "type": "normalization"
+      },
+      "Không đường": {
+        "canonical": "Không đường",
+        "aliases": [
+          "Zero",
+          "Zero Sugar"
+        ],
+        "type": "normalization"
+      },
+      "L": {
+        "canonical": "L",
+        "aliases": [
+          "l"
+        ],
+        "type": "normalization"
+      },
+      "Lon": {
+        "canonical": "Lon",
+        "aliases": [
+          "Can"
+        ],
+        "type": "normalization"
+      },
+      "g": {
+        "canonical": "g",
+        "aliases": [
+          "gr"
+        ],
+        "type": "normalization"
+      },
+      "kg": {
+        "canonical": "kg",
+        "aliases": [
+          "kg"
+        ],
+        "type": "normalization"
+      },
+      "không": {
+        "canonical": "không",
+        "aliases": [
+          "khong"
+        ],
+        "type": "normalization"
+      },
+      "mL": {
+        "canonical": "mL",
+        "aliases": [
+          "ml"
+        ],
+        "type": "normalization"
+      }
+    },
+    "knowledge_graph": {
+      "brand": {
+        "Pulppy": {
+          "product_types": [
+            "Khăn giấy"
+          ]
+        },
+        "Pepsi": {
+          "product_types": [
+            "Nước ngọt"
+          ]
+        },
+        "Oreo": {
+          "product_types": [
+            "Bánh quy"
+          ]
+        },
+        "Maggi": {
+          "product_types": [
+            "Gia vị"
+          ]
+        },
+        "Mirinda": {
+          "product_types": [
+            "Nước ngọt"
+          ]
+        },
+        "Pantene": {
+          "product_types": [
+            "Dầu gội"
+          ]
+        },
+        "7Up": {
+          "product_types": [
+            "Nước ngọt"
+          ]
+        },
+        "Nutifood": {
+          "product_types": [
+            "Sữa tươi"
+          ]
+        },
+        "Chinsu": {
+          "product_types": [
+            "Gia vị"
+          ]
+        },
+        "X-Men": {
+          "product_types": [
+            "Dầu gội"
+          ]
+        },
+        "3 Miền": {
+          "product_types": [
+            "Mì"
+          ]
+        },
+        "Clear": {
+          "product_types": [
+            "Dầu gội"
+          ]
+        },
+        "Sunsilk": {
+          "product_types": [
+            "Dầu gội"
+          ]
+        },
+        "An An": {
+          "product_types": [
+            "Khăn giấy"
+          ]
+        },
+        "Nam Ngư": {
+          "product_types": [
+            "Gia vị"
+          ]
+        },
+        "Bless You": {
+          "product_types": [
+            "Khăn giấy"
+          ]
+        },
+        "Knorr": {
+          "product_types": [
+            "Gia vị"
+          ]
+        },
+        "Tempo": {
+          "product_types": [
+            "Khăn giấy"
+          ]
+        },
+        "Hảo Hảo": {
+          "product_types": [
+            "Mì"
+          ]
+        },
+        "Sprite": {
+          "product_types": [
+            "Nước ngọt"
+          ]
+        },
+        "Coca Cola": {
+          "product_types": [
+            "Nước ngọt"
+          ]
+        },
+        "Cosy": {
+          "product_types": [
+            "Bánh quy"
+          ]
+        },
+        "Cung Đình": {
+          "product_types": [
+            "Mì"
+          ]
+        },
+        "TH True Milk": {
+          "product_types": [
+            "Sữa tươi"
+          ]
+        },
+        "Danisa": {
+          "product_types": [
+            "Bánh quy"
+          ]
+        },
+        "Kokomi": {
+          "product_types": [
+            "Mì"
+          ]
+        },
+        "Dutch Lady": {
+          "product_types": [
+            "Sữa tươi"
+          ]
+        },
+        "Vinamilk": {
+          "product_types": [
+            "Sữa tươi"
+          ]
+        },
+        "Gery": {
+          "product_types": [
+            "Bánh quy"
+          ]
+        },
+        "Ajinomoto": {
+          "product_types": [
+            "Gia vị"
+          ]
+        },
+        "Rejoice": {
+          "product_types": [
+            "Dầu gội"
+          ]
+        },
+        "Omachi": {
+          "product_types": [
+            "Mì"
+          ]
+        }
+      },
+      "product_type": {
+        "Khăn giấy": {
+          "attributes": [
+            "Không mùi",
+            "2 lớp",
+            "Hương lô hội",
+            "3 lớp"
+          ],
+          "varieties": []
+        },
+        "Nước ngọt": {
+          "attributes": [
+            "Nguyên bản",
+            "Chanh",
+            "Ít đường",
+            "Hương xá xị",
+            "Hương cam"
+          ],
+          "varieties": []
+        },
+        "Bánh quy": {
+          "attributes": [
+            "Vanila",
+            "Phô mai",
+            "Dâu",
+            "Socola",
+            "Bơ"
+          ],
+          "varieties": []
+        },
+        "Gia vị": {
+          "attributes": [
+            "Nước mắm",
+            "Bột ngọt",
+            "Tương ớt",
+            "Nước tương",
+            "Hạt nêm"
+          ],
+          "varieties": []
+        },
+        "Dầu gội": {
+          "attributes": [
+            "Sạch sâu",
+            "Suôn mượt",
+            "Trị gàu",
+            "Bạc hà"
+          ],
+          "varieties": []
+        },
+        "Sữa tươi": {
+          "attributes": [
+            "Socola",
+            "Không đường",
+            "Hương dâu",
+            "Có đường",
+            "Ít đường"
+          ],
+          "varieties": []
+        },
+        "Mì": {
+          "attributes": [
+            "Sườn heo",
+            "Bò hầm",
+            "Tôm chua cay",
+            "Xốt spaghetti",
+            "Lẩu thái"
+          ],
+          "varieties": []
+        },
+        "Tôm thẻ": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Trứng gà": {
+          "attributes": [],
+          "varieties": [
+            "Công nghiệp",
+            "Ta"
+          ]
+        },
+        "Xoài": {
+          "attributes": [],
+          "varieties": [
+            "Cát Hòa Lộc",
+            "Keo"
+          ]
+        },
+        "Trứng cút": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Cá hú": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Thịt ba rọi": {
+          "attributes": [],
+          "varieties": [
+            "Heo tộc",
+            "CP"
+          ]
+        },
+        "Cam": {
+          "attributes": [],
+          "varieties": [
+            "Sành miền Tây"
+          ]
+        },
+        "Nấm đùi gà": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Mực ống": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Bánh đa": {
+          "attributes": [],
+          "varieties": [
+            "Mè"
+          ]
+        },
+        "Thịt heo xay": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Khoai tây": {
+          "attributes": [],
+          "varieties": [
+            "Vàng"
+          ]
+        },
+        "Dưa leo": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Nghêu": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Rau ngót": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Ổi": {
+          "attributes": [],
+          "varieties": [
+            "Nữ hoàng"
+          ]
+        },
+        "Thanh long": {
+          "attributes": [],
+          "varieties": [
+            "Ruột đỏ",
+            "Ruột trắng"
+          ]
+        },
+        "Cá thu": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Thịt bò": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Đùi gà": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Cá nục": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Chuối": {
+          "attributes": [],
+          "varieties": [
+            "Già hương"
+          ]
+        },
+        "Bầu": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Chân giò": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Bắp cải": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Cánh gà": {
+          "attributes": [],
+          "varieties": [
+            "Công nghiệp"
+          ]
+        },
+        "Cà rốt": {
+          "attributes": [],
+          "varieties": [
+            "Hữu cơ"
+          ]
+        },
+        "Mồng tơi": {
+          "attributes": [],
+          "varieties": [
+            "Đồng"
+          ]
+        },
+        "Chôm chôm": {
+          "attributes": [],
+          "varieties": [
+            "Nhãn",
+            "Thái"
+          ]
+        },
+        "Đậu hũ": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Táo": {
+          "attributes": [],
+          "varieties": [
+            "Gala",
+            "Envy",
+            "Fuji"
+          ]
+        },
+        "Nạc dăm": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Xà lách": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Rau muống": {
+          "attributes": [],
+          "varieties": [
+            "Đồng quê"
+          ]
+        },
+        "Bún tươi": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Cá điêu hồng": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Khổ qua": {
+          "attributes": [],
+          "varieties": [
+            "Rừng"
+          ]
+        },
+        "Cà chua": {
+          "attributes": [],
+          "varieties": [
+            "Bi"
+          ]
+        },
+        "Cá lóc": {
+          "attributes": [],
+          "varieties": [
+            "Đồng",
+            "Nuôi"
+          ]
+        },
+        "Trứng vịt": {
+          "attributes": [],
+          "varieties": [
+            "Đồng"
+          ]
+        },
+        "Nấm kim châm": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Hành tây": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Cải ngọt": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Bưởi": {
+          "attributes": [],
+          "varieties": [
+            "Năm Roi",
+            "Da xanh"
+          ]
+        },
+        "Quýt": {
+          "attributes": [],
+          "varieties": []
+        },
+        "Sườn non": {
+          "attributes": [],
+          "varieties": [
+            "CP"
+          ]
+        },
+        "Bí đỏ": {
+          "attributes": [],
+          "varieties": [
+            "Hồ lô"
+          ]
+        }
+      }
+    }
+  }
+}

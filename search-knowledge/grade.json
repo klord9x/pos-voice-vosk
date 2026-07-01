@@ -1,0 +1,32 @@
+{
+  "Lớn": {
+    "canonical": "Lớn",
+    "type": "grade",
+    "normalized": "lớn"
+  },
+  "Nhỏ": {
+    "canonical": "Nhỏ",
+    "type": "grade",
+    "normalized": "nhỏ"
+  },
+  "Size lớn": {
+    "canonical": "Size lớn",
+    "type": "grade",
+    "normalized": "size lớn"
+  },
+  "Size vừa": {
+    "canonical": "Size vừa",
+    "type": "grade",
+    "normalized": "size vừa"
+  },
+  "Size vừa lớn": {
+    "canonical": "Size vừa lớn",
+    "type": "grade",
+    "normalized": "size vừa lớn"
+  },
+  "Tầm trung": {
+    "canonical": "Tầm trung",
+    "type": "grade",
+    "normalized": "tầm trung"
+  }
+}

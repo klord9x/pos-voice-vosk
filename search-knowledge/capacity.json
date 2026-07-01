@@ -1,0 +1,82 @@
+{
+  "100g": {
+    "canonical": "100g",
+    "type": "capacity",
+    "normalized": "100g"
+  },
+  "100ml": {
+    "canonical": "100ml",
+    "type": "capacity",
+    "normalized": "100ml"
+  },
+  "1L": {
+    "canonical": "1L",
+    "type": "capacity",
+    "normalized": "1l"
+  },
+  "1kg": {
+    "canonical": "1kg",
+    "type": "capacity",
+    "normalized": "1kg"
+  },
+  "250g": {
+    "canonical": "250g",
+    "type": "capacity",
+    "normalized": "250g"
+  },
+  "250ml": {
+    "canonical": "250ml",
+    "type": "capacity",
+    "normalized": "250ml"
+  },
+  "300g": {
+    "canonical": "300g",
+    "type": "capacity",
+    "normalized": "300g"
+  },
+  "400g": {
+    "canonical": "400g",
+    "type": "capacity",
+    "normalized": "400g"
+  },
+  "400ml": {
+    "canonical": "400ml",
+    "type": "capacity",
+    "normalized": "400ml"
+  },
+  "500g": {
+    "canonical": "500g",
+    "type": "capacity",
+    "normalized": "500g"
+  },
+  "50g": {
+    "canonical": "50g",
+    "type": "capacity",
+    "normalized": "50g"
+  },
+  "50ml": {
+    "canonical": "50ml",
+    "type": "capacity",
+    "normalized": "50ml"
+  },
+  "65g": {
+    "canonical": "65g",
+    "type": "capacity",
+    "normalized": "65g"
+  },
+  "65ml": {
+    "canonical": "65ml",
+    "type": "capacity",
+    "normalized": "65ml"
+  },
+  "85g": {
+    "canonical": "85g",
+    "type": "capacity",
+    "normalized": "85g"
+  },
+  "85ml": {
+    "canonical": "85ml",
+    "type": "capacity",
+    "normalized": "85ml"
+  }
+}

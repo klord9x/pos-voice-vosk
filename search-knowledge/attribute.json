@@ -1,0 +1,157 @@
+{
+  "2 lớp": {
+    "canonical": "2 lớp",
+    "type": "attribute",
+    "normalized": "2 lớp"
+  },
+  "3 lớp": {
+    "canonical": "3 lớp",
+    "type": "attribute",
+    "normalized": "3 lớp"
+  },
+  "Bò hầm": {
+    "canonical": "Bò hầm",
+    "type": "attribute",
+    "normalized": "bò hầm"
+  },
+  "Bơ": {
+    "canonical": "Bơ",
+    "type": "attribute",
+    "normalized": "bơ"
+  },
+  "Bạc hà": {
+    "canonical": "Bạc hà",
+    "type": "attribute",
+    "normalized": "bạc hà"
+  },
+  "Bột ngọt": {
+    "canonical": "Bột ngọt",
+    "type": "attribute",
+    "normalized": "bột ngọt"
+  },
+  "Chanh": {
+    "canonical": "Chanh",
+    "type": "attribute",
+    "normalized": "chanh"
+  },
+  "Có đường": {
+    "canonical": "Có đường",
+    "type": "attribute",
+    "normalized": "có đường"
+  },
+  "Dâu": {
+    "canonical": "Dâu",
+    "type": "attribute",
+    "normalized": "dâu"
+  },
+  "Hương cam": {
+    "canonical": "Hương cam",
+    "type": "attribute",
+    "normalized": "hương cam"
+  },
+  "Hương dâu": {
+    "canonical": "Hương dâu",
+    "type": "attribute",
+    "normalized": "hương dâu"
+  },
+  "Hương lô hội": {
+    "canonical": "Hương lô hội",
+    "type": "attribute",
+    "normalized": "hương lô hội"
+  },
+  "Hương xá xị": {
+    "canonical": "Hương xá xị",
+    "type": "attribute",
+    "normalized": "hương xá xị"
+  },
+  "Hạt nêm": {
+    "canonical": "Hạt nêm",
+    "type": "attribute",
+    "normalized": "hạt nêm"
+  },
+  "Không mùi": {
+    "canonical": "Không mùi",
+    "type": "attribute",
+    "normalized": "không mùi"
+  },
+  "Không đường": {
+    "canonical": "Không đường",
+    "type": "attribute",
+    "normalized": "không đường"
+  },
+  "Lẩu thái": {
+    "canonical": "Lẩu thái",
+    "type": "attribute",
+    "normalized": "lẩu thái"
+  },
+  "Nguyên bản": {
+    "canonical": "Nguyên bản",
+    "type": "attribute",
+    "normalized": "nguyên bản"
+  },
+  "Nước mắm": {
+    "canonical": "Nước mắm",
+    "type": "attribute",
+    "normalized": "nước mắm"
+  },
+  "Nước tương": {
+    "canonical": "Nước tương",
+    "type": "attribute",
+    "normalized": "nước tương"
+  },
+  "Phô mai": {
+    "canonical": "Phô mai",
+    "type": "attribute",
+    "normalized": "phô mai"
+  },
+  "Socola": {
+    "canonical": "Socola",
+    "type": "attribute",
+    "normalized": "socola"
+  },
+  "Suôn mượt": {
+    "canonical": "Suôn mượt",
+    "type": "attribute",
+    "normalized": "suôn mượt"
+  },
+  "Sườn heo": {
+    "canonical": "Sườn heo",
+    "type": "attribute",
+    "normalized": "sườn heo"
+  },
+  "Sạch sâu": {
+    "canonical": "Sạch sâu",
+    "type": "attribute",
+    "normalized": "sạch sâu"
+  },
+  "Trị gàu": {
+    "canonical": "Trị gàu",
+    "type": "attribute",
+    "normalized": "trị gàu"
+  },
+  "Tôm chua cay": {
+    "canonical": "Tôm chua cay",
+    "type": "attribute",
+    "normalized": "tôm chua cay"
+  },
+  "Tương ớt": {
+    "canonical": "Tương ớt",
+    "type": "attribute",
+    "normalized": "tương ớt"
+  },
+  "Vanila": {
+    "canonical": "Vanila",
+    "type": "attribute",
+    "normalized": "vanila"
+  },
+  "Xốt spaghetti": {
+    "canonical": "Xốt spaghetti",
+    "type": "attribute",
+    "normalized": "xốt spaghetti"
+  },
+  "Ít đường": {
+    "canonical": "Ít đường",
+    "type": "attribute",
+    "normalized": "ít đường"
+  }
+}

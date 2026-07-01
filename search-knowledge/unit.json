@@ -1,0 +1,37 @@
+{
+  "Chục": {
+    "canonical": "Chục",
+    "type": "unit",
+    "normalized": "chục"
+  },
+  "Con": {
+    "canonical": "Con",
+    "type": "unit",
+    "normalized": "con"
+  },
+  "Hũ": {
+    "canonical": "Hũ",
+    "type": "unit",
+    "normalized": "hũ"
+  },
+  "Kg": {
+    "canonical": "Kg",
+    "type": "unit",
+    "normalized": "kg"
+  },
+  "Phần": {
+    "canonical": "Phần",
+    "type": "unit",
+    "normalized": "phần"
+  },
+  "Trái": {
+    "canonical": "Trái",
+    "type": "unit",
+    "normalized": "trái"
+  },
+  "Vỉ": {
+    "canonical": "Vỉ",
+    "type": "unit",
+    "normalized": "vỉ"
+  }
+}

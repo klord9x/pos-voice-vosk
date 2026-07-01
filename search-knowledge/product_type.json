@@ -1,0 +1,272 @@
+{
+  "Bánh quy": {
+    "canonical": "Bánh quy",
+    "type": "product_type",
+    "normalized": "bánh quy"
+  },
+  "Bánh đa": {
+    "canonical": "Bánh đa",
+    "type": "product_type",
+    "normalized": "bánh đa"
+  },
+  "Bí đỏ": {
+    "canonical": "Bí đỏ",
+    "type": "product_type",
+    "normalized": "bí đỏ"
+  },
+  "Bún tươi": {
+    "canonical": "Bún tươi",
+    "type": "product_type",
+    "normalized": "bún tươi"
+  },
+  "Bưởi": {
+    "canonical": "Bưởi",
+    "type": "product_type",
+    "normalized": "bưởi"
+  },
+  "Bầu": {
+    "canonical": "Bầu",
+    "type": "product_type",
+    "normalized": "bầu"
+  },
+  "Bắp cải": {
+    "canonical": "Bắp cải",
+    "type": "product_type",
+    "normalized": "bắp cải"
+  },
+  "Cam": {
+    "canonical": "Cam",
+    "type": "product_type",
+    "normalized": "cam"
+  },
+  "Chuối": {
+    "canonical": "Chuối",
+    "type": "product_type",
+    "normalized": "chuối"
+  },
+  "Chân giò": {
+    "canonical": "Chân giò",
+    "type": "product_type",
+    "normalized": "chân giò"
+  },
+  "Chôm chôm": {
+    "canonical": "Chôm chôm",
+    "type": "product_type",
+    "normalized": "chôm chôm"
+  },
+  "Cà chua": {
+    "canonical": "Cà chua",
+    "type": "product_type",
+    "normalized": "cà chua"
+  },
+  "Cà rốt": {
+    "canonical": "Cà rốt",
+    "type": "product_type",
+    "normalized": "cà rốt"
+  },
+  "Cá hú": {
+    "canonical": "Cá hú",
+    "type": "product_type",
+    "normalized": "cá hú"
+  },
+  "Cá lóc": {
+    "canonical": "Cá lóc",
+    "type": "product_type",
+    "normalized": "cá lóc"
+  },
+  "Cá nục": {
+    "canonical": "Cá nục",
+    "type": "product_type",
+    "normalized": "cá nục"
+  },
+  "Cá thu": {
+    "canonical": "Cá thu",
+    "type": "product_type",
+    "normalized": "cá thu"
+  },
+  "Cá điêu hồng": {
+    "canonical": "Cá điêu hồng",
+    "type": "product_type",
+    "normalized": "cá điêu hồng"
+  },
+  "Cánh gà": {
+    "canonical": "Cánh gà",
+    "type": "product_type",
+    "normalized": "cánh gà"
+  },
+  "Cải ngọt": {
+    "canonical": "Cải ngọt",
+    "type": "product_type",
+    "normalized": "cải ngọt"
+  },
+  "Dưa leo": {
+    "canonical": "Dưa leo",
+    "type": "product_type",
+    "normalized": "dưa leo"
+  },
+  "Dầu gội": {
+    "canonical": "Dầu gội",
+    "type": "product_type",
+    "normalized": "dầu gội"
+  },
+  "Gia vị": {
+    "canonical": "Gia vị",
+    "type": "product_type",
+    "normalized": "gia vị"
+  },
+  "Hành tây": {
+    "canonical": "Hành tây",
+    "type": "product_type",
+    "normalized": "hành tây"
+  },
+  "Khoai tây": {
+    "canonical": "Khoai tây",
+    "type": "product_type",
+    "normalized": "khoai tây"
+  },
+  "Khăn giấy": {
+    "canonical": "Khăn giấy",
+    "type": "product_type",
+    "normalized": "khăn giấy"
+  },
+  "Khổ qua": {
+    "canonical": "Khổ qua",
+    "type": "product_type",
+    "normalized": "khổ qua"
+  },
+  "Mì": {
+    "canonical": "Mì",
+    "type": "product_type",
+    "normalized": "mì"
+  },
+  "Mồng tơi": {
+    "canonical": "Mồng tơi",
+    "type": "product_type",
+    "normalized": "mồng tơi"
+  },
+  "Mực ống": {
+    "canonical": "Mực ống",
+    "type": "product_type",
+    "normalized": "mực ống"
+  },
+  "Nghêu": {
+    "canonical": "Nghêu",
+    "type": "product_type",
+    "normalized": "nghêu"
+  },
+  "Nước ngọt": {
+    "canonical": "Nước ngọt",
+    "type": "product_type",
+    "normalized": "nước ngọt"
+  },
+  "Nạc dăm": {
+    "canonical": "Nạc dăm",
+    "type": "product_type",
+    "normalized": "nạc dăm"
+  },
+  "Nấm kim châm": {
+    "canonical": "Nấm kim châm",
+    "type": "product_type",
+    "normalized": "nấm kim châm"
+  },
+  "Nấm đùi gà": {
+    "canonical": "Nấm đùi gà",
+    "type": "product_type",
+    "normalized": "nấm đùi gà"
+  },
+  "Quýt": {
+    "canonical": "Quýt",
+    "type": "product_type",
+    "normalized": "quýt"
+  },
+  "Rau muống": {
+    "canonical": "Rau muống",
+    "type": "product_type",
+    "normalized": "rau muống"
+  },
+  "Rau ngót": {
+    "canonical": "Rau ngót",
+    "type": "product_type",
+    "normalized": "rau ngót"
+  },
+  "Sườn non": {
+    "canonical": "Sườn non",
+    "type": "product_type",
+    "normalized": "sườn non"
+  },
+  "Sữa tươi": {
+    "canonical": "Sữa tươi",
+    "type": "product_type",
+    "normalized": "sữa tươi"
+  },
+  "Thanh long": {
+    "canonical": "Thanh long",
+    "type": "product_type",
+    "normalized": "thanh long"
+  },
+  "Thịt ba rọi": {
+    "canonical": "Thịt ba rọi",
+    "type": "product_type",
+    "normalized": "thịt ba rọi"
+  },
+  "Thịt bò": {
+    "canonical": "Thịt bò",
+    "type": "product_type",
+    "normalized": "thịt bò"
+  },
+  "Thịt heo xay": {
+    "canonical": "Thịt heo xay",
+    "type": "product_type",
+    "normalized": "thịt heo xay"
+  },
+  "Trứng cút": {
+    "canonical": "Trứng cút",
+    "type": "product_type",
+    "normalized": "trứng cút"
+  },
+  "Trứng gà": {
+    "canonical": "Trứng gà",
+    "type": "product_type",
+    "normalized": "trứng gà"
+  },
+  "Trứng vịt": {
+    "canonical": "Trứng vịt",
+    "type": "product_type",
+    "normalized": "trứng vịt"
+  },
+  "Táo": {
+    "canonical": "Táo",
+    "type": "product_type",
+    "normalized": "táo"
+  },
+  "Tôm thẻ": {
+    "canonical": "Tôm thẻ",
+    "type": "product_type",
+    "normalized": "tôm thẻ"
+  },
+  "Xoài": {
+    "canonical": "Xoài",
+    "type": "product_type",
+    "normalized": "xoài"
+  },
+  "Xà lách": {
+    "canonical": "Xà lách",
+    "type": "product_type",
+    "normalized": "xà lách"
+  },
+  "Đùi gà": {
+    "canonical": "Đùi gà",
+    "type": "product_type",
+    "normalized": "đùi gà"
+  },
+  "Đậu hũ": {
+    "canonical": "Đậu hũ",
+    "type": "product_type",
+    "normalized": "đậu hũ"
+  },
+  "Ổi": {
+    "canonical": "Ổi",
+    "type": "product_type",
+    "normalized": "ổi"
+  }
+}

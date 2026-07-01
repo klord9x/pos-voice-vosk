@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "schema": 3,
+  "generator": "AI Search Knowledge Compiler",
+  "generator_version": "1.0",
+  "generated_at": "2026-07-01T09:22:24.518Z",
+  "catalog_rows": 991,
+  "catalog_hash": "6beb9c1d9725f399128811834f3b6278896e229db3af8decb06bae72943378d1",
+  "counts": {
+    "brand": 32,
+    "product_type": 54,
+    "attribute": 31,
+    "descriptor": 29,
+    "processing": 15,
+    "origin": 7,
+    "variety": 27,
+    "grade": 6,
+    "package": 9,
+    "unit": 7,
+    "capacity": 16,
+    "quantity": 6,
+    "speech": 18,
+    "normalization": 8
+  }
+}

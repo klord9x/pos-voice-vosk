@@ -1,0 +1,12 @@
+{
+  "warnings": [
+    "0 ambiguous entities detected.",
+    "9 discarded descriptors due to stopword filters."
+  ],
+  "stats": {
+    "discarded_descriptors": 9,
+    "ambiguous_entities": 0,
+    "speech_aliases_skipped": 3,
+    "duplicated_normalizations": 1
+  }
+}

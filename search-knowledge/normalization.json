@@ -1,0 +1,61 @@
+{
+  "Coca Cola": {
+    "canonical": "Coca Cola",
+    "aliases": [
+      "Coca-Cola",
+      "Coca   Cola",
+      "COCA COLA"
+    ],
+    "type": "normalization"
+  },
+  "Không đường": {
+    "canonical": "Không đường",
+    "aliases": [
+      "Zero",
+      "Zero Sugar"
+    ],
+    "type": "normalization"
+  },
+  "L": {
+    "canonical": "L",
+    "aliases": [
+      "l"
+    ],
+    "type": "normalization"
+  },
+  "Lon": {
+    "canonical": "Lon",
+    "aliases": [
+      "Can"
+    ],
+    "type": "normalization"
+  },
+  "g": {
+    "canonical": "g",
+    "aliases": [
+      "gr"
+    ],
+    "type": "normalization"
+  },
+  "kg": {
+    "canonical": "kg",
+    "aliases": [
+      "kg"
+    ],
+    "type": "normalization"
+  },
+  "không": {
+    "canonical": "không",
+    "aliases": [
+      "khong"
+    ],
+    "type": "normalization"
+  },
+  "mL": {
+    "canonical": "mL",
+    "aliases": [
+      "ml"
+    ],
+    "type": "normalization"
+  }
+}

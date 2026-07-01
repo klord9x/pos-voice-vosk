@@ -1,0 +1,147 @@
+{
+  "Baby": {
+    "canonical": "Baby",
+    "type": "descriptor",
+    "normalized": "baby"
+  },
+  "Biển": {
+    "canonical": "Biển",
+    "type": "descriptor",
+    "normalized": "biển"
+  },
+  "Búp": {
+    "canonical": "Búp",
+    "type": "descriptor",
+    "normalized": "búp"
+  },
+  "Bắp hoa": {
+    "canonical": "Bắp hoa",
+    "type": "descriptor",
+    "normalized": "bắp hoa"
+  },
+  "Cau": {
+    "canonical": "Cau",
+    "type": "descriptor",
+    "normalized": "cau"
+  },
+  "Dài": {
+    "canonical": "Dài",
+    "type": "descriptor",
+    "normalized": "dài"
+  },
+  "Dưa hấu Không hạt": {
+    "canonical": "Dưa hấu Không hạt",
+    "type": "descriptor",
+    "normalized": "dưa hấu không hạt"
+  },
+  "Dưa hấu Long An": {
+    "canonical": "Dưa hấu Long An",
+    "type": "descriptor",
+    "normalized": "dưa hấu long an"
+  },
+  "Góc tư": {
+    "canonical": "Góc tư",
+    "type": "descriptor",
+    "normalized": "góc tư"
+  },
+  "Gầu": {
+    "canonical": "Gầu",
+    "type": "descriptor",
+    "normalized": "gầu"
+  },
+  "Heo": {
+    "canonical": "Heo",
+    "type": "descriptor",
+    "normalized": "heo"
+  },
+  "Heo sau": {
+    "canonical": "Heo sau",
+    "type": "descriptor",
+    "normalized": "heo sau"
+  },
+  "Heo trước": {
+    "canonical": "Heo trước",
+    "type": "descriptor",
+    "normalized": "heo trước"
+  },
+  "Mỡ": {
+    "canonical": "Mỡ",
+    "type": "descriptor",
+    "normalized": "mỡ"
+  },
+  "Nhập khẩu": {
+    "canonical": "Nhập khẩu",
+    "type": "descriptor",
+    "normalized": "nhập khẩu"
+  },
+  "Quả": {
+    "canonical": "Quả",
+    "type": "descriptor",
+    "normalized": "quả"
+  },
+  "Sao": {
+    "canonical": "Sao",
+    "type": "descriptor",
+    "normalized": "sao"
+  },
+  "Sợi quả": {
+    "canonical": "Sợi quả",
+    "type": "descriptor",
+    "normalized": "sợi quả"
+  },
+  "Sợi to": {
+    "canonical": "Sợi to",
+    "type": "descriptor",
+    "normalized": "sợi to"
+  },
+  "Sợi to quả": {
+    "canonical": "Sợi to quả",
+    "type": "descriptor",
+    "normalized": "sợi to quả"
+  },
+  "Sứ": {
+    "canonical": "Sứ",
+    "type": "descriptor",
+    "normalized": "sứ"
+  },
+  "Thăn nội": {
+    "canonical": "Thăn nội",
+    "type": "descriptor",
+    "normalized": "thăn nội"
+  },
+  "Thường": {
+    "canonical": "Thường",
+    "type": "descriptor",
+    "normalized": "thường"
+  },
+  "Tròn": {
+    "canonical": "Tròn",
+    "type": "descriptor",
+    "normalized": "tròn"
+  },
+  "Trắng": {
+    "canonical": "Trắng",
+    "type": "descriptor",
+    "normalized": "trắng"
+  },
+  "Trắng quả": {
+    "canonical": "Trắng quả",
+    "type": "descriptor",
+    "normalized": "trắng quả"
+  },
+  "Tím": {
+    "canonical": "Tím",
+    "type": "descriptor",
+    "normalized": "tím"
+  },
+  "Vườn nhà": {
+    "canonical": "Vườn nhà",
+    "type": "descriptor",
+    "normalized": "vườn nhà"
+  },
+  "Xoàn": {
+    "canonical": "Xoàn",
+    "type": "descriptor",
+    "normalized": "xoàn"
+  }
+}

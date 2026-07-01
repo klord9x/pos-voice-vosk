@@ -1,0 +1,475 @@
+{
+  "brand": {
+    "Pulppy": {
+      "product_types": [
+        "Khăn giấy"
+      ]
+    },
+    "Pepsi": {
+      "product_types": [
+        "Nước ngọt"
+      ]
+    },
+    "Oreo": {
+      "product_types": [
+        "Bánh quy"
+      ]
+    },
+    "Maggi": {
+      "product_types": [
+        "Gia vị"
+      ]
+    },
+    "Mirinda": {
+      "product_types": [
+        "Nước ngọt"
+      ]
+    },
+    "Pantene": {
+      "product_types": [
+        "Dầu gội"
+      ]
+    },
+    "7Up": {
+      "product_types": [
+        "Nước ngọt"
+      ]
+    },
+    "Nutifood": {
+      "product_types": [
+        "Sữa tươi"
+      ]
+    },
+    "Chinsu": {
+      "product_types": [
+        "Gia vị"
+      ]
+    },
+    "X-Men": {
+      "product_types": [
+        "Dầu gội"
+      ]
+    },
+    "3 Miền": {
+      "product_types": [
+        "Mì"
+      ]
+    },
+    "Clear": {
+      "product_types": [
+        "Dầu gội"
+      ]
+    },
+    "Sunsilk": {
+      "product_types": [
+        "Dầu gội"
+      ]
+    },
+    "An An": {
+      "product_types": [
+        "Khăn giấy"
+      ]
+    },
+    "Nam Ngư": {
+      "product_types": [
+        "Gia vị"
+      ]
+    },
+    "Bless You": {
+      "product_types": [
+        "Khăn giấy"
+      ]
+    },
+    "Knorr": {
+      "product_types": [
+        "Gia vị"
+      ]
+    },
+    "Tempo": {
+      "product_types": [
+        "Khăn giấy"
+      ]
+    },
+    "Hảo Hảo": {
+      "product_types": [
+        "Mì"
+      ]
+    },
+    "Sprite": {
+      "product_types": [
+        "Nước ngọt"
+      ]
+    },
+    "Coca Cola": {
+      "product_types": [
+        "Nước ngọt"
+      ]
+    },
+    "Cosy": {
+      "product_types": [
+        "Bánh quy"
+      ]
+    },
+    "Cung Đình": {
+      "product_types": [
+        "Mì"
+      ]
+    },
+    "TH True Milk": {
+      "product_types": [
+        "Sữa tươi"
+      ]
+    },
+    "Danisa": {
+      "product_types": [
+        "Bánh quy"
+      ]
+    },
+    "Kokomi": {
+      "product_types": [
+        "Mì"
+      ]
+    },
+    "Dutch Lady": {
+      "product_types": [
+        "Sữa tươi"
+      ]
+    },
+    "Vinamilk": {
+      "product_types": [
+        "Sữa tươi"
+      ]
+    },
+    "Gery": {
+      "product_types": [
+        "Bánh quy"
+      ]
+    },
+    "Ajinomoto": {
+      "product_types": [
+        "Gia vị"
+      ]
+    },
+    "Rejoice": {
+      "product_types": [
+        "Dầu gội"
+      ]
+    },
+    "Omachi": {
+      "product_types": [
+        "Mì"
+      ]
+    }
+  },
+  "product_type": {
+    "Khăn giấy": {
+      "attributes": [
+        "Không mùi",
+        "2 lớp",
+        "Hương lô hội",
+        "3 lớp"
+      ],
+      "varieties": []
+    },
+    "Nước ngọt": {
+      "attributes": [
+        "Nguyên bản",
+        "Chanh",
+        "Ít đường",
+        "Hương xá xị",
+        "Hương cam"
+      ],
+      "varieties": []
+    },
+    "Bánh quy": {
+      "attributes": [
+        "Vanila",
+        "Phô mai",
+        "Dâu",
+        "Socola",
+        "Bơ"
+      ],
+      "varieties": []
+    },
+    "Gia vị": {
+      "attributes": [
+        "Nước mắm",
+        "Bột ngọt",
+        "Tương ớt",
+        "Nước tương",
+        "Hạt nêm"
+      ],
+      "varieties": []
+    },
+    "Dầu gội": {
+      "attributes": [
+        "Sạch sâu",
+        "Suôn mượt",
+        "Trị gàu",
+        "Bạc hà"
+      ],
+      "varieties": []
+    },
+    "Sữa tươi": {
+      "attributes": [
+        "Socola",
+        "Không đường",
+        "Hương dâu",
+        "Có đường",
+        "Ít đường"
+      ],
+      "varieties": []
+    },
+    "Mì": {
+      "attributes": [
+        "Sườn heo",
+        "Bò hầm",
+        "Tôm chua cay",
+        "Xốt spaghetti",
+        "Lẩu thái"
+      ],
+      "varieties": []
+    },
+    "Tôm thẻ": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Trứng gà": {
+      "attributes": [],
+      "varieties": [
+        "Công nghiệp",
+        "Ta"
+      ]
+    },
+    "Xoài": {
+      "attributes": [],
+      "varieties": [
+        "Cát Hòa Lộc",
+        "Keo"
+      ]
+    },
+    "Trứng cút": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Cá hú": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Thịt ba rọi": {
+      "attributes": [],
+      "varieties": [
+        "Heo tộc",
+        "CP"
+      ]
+    },
+    "Cam": {
+      "attributes": [],
+      "varieties": [
+        "Sành miền Tây"
+      ]
+    },
+    "Nấm đùi gà": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Mực ống": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Bánh đa": {
+      "attributes": [],
+      "varieties": [
+        "Mè"
+      ]
+    },
+    "Thịt heo xay": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Khoai tây": {
+      "attributes": [],
+      "varieties": [
+        "Vàng"
+      ]
+    },
+    "Dưa leo": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Nghêu": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Rau ngót": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Ổi": {
+      "attributes": [],
+      "varieties": [
+        "Nữ hoàng"
+      ]
+    },
+    "Thanh long": {
+      "attributes": [],
+      "varieties": [
+        "Ruột đỏ",
+        "Ruột trắng"
+      ]
+    },
+    "Cá thu": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Thịt bò": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Đùi gà": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Cá nục": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Chuối": {
+      "attributes": [],
+      "varieties": [
+        "Già hương"
+      ]
+    },
+    "Bầu": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Chân giò": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Bắp cải": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Cánh gà": {
+      "attributes": [],
+      "varieties": [
+        "Công nghiệp"
+      ]
+    },
+    "Cà rốt": {
+      "attributes": [],
+      "varieties": [
+        "Hữu cơ"
+      ]
+    },
+    "Mồng tơi": {
+      "attributes": [],
+      "varieties": [
+        "Đồng"
+      ]
+    },
+    "Chôm chôm": {
+      "attributes": [],
+      "varieties": [
+        "Nhãn",
+        "Thái"
+      ]
+    },
+    "Đậu hũ": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Táo": {
+      "attributes": [],
+      "varieties": [
+        "Gala",
+        "Envy",
+        "Fuji"
+      ]
+    },
+    "Nạc dăm": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Xà lách": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Rau muống": {
+      "attributes": [],
+      "varieties": [
+        "Đồng quê"
+      ]
+    },
+    "Bún tươi": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Cá điêu hồng": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Khổ qua": {
+      "attributes": [],
+      "varieties": [
+        "Rừng"
+      ]
+    },
+    "Cà chua": {
+      "attributes": [],
+      "varieties": [
+        "Bi"
+      ]
+    },
+    "Cá lóc": {
+      "attributes": [],
+      "varieties": [
+        "Đồng",
+        "Nuôi"
+      ]
+    },
+    "Trứng vịt": {
+      "attributes": [],
+      "varieties": [
+        "Đồng"
+      ]
+    },
+    "Nấm kim châm": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Hành tây": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Cải ngọt": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Bưởi": {
+      "attributes": [],
+      "varieties": [
+        "Năm Roi",
+        "Da xanh"
+      ]
+    },
+    "Quýt": {
+      "attributes": [],
+      "varieties": []
+    },
+    "Sườn non": {
+      "attributes": [],
+      "varieties": [
+        "CP"
+      ]
+    },
+    "Bí đỏ": {
+      "attributes": [],
+      "varieties": [
+        "Hồ lô"
+      ]
+    }
+  }
+}

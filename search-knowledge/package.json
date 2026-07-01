@@ -1,0 +1,47 @@
+{
+  "Bó": {
+    "canonical": "Bó",
+    "type": "package",
+    "normalized": "bó"
+  },
+  "Chai": {
+    "canonical": "Chai",
+    "type": "package",
+    "normalized": "chai"
+  },
+  "Cuộn": {
+    "canonical": "Cuộn",
+    "type": "package",
+    "normalized": "cuộn"
+  },
+  "Gói": {
+    "canonical": "Gói",
+    "type": "package",
+    "normalized": "gói"
+  },
+  "Hộp": {
+    "canonical": "Hộp",
+    "type": "package",
+    "normalized": "hộp"
+  },
+  "Khay": {
+    "canonical": "Khay",
+    "type": "package",
+    "normalized": "khay"
+  },
+  "Lon": {
+    "canonical": "Lon",
+    "type": "package",
+    "normalized": "lon"
+  },
+  "Lốc": {
+    "canonical": "Lốc",
+    "type": "package",
+    "normalized": "lốc"
+  },
+  "Thùng": {
+    "canonical": "Thùng",
+    "type": "package",
+    "normalized": "thùng"
+  }
+}

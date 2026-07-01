@@ -1,0 +1,137 @@
+{
+  "Bi": {
+    "canonical": "Bi",
+    "type": "variety",
+    "normalized": "bi"
+  },
+  "CP": {
+    "canonical": "CP",
+    "type": "variety",
+    "normalized": "cp"
+  },
+  "Cát Hòa Lộc": {
+    "canonical": "Cát Hòa Lộc",
+    "type": "variety",
+    "normalized": "cát hòa lộc"
+  },
+  "Công nghiệp": {
+    "canonical": "Công nghiệp",
+    "type": "variety",
+    "normalized": "công nghiệp"
+  },
+  "Da xanh": {
+    "canonical": "Da xanh",
+    "type": "variety",
+    "normalized": "da xanh"
+  },
+  "Envy": {
+    "canonical": "Envy",
+    "type": "variety",
+    "normalized": "envy"
+  },
+  "Fuji": {
+    "canonical": "Fuji",
+    "type": "variety",
+    "normalized": "fuji"
+  },
+  "Gala": {
+    "canonical": "Gala",
+    "type": "variety",
+    "normalized": "gala"
+  },
+  "Già hương": {
+    "canonical": "Già hương",
+    "type": "variety",
+    "normalized": "già hương"
+  },
+  "Heo tộc": {
+    "canonical": "Heo tộc",
+    "type": "variety",
+    "normalized": "heo tộc"
+  },
+  "Hồ lô": {
+    "canonical": "Hồ lô",
+    "type": "variety",
+    "normalized": "hồ lô"
+  },
+  "Hữu cơ": {
+    "canonical": "Hữu cơ",
+    "type": "variety",
+    "normalized": "hữu cơ"
+  },
+  "Keo": {
+    "canonical": "Keo",
+    "type": "variety",
+    "normalized": "keo"
+  },
+  "Mè": {
+    "canonical": "Mè",
+    "type": "variety",
+    "normalized": "mè"
+  },
+  "Nhãn": {
+    "canonical": "Nhãn",
+    "type": "variety",
+    "normalized": "nhãn"
+  },
+  "Nuôi": {
+    "canonical": "Nuôi",
+    "type": "variety",
+    "normalized": "nuôi"
+  },
+  "Năm Roi": {
+    "canonical": "Năm Roi",
+    "type": "variety",
+    "normalized": "năm roi"
+  },
+  "Nữ hoàng": {
+    "canonical": "Nữ hoàng",
+    "type": "variety",
+    "normalized": "nữ hoàng"
+  },
+  "Ruột trắng": {
+    "canonical": "Ruột trắng",
+    "type": "variety",
+    "normalized": "ruột trắng"
+  },
+  "Ruột đỏ": {
+    "canonical": "Ruột đỏ",
+    "type": "variety",
+    "normalized": "ruột đỏ"
+  },
+  "Rừng": {
+    "canonical": "Rừng",
+    "type": "variety",
+    "normalized": "rừng"
+  },
+  "Sành miền Tây": {
+    "canonical": "Sành miền Tây",
+    "type": "variety",
+    "normalized": "sành miền tây"
+  },
+  "Ta": {
+    "canonical": "Ta",
+    "type": "variety",
+    "normalized": "ta"
+  },
+  "Thái": {
+    "canonical": "Thái",
+    "type": "variety",
+    "normalized": "thái"
+  },
+  "Vàng": {
+    "canonical": "Vàng",
+    "type": "variety",
+    "normalized": "vàng"
+  },
+  "Đồng": {
+    "canonical": "Đồng",
+    "type": "variety",
+    "normalized": "đồng"
+  },
+  "Đồng quê": {
+    "canonical": "Đồng quê",
+    "type": "variety",
+    "normalized": "đồng quê"
+  }
+}

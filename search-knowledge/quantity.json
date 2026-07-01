@@ -1,0 +1,32 @@
+{
+  "4": {
+    "canonical": "4",
+    "type": "quantity",
+    "normalized": "4"
+  },
+  "6": {
+    "canonical": "6",
+    "type": "quantity",
+    "normalized": "6"
+  },
+  "10": {
+    "canonical": "10",
+    "type": "quantity",
+    "normalized": "10"
+  },
+  "12": {
+    "canonical": "12",
+    "type": "quantity",
+    "normalized": "12"
+  },
+  "24": {
+    "canonical": "24",
+    "type": "quantity",
+    "normalized": "24"
+  },
+  "30": {
+    "canonical": "30",
+    "type": "quantity",
+    "normalized": "30"
+  }
+}
