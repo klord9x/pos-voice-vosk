@@ -173,10 +173,14 @@ function renderCart(){
     var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
-    var semantic = renderSemanticName(prod._display || computeProductDisplay(prod.name, prod.unit), 'cart');
+    var display = prod._display || computeProductDisplay(prod.name, prod.unit);
     html += '<span class="name'+(item._deleted?' strikethrough':'')+'">';
-    html += '<span class="name-line1">'+escapeHtml(semantic.line1)+'</span>';
-    if(semantic.line2) html += '<span class="name-line2">'+escapeHtml(semantic.line2)+'</span>';
+    html += '<span class="name-line1">'+escapeHtml(display.title)+'</span>';
+    if(display.variant || display.package) {
+      var line2 = display.variant;
+      if(display.package) line2 += (line2 ? ' · ' : '') + display.package;
+      html += '<span class="name-line2">'+escapeHtml(line2)+'</span>';
+    }
     html += '</span>';
     html += '<span class="qty">'+qtyStr+'</span>';
     html += '<span class="price">'+fmtCompact(item.total)+'</span>';
@@ -777,32 +781,30 @@ function renderSuggestions(results){
   if (!area) return;
 
   var html = '';
-  var itemData = [];
   for (var i = 0; i < SUGGESTIONS.length; i++) {
     var p = SUGGESTIONS[i].product;
     var display = p._display || computeProductDisplay(p.name, p.unit);
-    itemData.push({ display: display, chips: buildDisplayChips(display) });
-  }
-  var prevTitle = null;
-  var prevChips = null;
-  for (var i = 0; i < itemData.length; i++) {
-    var d = itemData[i];
-    var p = SUGGESTIONS[i].product;
-    var titleText = d.display.title.map(function(g) { return g.text; }).join(' ');
-    var sameCluster = prevTitle !== null && titleText === prevTitle;
-    var titleDimmed = sameCluster;
-    var diffMask = sameCluster && prevChips ? d.chips.map(function(c, idx) {
-      return idx >= prevChips.length || c.text !== prevChips[idx].text;
-    }) : null;
-    var semantic = renderSemanticName(d.display, 'suggest', { titleDimmed: titleDimmed, diffMask: diffMask });
+    
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
-    html += semantic.html;
+    html += '<div class="item-content">';
+    
+    // Line 1: Title + Price
+    html += '<div class="line1">';
+    html += '<span class="title">'+escapeHtml(display.title)+'</span>';
     html += '<span class="price">'+fmtShort(p.price)+'</span>';
     html += '</div>';
-    prevTitle = titleText;
-    prevChips = d.chips;
+    
+    // Line 2: Variant + Package (2 columns)
+    html += '<div class="line2">';
+    html += '<span class="variant">'+escapeHtml(display.variant)+'</span>';
+    html += '<span class="package">'+escapeHtml(display.package)+'</span>';
+    html += '</div>';
+    
+    html += '</div>';
+    html += '</div>';
   }
+  
   area.innerHTML = html;
   updateActiveSuggestion();
   area.scrollTop = 0;

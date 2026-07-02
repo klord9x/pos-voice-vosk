@@ -73,21 +73,42 @@ body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
 .suggest{flex:1;overflow-y:auto;}
 .suggest::-webkit-scrollbar{width:4px;}
 .suggest::-webkit-scrollbar-thumb{background:#444;}
-.suggest .item{min-height:40px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:4px 12px;border-bottom:1px solid var(--border);cursor:pointer;position:relative;}
+/* ===== Suggest List — Flat List with Display Model ===== */
+.suggest .item{min-height:48px;display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid var(--border);cursor:pointer;position:relative;}
 .suggest .item:last-child{border-bottom:none;}
 .suggest .item:active{background:rgba(255,255,255,.04);}
-.suggest .item .indicator{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:12px;display:none;}
+
+/* Indicator */
+.suggest .item .indicator{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:16px;font-weight:700;display:none;}
 .suggest .item.active .indicator{display:inline;}
-.suggest .item.active{background:rgba(10,132,255,.1);padding-left:28px;}
-.suggest .item .name{font-size:16px;overflow:hidden;}
-.suggest .item .price{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;}
-.suggest .item .name-line2{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.spec{background:var(--surface);padding:0 4px;border-radius:3px;font-size:10px;color:var(--muted);white-space:nowrap;display:inline-block;}
-.spec.prominent{background:rgba(10,132,255,.15);color:var(--primary);font-weight:700;padding:1px 8px;letter-spacing:.3px;}
-.suggest .item .name-line1.dim{opacity:.35;}
-.spec.dim{opacity:.35;}
-.spec.prominent.sale-package{background:rgba(10,132,255,.25);}
-.title-group{white-space:nowrap;}
+
+/* Active state */
+.suggest .item.active{background:rgba(10,132,255,.06);}
+
+/* Item content wrapper */
+.suggest .item .item-content{flex:1;display:flex;flex-direction:column;gap:2px;margin-left:20px;}
+
+/* Line 1: Title + Price */
+.suggest .item .line1{display:flex;justify-content:space-between;align-items:center;}
+.suggest .item .line1 .title{font-size:16px;font-weight:400;color:var(--text);}
+.suggest .item .line1 .price{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+/* Line 2: Variant + Package */
+.suggest .item .line2{display:flex;justify-content:space-between;align-items:center;}
+.suggest .item .line2 .variant{font-size:14px;font-weight:600;color:var(--text);}
+.suggest .item .line2 .package{font-size:14px;font-weight:400;color:var(--muted);}
+
+/* Active item typography */
+.suggest .item.active .line1 .title{font-weight:500;color:var(--text);}
+.suggest .item.active .line1 .price{font-weight:600;color:var(--text);}
+.suggest .item.active .line2 .variant{font-weight:600;color:var(--text);}
+.suggest .item.active .line2 .package{font-weight:500;color:var(--text);}
+
+/* Non-active dimming */
+.suggest .item:not(.active) .line1 .title{opacity:.65;}
+.suggest .item:not(.active) .line1 .price{opacity:.7;}
+.suggest .item:not(.active) .line2 .variant{opacity:1;}
+.suggest .item:not(.active) .line2 .package{opacity:.9;}
 
 .quick-qty{flex:1;padding:12px;background:var(--bg);overflow-y:auto;}
 .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}

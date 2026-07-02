@@ -1,102 +1,67 @@
 /* ===== Semantic Display Engine ===== */
-/* Renders product names using semantic groups, never breaking within a group */
-
-var CONTAINER_UNITS = new Set(['thùng','lốc','bịch','túi','bao','rổ','bó']);
-var PROMINENT_TYPES = new Set(['sale_package','package_spec','container_unit']);
+/* Returns a clean Display Model used by all UI screens */
 
 function computeProductDisplay(name, unit) {
-  if (!name) return { title: [], subtitle: [], saleUnit: '' };
+  if (!name) return { title: '', variant: '', package: '', chips: [] };
   var groups = parseProductSemantic(name);
-  if (!groups || groups.length === 0)
-    return { title: [], subtitle: [], saleUnit: unit || '' };
-  var title = [], subtitle = [];
+  if (!groups || groups.length === 0) {
+    return { title: name || '', variant: '', package: unit || '', chips: [] };
+  }
+
+  var title = [];
+  var variant = [];
+  var packageParts = [];
+  var chips = [];
   var i = 0;
+
   while (i < groups.length) {
     var g = groups[i];
     if (g.type === 'brand' || g.type === 'product_type') {
-      title.push({ type: g.type, text: g.text });
-      i++;
-    } else if (g.type === 'quantity' && i + 1 < groups.length &&
-               (groups[i + 1].type === 'package' || groups[i + 1].type === 'unit')) {
-      subtitle.push({ type: 'package_spec', text: g.text + ' ' + groups[i + 1].text });
-      i += 2;
+      title.push(g.text);
+    } else if (['quantity', 'package', 'unit'].indexOf(g.type) !== -1) {
+      // Package-related: group quantity + unit
+      if (g.type === 'quantity' && i + 1 < groups.length && 
+          (groups[i + 1].type === 'package' || groups[i + 1].type === 'unit')) {
+        packageParts.push(g.text + ' ' + groups[i + 1].text);
+        i++; // Skip next
+      } else if (g.type === 'quantity') {
+        packageParts.push(g.text);
+      } else {
+        packageParts.push(g.text);
+      }
     } else {
-      subtitle.push({ type: g.type, text: g.text });
-      i++;
+      // Identity types (attribute, descriptor, etc.)
+      variant.push(g.text);
     }
-  }
-  return { title: title, subtitle: subtitle, saleUnit: unit || '' };
-}
-
-function renderSemanticName(display, mode, options) {
-  if (!display) return { line1: '', line2: '', html: '' };
-  mode = mode || 'suggest';
-  if (mode === 'suggest') return renderSuggestDisplay(display, options);
-  if (mode === 'cart') return renderCartDisplay(display);
-  return renderCartDisplay(display);
-}
-
-function renderSuggestDisplay(display, options) {
-  var titleText = display.title.map(function(g) { return g.text; }).join(' ');
-  if (!titleText) {
-    var all = display.subtitle.map(function(g) { return g.text; }).join(' ');
-    return { line1: all, line2: '', html: '<span class="name"><span class="name-line1">' + esc(all) + '</span></span>' };
+    // Add to chips for backward compatibility
+    chips.push({ type: g.type, text: g.text });
+    i++;
   }
 
-  var chips = buildDisplayChips(display);
-  var titleCls = 'name-line1' + (options && options.titleDimmed ? ' dim' : '');
-  var titleHtml = display.title.map(function(g) {
-    return '<span class="title-group">' + esc(g.text) + '</span>';
-  }).join(' ');
-  var html = '<span class="name"><span class="' + titleCls + '">' + titleHtml + '</span>';
-  if (chips.length) {
-    html += '<span class="name-line2">';
-    for (var si = 0; si < chips.length; si++) {
-      var dimCls = options && options.diffMask && !options.diffMask[si] ? ' dim' : '';
-      var extraCls = chips[si].type === 'sale_package' ? ' sale-package' : '';
-      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + extraCls + dimCls + '">' + esc(chips[si].text) + '</span>';
+  // Build package string with saleUnit prepended
+  var packageStr = '';
+  if (unit) {
+    if (packageParts.length > 0) {
+      var firstPart = packageParts[0];
+      if (!firstPart.toLowerCase().startsWith(unit.toLowerCase())) {
+        packageStr = unit + ' ' + firstPart;
+        for (var k = 1; k < packageParts.length; k++) {
+          packageStr += ' ' + packageParts[k];
+        }
+      } else {
+        packageStr = packageParts.join(' ');
+      }
+    } else {
+      packageStr = unit;
     }
-    html += '</span>';
+  } else {
+    packageStr = packageParts.join(' ');
   }
-  html += '</span>';
+
   return {
-    line1: titleText,
-    line2: chips.map(function(g) { return g.text; }).join(' '),
-    html: html
+    title: title.join(' '),
+    variant: variant.join(' '),
+    package: packageStr,
+    chips: chips
   };
-}
-
-function renderCartDisplay(display) {
-  var titleText = display.title.map(function(g) { return g.text; }).join(' ');
-  var chips = buildDisplayChips(display);
-  var subText = chips.map(function(g) { return g.text; }).join(' ');
-  if (!titleText) {
-    return { line1: subText || '', line2: '', html: '' };
-  }
-  return { line1: titleText, line2: subText, html: '' };
-}
-
-function buildDisplayChips(display) {
-  var chips = [];
-  var merged = false;
-  display.subtitle.forEach(function(g) {
-    if (!merged && g.type === 'package_spec' && display.saleUnit &&
-        CONTAINER_UNITS.has(display.saleUnit)) {
-      chips.push({ type: 'sale_package', text: display.saleUnit + ' ' + g.text });
-      merged = true;
-    } else {
-      chips.push(g);
-    }
-  });
-  if (!merged && display.saleUnit && CONTAINER_UNITS.has(display.saleUnit)) {
-    chips.push({ type: 'container_unit', text: display.saleUnit });
-  }
-
-  var variant = chips.filter(function(c) { return !PROMINENT_TYPES.has(c.type); });
-  var prominent = chips.filter(function(c) { return PROMINENT_TYPES.has(c.type); });
-  return variant.concat(prominent);
-}
-
-function esc(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
