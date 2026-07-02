@@ -84,6 +84,8 @@ body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
 .suggest .item .name-line2{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
 .spec{background:var(--surface);padding:0 4px;border-radius:3px;font-size:10px;color:var(--muted);white-space:nowrap;display:inline-block;}
 .spec.prominent{background:rgba(10,132,255,.15);color:var(--primary);font-weight:700;padding:1px 8px;letter-spacing:.3px;}
+.suggest .item .name-line1.dim{opacity:.35;}
+.spec.dim{opacity:.35;}
 
 .quick-qty{flex:1;padding:12px;background:var(--bg);overflow-y:auto;}
 .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}

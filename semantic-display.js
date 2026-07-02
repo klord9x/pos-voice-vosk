@@ -28,28 +28,29 @@ function computeProductDisplay(name, unit) {
   return { title: title, subtitle: subtitle, saleUnit: unit || '' };
 }
 
-function renderSemanticName(display, mode) {
+function renderSemanticName(display, mode, options) {
   if (!display) return { line1: '', line2: '', html: '' };
   mode = mode || 'suggest';
-  if (mode === 'suggest') return renderSuggestDisplay(display);
+  if (mode === 'suggest') return renderSuggestDisplay(display, options);
   if (mode === 'cart') return renderCartDisplay(display);
   return renderCartDisplay(display);
 }
 
-function renderSuggestDisplay(display) {
+function renderSuggestDisplay(display, options) {
   var titleText = display.title.map(function(g) { return g.text; }).join(' ');
   if (!titleText) {
     var all = display.subtitle.map(function(g) { return g.text; }).join(' ');
     return { line1: all, line2: '', html: '<span class="name"><span class="name-line1">' + esc(all) + '</span></span>' };
   }
 
-  var chips = _buildDisplayChips(display);
-
-  var html = '<span class="name"><span class="name-line1">' + esc(titleText) + '</span>';
+  var chips = buildDisplayChips(display);
+  var titleCls = 'name-line1' + (options && options.titleDimmed ? ' dim' : '');
+  var html = '<span class="name"><span class="' + titleCls + '">' + esc(titleText) + '</span>';
   if (chips.length) {
     html += '<span class="name-line2">';
     for (var si = 0; si < chips.length; si++) {
-      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + '">' + esc(chips[si].text) + '</span>';
+      var dimCls = options && options.diffMask && !options.diffMask[si] ? ' dim' : '';
+      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + dimCls + '">' + esc(chips[si].text) + '</span>';
     }
     html += '</span>';
   }
@@ -63,7 +64,7 @@ function renderSuggestDisplay(display) {
 
 function renderCartDisplay(display) {
   var titleText = display.title.map(function(g) { return g.text; }).join(' ');
-  var chips = _buildDisplayChips(display);
+  var chips = buildDisplayChips(display);
   var subText = chips.map(function(g) { return g.text; }).join(' ');
   if (!titleText) {
     return { line1: subText || '', line2: '', html: '' };
@@ -71,7 +72,7 @@ function renderCartDisplay(display) {
   return { line1: titleText, line2: subText, html: '' };
 }
 
-function _buildDisplayChips(display) {
+function buildDisplayChips(display) {
   var chips = [];
   var merged = false;
   display.subtitle.forEach(function(g) {

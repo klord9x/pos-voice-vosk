@@ -777,14 +777,31 @@ function renderSuggestions(results){
   if (!area) return;
 
   var html = '';
+  var itemData = [];
   for (var i = 0; i < SUGGESTIONS.length; i++) {
     var p = SUGGESTIONS[i].product;
-    var semantic = renderSemanticName(p._display || computeProductDisplay(p.name, p.unit), 'suggest');
+    var display = p._display || computeProductDisplay(p.name, p.unit);
+    itemData.push({ display: display, chips: buildDisplayChips(display) });
+  }
+  var prevTitle = null;
+  var prevChips = null;
+  for (var i = 0; i < itemData.length; i++) {
+    var d = itemData[i];
+    var p = SUGGESTIONS[i].product;
+    var titleText = d.display.title.map(function(g) { return g.text; }).join(' ');
+    var sameCluster = prevTitle !== null && titleText === prevTitle;
+    var titleDimmed = sameCluster;
+    var diffMask = sameCluster && prevChips ? d.chips.map(function(c, idx) {
+      return idx >= prevChips.length || c.text !== prevChips[idx].text;
+    }) : null;
+    var semantic = renderSemanticName(d.display, 'suggest', { titleDimmed: titleDimmed, diffMask: diffMask });
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
     html += semantic.html;
     html += '<span class="price">'+fmtShort(p.price)+'</span>';
     html += '</div>';
+    prevTitle = titleText;
+    prevChips = d.chips;
   }
   area.innerHTML = html;
   updateActiveSuggestion();
