@@ -102,10 +102,6 @@ body[data-parser="pay"] .keyboard > #kbPay .row{flex:1;min-height:0;}
 .suggest .item.active .line1 .price{font-weight:600;color:var(--text);}
 .suggest .item.active .line2 .subtitle{font-weight:500;color:var(--text);}
 
-/* Non-active dimming */
-.suggest .item:not(.active) .line1 .title{opacity:.65;}
-.suggest .item:not(.active) .line1 .price{opacity:.7;}
-.suggest .item:not(.active) .line2 .subtitle{opacity:1;}
 
 .quick-qty{flex:1;padding:12px;background:var(--bg);overflow-y:auto;}
 .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
