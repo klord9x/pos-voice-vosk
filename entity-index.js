@@ -63,7 +63,7 @@ function buildEntityIndex() {
   }
 
   PRODUCTS.forEach(function(product, idx) {
-    var display = product._display || computeProductDisplay(product.name);
+    var display = product._display || computeProductDisplay(product.name, product.unit);
     var seen = {};
     var allGroups = (display.title || []).concat(display.subtitle || []);
     allGroups.forEach(function(g) {
