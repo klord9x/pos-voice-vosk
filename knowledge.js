@@ -1,7 +1,9 @@
 /* ===== Knowledge API — load, normalize, lookup, expand ===== */
 var KNOWLEDGE = null;
 var ENTITY_LOOKUP = {};
+var DISPLAY_MAP = {};
 var _knowledgeReady = null;
+var _displayReady = null;
 var ENTITY_GROUPS = {
   spec: new Set(['package','capacity','quantity','unit'])
 };
@@ -20,6 +22,20 @@ function loadKnowledge() {
       return bundle;
     });
   return _knowledgeReady;
+}
+
+function loadDisplayKnowledge() {
+  if (_displayReady) return _displayReady;
+  _displayReady = fetch('/search-knowledge/display_knowledge.json')
+    .then(function(r) { return r.json(); })
+    .then(function(entries) {
+      DISPLAY_MAP = {};
+      entries.forEach(function(e) {
+        DISPLAY_MAP[e.sku] = { title: e.display_title, subtitle: e.display_subtitle };
+      });
+      return DISPLAY_MAP;
+    });
+  return _displayReady;
 }
 
 function _buildEntityLookup(knowledge) {

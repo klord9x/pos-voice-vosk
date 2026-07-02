@@ -6,162 +6,194 @@
       "3 Miền": {
         "canonical": "3 Miền",
         "type": "brand",
-        "normalized": "3 miền"
+        "normalized": "3 miền",
+        "category_defining": false
       },
       "7Up": {
         "canonical": "7Up",
         "type": "brand",
-        "normalized": "7up"
+        "normalized": "7up",
+        "category_defining": true
       },
       "Ajinomoto": {
         "canonical": "Ajinomoto",
         "type": "brand",
-        "normalized": "ajinomoto"
+        "normalized": "ajinomoto",
+        "category_defining": false
       },
       "An An": {
         "canonical": "An An",
         "type": "brand",
-        "normalized": "an an"
+        "normalized": "an an",
+        "category_defining": false
       },
       "Bless You": {
         "canonical": "Bless You",
         "type": "brand",
-        "normalized": "bless you"
+        "normalized": "bless you",
+        "category_defining": false
       },
       "Chinsu": {
         "canonical": "Chinsu",
         "type": "brand",
-        "normalized": "chinsu"
+        "normalized": "chinsu",
+        "category_defining": false
       },
       "Clear": {
         "canonical": "Clear",
         "type": "brand",
-        "normalized": "clear"
+        "normalized": "clear",
+        "category_defining": true
       },
       "Coca Cola": {
         "canonical": "Coca Cola",
         "type": "brand",
-        "normalized": "coca cola"
+        "normalized": "coca cola",
+        "category_defining": true
       },
       "Cosy": {
         "canonical": "Cosy",
         "type": "brand",
-        "normalized": "cosy"
+        "normalized": "cosy",
+        "category_defining": false
       },
       "Cung Đình": {
         "canonical": "Cung Đình",
         "type": "brand",
-        "normalized": "cung đình"
+        "normalized": "cung đình",
+        "category_defining": false
       },
       "Danisa": {
         "canonical": "Danisa",
         "type": "brand",
-        "normalized": "danisa"
+        "normalized": "danisa",
+        "category_defining": false
       },
       "Dutch Lady": {
         "canonical": "Dutch Lady",
         "type": "brand",
-        "normalized": "dutch lady"
+        "normalized": "dutch lady",
+        "category_defining": false
       },
       "Gery": {
         "canonical": "Gery",
         "type": "brand",
-        "normalized": "gery"
+        "normalized": "gery",
+        "category_defining": false
       },
       "Hảo Hảo": {
         "canonical": "Hảo Hảo",
         "type": "brand",
-        "normalized": "hảo hảo"
+        "normalized": "hảo hảo",
+        "category_defining": true
       },
       "Knorr": {
         "canonical": "Knorr",
         "type": "brand",
-        "normalized": "knorr"
+        "normalized": "knorr",
+        "category_defining": false
       },
       "Kokomi": {
         "canonical": "Kokomi",
         "type": "brand",
-        "normalized": "kokomi"
+        "normalized": "kokomi",
+        "category_defining": false
       },
       "Maggi": {
         "canonical": "Maggi",
         "type": "brand",
-        "normalized": "maggi"
+        "normalized": "maggi",
+        "category_defining": false
       },
       "Mirinda": {
         "canonical": "Mirinda",
         "type": "brand",
-        "normalized": "mirinda"
+        "normalized": "mirinda",
+        "category_defining": true
       },
       "Nam Ngư": {
         "canonical": "Nam Ngư",
         "type": "brand",
-        "normalized": "nam ngư"
+        "normalized": "nam ngư",
+        "category_defining": false
       },
       "Nutifood": {
         "canonical": "Nutifood",
         "type": "brand",
-        "normalized": "nutifood"
+        "normalized": "nutifood",
+        "category_defining": false
       },
       "Omachi": {
         "canonical": "Omachi",
         "type": "brand",
-        "normalized": "omachi"
+        "normalized": "omachi",
+        "category_defining": true
       },
       "Oreo": {
         "canonical": "Oreo",
         "type": "brand",
-        "normalized": "oreo"
+        "normalized": "oreo",
+        "category_defining": true
       },
       "Pantene": {
         "canonical": "Pantene",
         "type": "brand",
-        "normalized": "pantene"
+        "normalized": "pantene",
+        "category_defining": true
       },
       "Pepsi": {
         "canonical": "Pepsi",
         "type": "brand",
-        "normalized": "pepsi"
+        "normalized": "pepsi",
+        "category_defining": true
       },
       "Pulppy": {
         "canonical": "Pulppy",
         "type": "brand",
-        "normalized": "pulppy"
+        "normalized": "pulppy",
+        "category_defining": false
       },
       "Rejoice": {
         "canonical": "Rejoice",
         "type": "brand",
-        "normalized": "rejoice"
+        "normalized": "rejoice",
+        "category_defining": true
       },
       "Sprite": {
         "canonical": "Sprite",
         "type": "brand",
-        "normalized": "sprite"
+        "normalized": "sprite",
+        "category_defining": true
       },
       "Sunsilk": {
         "canonical": "Sunsilk",
         "type": "brand",
-        "normalized": "sunsilk"
+        "normalized": "sunsilk",
+        "category_defining": true
       },
       "TH True Milk": {
         "canonical": "TH True Milk",
         "type": "brand",
-        "normalized": "th true milk"
+        "normalized": "th true milk",
+        "category_defining": false
       },
       "Tempo": {
         "canonical": "Tempo",
         "type": "brand",
-        "normalized": "tempo"
+        "normalized": "tempo",
+        "category_defining": false
       },
       "Vinamilk": {
         "canonical": "Vinamilk",
         "type": "brand",
-        "normalized": "vinamilk"
+        "normalized": "vinamilk",
+        "category_defining": false
       },
       "X-Men": {
         "canonical": "X-Men",
         "type": "brand",
-        "normalized": "x-men"
+        "normalized": "x-men",
+        "category_defining": true
       }
     },
     "product_type": {

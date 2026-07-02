@@ -1184,8 +1184,8 @@ function saveInvoiceBtn(){
 
 apiCall('getProducts').then(function(products){
   PRODUCTS = products || [];
-  return loadKnowledge();
-}).then(function(bundle){
+  return Promise.all([loadKnowledge(), loadDisplayKnowledge()]);
+}).then(function(results){
   var kv = KNOWLEDGE && KNOWLEDGE.version || 1;
   return loadIndexFromCache().then(function(cached){
     var needsBuild = true;

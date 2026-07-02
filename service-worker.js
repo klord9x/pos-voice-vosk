@@ -8,6 +8,7 @@ const ASSETS = [
   '/search.js',
   '/index-builder.js',
   '/search-knowledge/knowledge.bundle.json',
+  '/search-knowledge/display_knowledge.json',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
