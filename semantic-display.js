@@ -2,6 +2,7 @@
 /* Renders product names using semantic groups, never breaking within a group */
 
 var CONTAINER_UNITS = new Set(['thùng','lốc','bịch','túi','bao','rổ','bó']);
+var PROMINENT_TYPES = new Set(['sale_package','package_spec','container_unit']);
 
 function computeProductDisplay(name, unit) {
   if (!name) return { title: [], subtitle: [], saleUnit: '' };
@@ -48,7 +49,7 @@ function renderSuggestDisplay(display) {
   if (chips.length) {
     html += '<span class="name-line2">';
     for (var si = 0; si < chips.length; si++) {
-      html += '<span class="spec' + (chips[si].type === 'sale_package' ? ' sale_package' : '') + '">' + esc(chips[si].text) + '</span>';
+      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + '">' + esc(chips[si].text) + '</span>';
     }
     html += '</span>';
   }
@@ -83,9 +84,12 @@ function _buildDisplayChips(display) {
     }
   });
   if (!merged && display.saleUnit && CONTAINER_UNITS.has(display.saleUnit)) {
-    chips.push({ type: 'unit', text: display.saleUnit });
+    chips.push({ type: 'container_unit', text: display.saleUnit });
   }
-  return chips;
+
+  var variant = chips.filter(function(c) { return !PROMINENT_TYPES.has(c.type); });
+  var prominent = chips.filter(function(c) { return PROMINENT_TYPES.has(c.type); });
+  return variant.concat(prominent);
 }
 
 function esc(s) {
