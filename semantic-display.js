@@ -62,6 +62,7 @@ function computeProductDisplay(name, unit) {
     title: title.join(' '),
     variant: variant.join(' '),
     package: packageStr,
-    chips: chips
+    chips: chips,
+    subtitle: chips  // backward-compat cho entity-index.js
   };
 }

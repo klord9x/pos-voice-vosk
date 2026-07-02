@@ -65,7 +65,11 @@ function buildEntityIndex() {
   PRODUCTS.forEach(function(product, idx) {
     var display = product._display || computeProductDisplay(product.name, product.unit);
     var seen = {};
-    var allGroups = (display.title || []).concat(display.subtitle || []);
+    // Display Model mới: title là string, subtitle/chips là array
+    var allGroups = (display.subtitle || display.chips || []);
+    if (display.title) {
+      allGroups = [{ type: null, text: display.title }].concat(allGroups);
+    }
     allGroups.forEach(function(g) {
       var text = norm(g.text);
       var entity = ENTITY_BY_TEXT[text];
