@@ -115,27 +115,43 @@ function lookupEntities(text) {
   return matches;
 }
 
-function splitProductName(name) {
-  if (!name) return { line1: '', line2: '' };
+
+function parseProductSemantic(name) {
+  if (!name) return [];
   var entities = lookupEntities(name);
-
-  var specWords = {};
-  entities.forEach(function(e) {
-    if (!isSpecEntity(e)) return;
-    for (var w = e.wordStart; w <= e.wordEnd; w++) specWords[w] = true;
-  });
-
   var words = name.split(/\s+/).filter(Boolean);
-  var suffixStart = words.length;
-  while (suffixStart > 0 && specWords[suffixStart - 1]) suffixStart--;
+  if (words.length === 0) return [];
 
-  if (suffixStart >= words.length || suffixStart === 0)
-    return { line1: name, line2: '' };
+  var used = {};
+  var deduped = [];
+  entities.slice().sort(function(a, b) {
+    var aLen = a.wordEnd - a.wordStart;
+    var bLen = b.wordEnd - b.wordStart;
+    return bLen !== aLen ? bLen - aLen : a.wordStart - b.wordStart;
+  }).forEach(function(e) {
+    for (var w = e.wordStart; w <= e.wordEnd; w++) {
+      if (used[w]) return;
+    }
+    for (var w = e.wordStart; w <= e.wordEnd; w++) used[w] = true;
+    deduped.push(e);
+  });
+  deduped.sort(function(a, b) { return a.wordStart - b.wordStart; });
 
-  return {
-    line1: words.slice(0, suffixStart).join(' '),
-    line2: words.slice(suffixStart).join(' ')
-  };
+  var groups = [];
+  var ptr = 0;
+  deduped.forEach(function(e) {
+    if (e.wordStart > ptr) {
+      var gap = words.slice(ptr, e.wordStart).join(' ');
+      if (gap) groups.push({ type: null, text: gap });
+    }
+    groups.push({ type: e.type, text: e.text });
+    ptr = e.wordEnd + 1;
+  });
+  if (ptr < words.length) {
+    var gap = words.slice(ptr).join(' ');
+    if (gap) groups.push({ type: null, text: gap });
+  }
+  return groups;
 }
 
 function expandEntities(entities) {
