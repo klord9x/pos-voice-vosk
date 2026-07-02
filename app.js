@@ -173,7 +173,7 @@ function renderCart(){
     var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
-    var semantic = renderSemanticName(prod.name, 'cart');
+    var semantic = renderSemanticName(prod._display || computeProductDisplay(prod.name), 'cart');
     html += '<span class="name'+(item._deleted?' strikethrough':'')+'">';
     html += '<span class="name-line1">'+escapeHtml(semantic.line1)+'</span>';
     if(semantic.line2) html += '<span class="name-line2">'+escapeHtml(semantic.line2)+'</span>';
@@ -779,7 +779,7 @@ function renderSuggestions(results){
   var html = '';
   for (var i = 0; i < SUGGESTIONS.length; i++) {
     var p = SUGGESTIONS[i].product;
-    var semantic = renderSemanticName(p.name, 'suggest');
+    var semantic = renderSemanticName(p._display || computeProductDisplay(p.name), 'suggest');
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
     html += semantic.html;
@@ -1188,6 +1188,7 @@ apiCall('getProducts').then(function(products){
       needsBuild = PRODUCTS.some(function(p) { return !p._idx; });
     }
     if (needsBuild) buildAllIndexes();
+    PRODUCTS.forEach(function(p) { p._display = computeProductDisplay(p.name); });
     SEARCH_CACHE = {};
     var cachePayload = PRODUCTS.map(function(p) {
       return { code: p.code, name: p.name, price: p.price, unit: p.unit, _idx: p._idx };

@@ -1,53 +1,67 @@
 /* ===== Semantic Display Engine ===== */
 /* Renders product names using semantic groups, never breaking within a group */
 
-function renderSemanticName(name, mode) {
-  if (!name) return { line1: '', line2: '', html: '' };
-  mode = mode || 'suggest';
-
+function computeProductDisplay(name) {
+  if (!name) return { title: [], subtitle: [] };
   var groups = parseProductSemantic(name);
   if (!groups || groups.length === 0)
-    return { line1: name, line2: '', html: '<span class="name"><span class="name-line1">' + esc(name) + '</span></span>' };
-
-  if (mode === 'suggest') {
-    return renderSuggest(groups);
+    return { title: [], subtitle: [] };
+  var title = [], subtitle = [];
+  var i = 0;
+  while (i < groups.length) {
+    var g = groups[i];
+    if (g.type === 'brand' || g.type === 'product_type') {
+      title.push({ type: g.type, text: g.text });
+      i++;
+    } else if (g.type === 'quantity' && i + 1 < groups.length &&
+               (groups[i + 1].type === 'package' || groups[i + 1].type === 'unit')) {
+      subtitle.push({ type: 'package_spec', text: g.text + ' ' + groups[i + 1].text });
+      i += 2;
+    } else {
+      subtitle.push({ type: g.type, text: g.text });
+      i++;
+    }
   }
-
-  var all = groups.map(function(g) { return g.text; }).join(' ');
-  return { line1: all, line2: '', html: '<span class="name"><span class="name-line1">' + esc(all) + '</span></span>' };
+  return { title: title, subtitle: subtitle };
 }
 
-function renderSuggest(groups) {
-  var line1 = [], line2 = [];
-  var crossed = false;
+function renderSemanticName(display, mode) {
+  if (!display) return { line1: '', line2: '', html: '' };
+  mode = mode || 'suggest';
+  if (mode === 'suggest') return renderSuggestDisplay(display);
+  if (mode === 'cart') return renderCartDisplay(display);
+  return renderCartDisplay(display);
+}
 
-  groups.forEach(function(g) {
-    if (!crossed && (g.type === 'brand' || g.type === 'product_type')) {
-      line1.push(g.text);
-    } else {
-      crossed = true;
-      line2.push(g.text);
-    }
-  });
-
-  var line1Text = line1.join(' ');
-  if (!line1Text) {
-    var all = groups.map(function(g) { return g.text; }).join(' ');
+function renderSuggestDisplay(display) {
+  var titleText = display.title.map(function(g) { return g.text; }).join(' ');
+  if (!titleText) {
+    var all = display.subtitle.map(function(g) { return g.text; }).join(' ');
     return { line1: all, line2: '', html: '<span class="name"><span class="name-line1">' + esc(all) + '</span></span>' };
   }
-
-  var line2Text = line2.join(' ');
-  var html = '<span class="name"><span class="name-line1">' + esc(line1Text) + '</span>';
-  if (line2.length) {
+  var html = '<span class="name"><span class="name-line1">' + esc(titleText) + '</span>';
+  if (display.subtitle.length) {
     html += '<span class="name-line2">';
-    for (var si = 0; si < line2.length; si++) {
-      html += '<span class="spec">' + esc(line2[si]) + '</span>';
+    for (var si = 0; si < display.subtitle.length; si++) {
+      html += '<span class="spec">' + esc(display.subtitle[si].text) + '</span>';
     }
     html += '</span>';
   }
   html += '</span>';
+  return {
+    line1: titleText,
+    line2: display.subtitle.map(function(g) { return g.text; }).join(' '),
+    html: html
+  };
+}
 
-  return { line1: line1Text, line2: line2Text, html: html };
+function renderCartDisplay(display) {
+  var titleText = display.title.map(function(g) { return g.text; }).join(' ');
+  var subText = display.subtitle.map(function(g) { return g.text; }).join(' ');
+  if (!titleText) {
+    return { line1: subText || '', line2: '', html: '' };
+  }
+  return { line1: titleText, line2: subText, html: '' };
 }
 
 function esc(s) {
