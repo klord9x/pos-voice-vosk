@@ -173,14 +173,10 @@ function renderCart(){
     var qtyStr = item.unit === 'kg' || item.unit === 'ký' ? fmtCompact(item.qty)+'kg' : '×'+fmtCompact(item.qty);
     html += '<div class="cart-row'+(isActive?' active':'')+(item._deleted?' ghost':'')+'" data-idx="'+i+'" onclick="onCartRowTap('+i+')">';
     html += '<span class="indicator">'+(isActive?'▶':'')+'</span>';
-    var display = prod._display || computeProductDisplay(prod.name, prod.unit);
+    var d = prod.display;
     html += '<span class="name'+(item._deleted?' strikethrough':'')+'">';
-    html += '<span class="name-line1">'+escapeHtml(display.title)+'</span>';
-    if(display.variant || display.package) {
-      var line2 = display.variant;
-      if(display.package) line2 += (line2 ? ' · ' : '') + display.package;
-      html += '<span class="name-line2">'+escapeHtml(line2)+'</span>';
-    }
+    html += '<span class="name-line1">'+escapeHtml(d.title)+'</span>';
+    if(d.subtitle) html += '<span class="name-line2">'+escapeHtml(d.subtitle)+'</span>';
     html += '</span>';
     html += '<span class="qty">'+qtyStr+'</span>';
     html += '<span class="price">'+fmtCompact(item.total)+'</span>';
@@ -783,24 +779,18 @@ function renderSuggestions(results){
   var html = '';
   for (var i = 0; i < SUGGESTIONS.length; i++) {
     var p = SUGGESTIONS[i].product;
-    var display = p._display || computeProductDisplay(p.name, p.unit);
+    var d = p.display;
     
     html += '<div class="item" id="suggest'+i+'" onclick="onSuggestionTap('+i+')">';
     html += '<span class="indicator"></span>';
     html += '<div class="item-content">';
-    
-    // Line 1: Title + Price
     html += '<div class="line1">';
-    html += '<span class="title">'+escapeHtml(display.title)+'</span>';
+    html += '<span class="title">'+escapeHtml(d.title)+'</span>';
     html += '<span class="price">'+fmtShort(p.price)+'</span>';
     html += '</div>';
-    
-    // Line 2: Variant + Package (2 columns)
     html += '<div class="line2">';
-    html += '<span class="variant">'+escapeHtml(display.variant)+'</span>';
-    html += '<span class="package">'+escapeHtml(display.package)+'</span>';
+    html += '<span class="subtitle">'+escapeHtml(d.subtitle)+'</span>';
     html += '</div>';
-    
     html += '</div>';
     html += '</div>';
   }
@@ -1207,7 +1197,7 @@ apiCall('getProducts').then(function(products){
       needsBuild = PRODUCTS.some(function(p) { return !p._idx; });
     }
     if (needsBuild) buildAllIndexes();
-    PRODUCTS.forEach(function(p) { p._display = computeProductDisplay(p.name, p.unit); });
+    migrateLegacyDisplay(PRODUCTS);
     buildEntityIndex();
     SEARCH_CACHE = {};
     var cachePayload = PRODUCTS.map(function(p) {

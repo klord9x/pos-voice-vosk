@@ -1,0 +1,480 @@
+{
+  "Bột ngọt": {
+    "pattern": "PATTERN_PRODUCT_BRAND_PACKAGE_CAPACITY",
+    "aliases": [
+      "Mì chính"
+    ],
+    "examples": [
+      "Bột ngọt Chinsu Chai 250ml",
+      "Bột ngọt Chinsu Gói 250g"
+    ]
+  },
+  "Nước mắm": {
+    "pattern": "PATTERN_PRODUCT_BRAND_PACKAGE_CAPACITY",
+    "aliases": [],
+    "examples": [
+      "Nước mắm Maggi 65g",
+      "Nước mắm Maggi 85g"
+    ]
+  },
+  "Hạt nêm": {
+    "pattern": "PATTERN_PRODUCT_BRAND_PACKAGE_CAPACITY",
+    "aliases": [
+      "Bột nêm"
+    ],
+    "examples": [
+      "Hạt nêm Nam Ngư 500g",
+      "Hạt nêm Maggi Gói 50g"
+    ]
+  },
+  "Nước tương": {
+    "pattern": "PATTERN_PRODUCT_BRAND_PACKAGE_CAPACITY",
+    "aliases": [
+      "Xì dầu"
+    ],
+    "examples": [
+      "Nước tương Knorr Chai 400ml",
+      "Nước tương Knorr 500g"
+    ]
+  },
+  "Tương ớt": {
+    "pattern": "PATTERN_PRODUCT_BRAND_PACKAGE_CAPACITY",
+    "aliases": [],
+    "examples": [
+      "Tương ớt Nam Ngư Gói 100g",
+      "Tương ớt Knorr 100g"
+    ]
+  },
+  "Nước ngọt": {
+    "pattern": "PATTERN_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [
+      "Nước có ga",
+      "Nước giải khát"
+    ],
+    "examples": [
+      "Pepsi Nguyên bản Thùng 24",
+      "Mirinda Chanh Chai 1L"
+    ]
+  },
+  "Bánh quy": {
+    "pattern": "PATTERN_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [],
+    "examples": [
+      "Oreo Vanila Gói 65g",
+      "Oreo Vanila Gói 100g"
+    ]
+  },
+  "Dầu gội": {
+    "pattern": "PATTERN_PRODUCT_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [],
+    "examples": [
+      "Dầu gội Pantene Sạch sâu Gói 85g",
+      "Dầu gội X-Men Suôn mượt Chai 400ml"
+    ]
+  },
+  "Sữa tươi": {
+    "pattern": "PATTERN_PRODUCT_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [],
+    "examples": [
+      "Sữa tươi Nutifood Socola Lốc 4",
+      "Sữa tươi TH True Milk Không đường Lốc 4"
+    ]
+  },
+  "Mì": {
+    "pattern": "PATTERN_PRODUCT_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [
+      "Mì tôm",
+      "Mì gói"
+    ],
+    "examples": [
+      "Mì 3 Miền Sườn heo Gói 500g",
+      "Mì Hảo Hảo Sườn heo Thùng 30"
+    ]
+  },
+  "Khăn giấy": {
+    "pattern": "PATTERN_PRODUCT_BRAND_VARIANT_PACKAGE_CAPACITY_QUANTITY",
+    "aliases": [
+      "Giấy ăn"
+    ],
+    "examples": [
+      "Khăn giấy Pulppy Không mùi Lốc 6",
+      "Khăn giấy An An Không mùi Lốc 10"
+    ]
+  },
+  "Tôm thẻ": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Tôm thẻ Size vừa 1kg Kg",
+      "Tôm thẻ Size vừa lớn Con"
+    ]
+  },
+  "Trứng gà": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Trứng gà Công nghiệp Gói",
+      "Trứng gà Ta 10 Chục"
+    ]
+  },
+  "Xoài": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Xoài Cát Hòa Lộc Phần",
+      "Xoài Keo 500g Kg"
+    ]
+  },
+  "Trứng cút": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Trứng cút Lộn 10 Chục",
+      "Trứng cút Tươi 10 Chục"
+    ]
+  },
+  "Cá hú": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cá hú Tươi 500g Kg",
+      "Cá hú Tươi 1kg Kg"
+    ]
+  },
+  "Thịt ba rọi": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Thịt ba rọi Heo tộc 1kg Kg",
+      "Thịt ba rọi CP Gói"
+    ]
+  },
+  "Cam": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cam Sành miền Tây 500g Kg",
+      "Cam 500g Kg"
+    ]
+  },
+  "Nấm đùi gà": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Nấm đùi gà Tươi Gói",
+      "Nấm đùi gà Khay 10 Chục"
+    ]
+  },
+  "Mực ống": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Mực ống Tươi rói 1kg Kg",
+      "Mực ống Miền Trung Khay 500g"
+    ]
+  },
+  "Bánh đa": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bánh đa Mè 10 Vỉ",
+      "Bánh đa Hải Phòng 10 Vỉ"
+    ]
+  },
+  "Thịt heo xay": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Thịt heo xay Nạc Khay 300g",
+      "Thịt heo xay Sẵn Khay 300g"
+    ]
+  },
+  "Khoai tây": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Khoai tây Đà Lạt Khay 500g",
+      "Khoai tây Đà Lạt Khay 300g"
+    ]
+  },
+  "Dưa leo": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Dưa leo Khay 300g",
+      "Dưa leo Khay 500g"
+    ]
+  },
+  "Nghêu": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Nghêu Sống Khay 300g",
+      "Nghêu Bến Tre 1kg Kg"
+    ]
+  },
+  "Rau ngót": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Rau ngót Sạch Khay 500g",
+      "Rau ngót Sạch 1kg Kg"
+    ]
+  },
+  "Ổi": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Ổi Đài Loan 1kg Kg",
+      "Ổi Nữ hoàng Trái"
+    ]
+  },
+  "Thanh long": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Thanh long Ruột đỏ Trái",
+      "Thanh long Ruột đỏ Phần"
+    ]
+  },
+  "Cá thu": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cá thu Cắt lát Khay 500g",
+      "Cá thu Tươi Khay 300g"
+    ]
+  },
+  "Thịt bò": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Thịt bò Khay 500g",
+      "Thịt bò 500g Kg"
+    ]
+  },
+  "Đùi gà": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Đùi gà Tươi tỏi 500g Kg",
+      "Đùi gà Tươi tỏi Khay 500g"
+    ]
+  },
+  "Cá nục": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cá nục Hấp sẵn Khay 500g",
+      "Cá nục Hấp sẵn 1kg Kg"
+    ]
+  },
+  "Chuối": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Chuối 1kg Kg",
+      "Chuối Trái"
+    ]
+  },
+  "Bầu": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bầu Lớn Bó",
+      "Bầu Khay 500g"
+    ]
+  },
+  "Chân giò": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Chân giò Khay 300g",
+      "Chân giò Gói"
+    ]
+  },
+  "Bắp cải": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bắp cải Đà Lạt Khay 500g",
+      "Bắp cải Đà Lạt 1kg Kg"
+    ]
+  },
+  "Cánh gà": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cánh gà Tươi Khay 500g",
+      "Cánh gà Tươi 1kg Kg"
+    ]
+  },
+  "Cà rốt": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cà rốt Đà Lạt 500g Kg",
+      "Cà rốt Hữu cơ 1kg Kg"
+    ]
+  },
+  "Mồng tơi": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Mồng tơi Sạch 1kg Kg",
+      "Mồng tơi Đồng Khay 500g"
+    ]
+  },
+  "Chôm chôm": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Chôm chôm Nhãn Trái",
+      "Chôm chôm Nhãn Phần"
+    ]
+  },
+  "Đậu hũ": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Đậu hũ Chiên 10 Chục",
+      "Đậu hũ Gói"
+    ]
+  },
+  "Táo": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Táo Gala Trái",
+      "Táo Envy Phần"
+    ]
+  },
+  "Nạc dăm": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Nạc dăm Mềm 500g Kg",
+      "Nạc dăm Mềm Gói"
+    ]
+  },
+  "Xà lách": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Xà lách Đà Lạt Khay 500g",
+      "Xà lách Đà Lạt 500g Kg"
+    ]
+  },
+  "Rau muống": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Rau muống Đồng quê Khay 500g",
+      "Rau muống Sông hồng Khay 500g"
+    ]
+  },
+  "Bún tươi": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bún tươi Nhỏ 10 Vỉ",
+      "Bún tươi Gói"
+    ]
+  },
+  "Cá điêu hồng": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cá điêu hồng Làm sẵn Khay 500g",
+      "Cá điêu hồng Làm sẵn Tầm trung Con"
+    ]
+  },
+  "Khổ qua": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Khổ qua Rừng Khay 300g",
+      "Khổ qua 1kg Kg"
+    ]
+  },
+  "Cà chua": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cà chua Bi Khay 500g",
+      "Cà chua Bi Khay 300g"
+    ]
+  },
+  "Cá lóc": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cá lóc Đồng Lớn Con",
+      "Cá lóc Nuôi 500g Kg"
+    ]
+  },
+  "Trứng vịt": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Trứng vịt Muối Gói",
+      "Trứng vịt Đồng Gói"
+    ]
+  },
+  "Nấm kim châm": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Nấm kim châm Gói 10 Chục",
+      "Nấm kim châm Hàn Quốc Gói"
+    ]
+  },
+  "Hành tây": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Hành tây Đà Lạt Khay 300g",
+      "Hành tây Nhỏ Bó"
+    ]
+  },
+  "Cải ngọt": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Cải ngọt Đà Lạt Khay 300g",
+      "Cải ngọt Đà Lạt Nhỏ Bó"
+    ]
+  },
+  "Bưởi": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bưởi Năm Roi Phần",
+      "Bưởi Da xanh Phần"
+    ]
+  },
+  "Quýt": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Quýt Trái",
+      "Quýt 1kg Kg"
+    ]
+  },
+  "Sườn non": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Sườn non CP Gói",
+      "Sườn non Tươi 1kg Kg"
+    ]
+  },
+  "Bí đỏ": {
+    "pattern": "PATTERN_FRESH_FOOD",
+    "aliases": [],
+    "examples": [
+      "Bí đỏ 500g Kg",
+      "Bí đỏ Hồ lô Khay 500g"
+    ]
+  }
+}

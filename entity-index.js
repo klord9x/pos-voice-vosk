@@ -1,6 +1,6 @@
 /* ===== Entity Index — Intent detection, posting lists ===== */
 /* Depends on: knowledge.js (KNOWLEDGE), search.js (norm),
-   index-builder.js (buildInitialism), semantic-display.js (computeProductDisplay) */
+   index-builder.js (buildInitialism) */
 
 var ENTITY_REGISTRY = [];
 var ENTITY_BY_TEXT = {};
@@ -63,14 +63,9 @@ function buildEntityIndex() {
   }
 
   PRODUCTS.forEach(function(product, idx) {
-    var display = product._display || computeProductDisplay(product.name, product.unit);
     var seen = {};
-    // Display Model mới: title là string, subtitle/chips là array
-    var allGroups = (display.subtitle || display.chips || []);
-    if (display.title) {
-      allGroups = [{ type: null, text: display.title }].concat(allGroups);
-    }
-    allGroups.forEach(function(g) {
+    var groups = parseProductSemantic(product.name || '');
+    groups.forEach(function(g) {
       var text = norm(g.text);
       var entity = ENTITY_BY_TEXT[text];
       if (entity && !seen[entity.id]) {
