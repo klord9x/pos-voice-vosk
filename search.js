@@ -406,7 +406,7 @@ function processTranscript(text) {
   segments.forEach(function(seg) {
     var parsed = parseSegment(seg);
     if (!parsed) return;
-    var top3 = matchProductTop3(parsed.phrase);
+    var top3 = searchProducts(parsed.phrase);
     if (!top3 || top3.length === 0 || !top3[0].product) return;
     ITEMS.push({
       spokenText: parsed.raw,
@@ -566,4 +566,172 @@ function _finishSearch(results, unitHint, cacheKey) {
   var out = results.slice(0, SUGGEST_MAX);
   if (cacheKey) SEARCH_CACHE[cacheKey] = out;
   return out;
+}
+
+/* ── New Intent-First Pipeline ─────────────────── */
+
+function searchProducts(rawQuery, mode) {
+  mode = mode || SEARCH_INPUT_MODE || 'type';
+  if (!rawQuery || !rawQuery.trim()) return [];
+
+  var cacheKey = 'v2:' + mode + ':' + rawQuery.trim().toLowerCase();
+  if (SEARCH_CACHE[cacheKey]) return SEARCH_CACHE[cacheKey];
+
+  var parsed = parseQueryInput(rawQuery, mode);
+  var q = parsed.phrase;
+  var unitHint = parsed.unit || '';
+
+  var intents = detectIntent(q);
+  var candidates = intents.length > 0 ? generateCandidates(intents) : [];
+
+  if (candidates.length < 3) {
+    var fallback = stringMatchSearch(q, mode);
+    candidates = mergeCandidates(candidates, fallback);
+  }
+
+  var ranked = rankCandidates(candidates, unitHint);
+  var out = ranked.slice(0, SUGGEST_MAX);
+  SEARCH_CACHE[cacheKey] = out;
+  return out;
+}
+
+function detectIntent(q) {
+  if (!q || q.length < 2 || !INTENT_INDEX) return [];
+  var matches = [];
+
+  if (INTENT_INDEX[q]) {
+    INTENT_INDEX[q].forEach(function(m) {
+      matches.push({ entityId: m.entityId, confidence: m.confidence, matchType: 'exact' });
+    });
+  }
+
+  if (ENTITY_REGISTRY) {
+    ENTITY_REGISTRY.forEach(function(entity) {
+      if (entity.text.indexOf(q) === 0 && !matches.some(function(m) { return m.entityId === entity.id; })) {
+        matches.push({ entityId: entity.id, confidence: 0.80, matchType: 'prefix' });
+      }
+    });
+  }
+
+  matches.sort(function(a, b) { return b.confidence - a.confidence; });
+  return matches.slice(0, 3);
+}
+
+function generateCandidates(intents) {
+  var productSet = new Set();
+  intents.forEach(function(intent) {
+    var posting = POSTINGS[intent.entityId];
+    if (posting) {
+      posting.forEach(function(idx) { productSet.add(idx); });
+    }
+  });
+  return Array.from(productSet).map(function(idx) {
+    return { product: PRODUCTS[idx], _intentConfidence: intents[0].confidence, matchType: 'intent' };
+  });
+}
+
+function stringMatchSearch(q, mode) {
+  if (!q || q.length < 1) return [];
+  var results = [];
+  var already = {};
+  var qPhonetic = toPhoneticKey(q);
+  var qTokens = q.split(' ').filter(Boolean);
+
+  PRODUCTS.forEach(function(p, idx) {
+    var key = p._idx.code || p.name;
+    if (already[key]) return;
+    if (p._idx.code === q || (p._idx.barcode && p._idx.barcode === q) ||
+        (p._idx.searchable && p._idx.searchable.indexOf(q) !== -1)) {
+      already[key] = true;
+      results.push({ p: p, tier: 1, score: 1.00, matchType: 'exact' });
+    }
+  });
+
+  PRODUCTS.forEach(function(p) {
+    var key = p._idx.code || p.name;
+    if (already[key]) return;
+    if (p._idx.searchable && p._idx.searchable.some(function(s) { return s.indexOf(q) === 0; })) {
+      already[key] = true;
+      results.push({ p: p, tier: 2, score: 0.90, matchType: 'prefix' });
+    }
+  });
+
+  PRODUCTS.forEach(function(p) {
+    var key = p._idx.code || p.name;
+    if (already[key]) return;
+    if (p._idx.searchable && p._idx.searchable.some(function(s) { return s.indexOf(q) !== -1; })) {
+      already[key] = true;
+      results.push({ p: p, tier: 3, score: 0.82, matchType: 'contains' });
+      return;
+    }
+    if (qTokens.length > 1 && p._idx.tokens && qTokens.every(function(t) {
+      return p._idx.tokens.some(function(pt) { return pt.indexOf(t) === 0; });
+    })) {
+      already[key] = true;
+      results.push({ p: p, tier: 3, score: 0.75, matchType: 'multi-kw' });
+    }
+  });
+
+  resetScoreCache();
+  var candidatelist = [];
+  PRODUCTS.forEach(function(p) {
+    var key = p._idx.code || p.name;
+    if (already[key]) return;
+    var quick = Math.max(
+      levRatio(q, p._idx.name),
+      p._idx.searchable ? bestTypingScore(q, qPhonetic, p._idx.searchable, mode) : 0
+    );
+    if (quick > 0.35) candidatelist.push({ p: p, quick: quick });
+  });
+  candidatelist.sort(function(a, b) { return b.quick - a.quick; });
+  candidatelist.slice(0, 30).forEach(function(x) {
+    var fuzzy = combinedScoreCached(q, x.p._idx.name, mode, qPhonetic, x.p._idx.phonetic);
+    if (fuzzy > 0.50) {
+      results.push({ p: x.p, tier: 4, score: fuzzy, matchType: 'fuzzy' });
+    }
+  });
+
+  return results;
+}
+
+function mergeCandidates(intentCandidates, fallbackResults) {
+  var seen = {};
+  var merged = [];
+  intentCandidates.forEach(function(c) {
+    var key = c.product._idx.code || c.product.name;
+    if (!seen[key]) {
+      seen[key] = true;
+      merged.push(c);
+    }
+  });
+  fallbackResults.forEach(function(r) {
+    var key = r.p._idx.code || r.p.name;
+    if (!seen[key]) {
+      seen[key] = true;
+      merged.push({ product: r.p, score: r.score, tier: r.tier, matchType: r.matchType });
+    }
+  });
+  return merged;
+}
+
+function rankCandidates(candidates, unitHint) {
+  candidates.forEach(function(c) {
+    if (c.matchType === 'intent') {
+      c.score = c._intentConfidence || 0.80;
+    }
+    if (unitHint && c.product._idx.unit === unitHint) {
+      c.score = Math.min(1.0, c.score + 0.12);
+    }
+  });
+
+  candidates.sort(function(a, b) {
+    if (a.matchType === 'intent' && b.matchType !== 'intent') return -1;
+    if (a.matchType !== 'intent' && b.matchType === 'intent') return 1;
+    if (a.matchType === 'intent' && b.matchType === 'intent') {
+      return b.score - a.score;
+    }
+    return a.tier !== b.tier ? a.tier - b.tier : b.score - a.score;
+  });
+
+  return candidates;
 }

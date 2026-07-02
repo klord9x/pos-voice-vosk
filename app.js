@@ -887,7 +887,7 @@ function liveSearch(){
   // Giữ parseSegment cho backward-compat qty (special fractions, ký rưỡi, etc.)
   var parsed = parseSegment(SEARCH_QUERY);
   var qty = parsed && parsed.qty > 0 ? parsed.qty : 1;
-  var results = matchProductTop3(SEARCH_QUERY, null, SEARCH_INPUT_MODE);
+  var results = searchProducts(SEARCH_QUERY, SEARCH_INPUT_MODE);
   // Fallback: cascade không ra kết quả nào -> không để list trống,
   // hiện SP bán chạy/gần đây để người bán còn cuộn tay chọn
   if(!results || results.length === 0){
@@ -1189,6 +1189,7 @@ apiCall('getProducts').then(function(products){
     }
     if (needsBuild) buildAllIndexes();
     PRODUCTS.forEach(function(p) { p._display = computeProductDisplay(p.name); });
+    buildEntityIndex();
     SEARCH_CACHE = {};
     var cachePayload = PRODUCTS.map(function(p) {
       return { code: p.code, name: p.name, price: p.price, unit: p.unit, _idx: p._idx };
