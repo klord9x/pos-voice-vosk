@@ -45,12 +45,16 @@ function renderSuggestDisplay(display, options) {
 
   var chips = buildDisplayChips(display);
   var titleCls = 'name-line1' + (options && options.titleDimmed ? ' dim' : '');
-  var html = '<span class="name"><span class="' + titleCls + '">' + esc(titleText) + '</span>';
+  var titleHtml = display.title.map(function(g) {
+    return '<span class="title-group">' + esc(g.text) + '</span>';
+  }).join(' ');
+  var html = '<span class="name"><span class="' + titleCls + '">' + titleHtml + '</span>';
   if (chips.length) {
     html += '<span class="name-line2">';
     for (var si = 0; si < chips.length; si++) {
       var dimCls = options && options.diffMask && !options.diffMask[si] ? ' dim' : '';
-      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + dimCls + '">' + esc(chips[si].text) + '</span>';
+      var extraCls = chips[si].type === 'sale_package' ? ' sale-package' : '';
+      html += '<span class="spec' + (PROMINENT_TYPES.has(chips[si].type) ? ' prominent' : '') + extraCls + dimCls + '">' + esc(chips[si].text) + '</span>';
     }
     html += '</span>';
   }

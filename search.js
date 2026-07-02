@@ -728,7 +728,7 @@ function rankCandidates(candidates, unitHint) {
     if (a.matchType === 'intent' && b.matchType !== 'intent') return -1;
     if (a.matchType !== 'intent' && b.matchType === 'intent') return 1;
     if (a.matchType === 'intent' && b.matchType === 'intent') {
-      return b.score - a.score;
+      return b.score !== a.score ? b.score - a.score : a.product.name.localeCompare(b.product.name);
     }
     return a.tier !== b.tier ? a.tier - b.tier : b.score - a.score;
   });
